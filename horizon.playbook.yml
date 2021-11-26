@@ -1,0 +1,38 @@
+---
+- name: "Create a temporary rhel builder"
+  hosts: localhost
+  connection: local
+  tasks:
+  - name: "vagrant start a rhel8 builder"
+    shell: "vagrant up"
+  - name: "save old ssh config file"
+    shell: "vagrant ssh-config >  builder.conf"
+  - name: "copy key to servers"
+    shell: "vagrant scp ~/.ssh/scldistro scldistro"
+
+
+- name: Build openstack components
+  hosts: builders
+  tasks:
+     - name: Build the scl
+       vars:
+          - version: "1.0.0"
+          - branch:  "stable/train"
+          - project:  "horizon"
+          - organisation: "met"
+          - scl_version: "stein"
+          - scl_release: "1"
+          - scl_description: "A precompiled package which installed the requirements for running the service"
+          - repo_url: "https://github.com/openstack/horizon.git"
+       include_role:
+         name:  miracle-ansible-role-pipfreeze2scl 
+  become: True
+
+
+
+- name: "Playing with Ansible and Git"
+  hosts: localhost
+  connection: local
+  tasks:
+  - name: "vagrant destroy"
+    shell: "echo vagrant destroy -f"

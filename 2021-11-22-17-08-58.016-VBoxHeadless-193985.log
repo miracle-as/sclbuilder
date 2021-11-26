@@ -1,0 +1,12 @@
+Log created: 2021-11-22T17:08:58.167298000Z
+Process ID:  193985 (0x2f5c1)
+Parent PID:  1 (0x1)
+Executable:  /usr/lib64/virtualbox/VBoxHeadless
+Arg[0]: /usr/lib64/virtualbox/VBoxHeadless
+Arg[1]: --comment
+Arg[2]: pip2scl_ironic_1637564081786_9089
+Arg[3]: --startvm
+Arg[4]: 342f3b16-9b45-4eca-b63f-1f705a422c7b
+Arg[5]: --vrde
+Arg[6]: config
+AddRef: illegal refcnt=3221225469 state=2

@@ -1,0 +1,12 @@
+Log created: 2021-10-16T18:55:16.971749000Z
+Process ID:  72314 (0x11a7a)
+Parent PID:  1 (0x1)
+Executable:  /usr/lib64/virtualbox/VBoxHeadless
+Arg[0]: /usr/lib64/virtualbox/VBoxHeadless
+Arg[1]: --comment
+Arg[2]: pip2scl_api1_1634408389073_36406
+Arg[3]: --startvm
+Arg[4]: 4e3af3bb-eea2-42c0-873b-2ad0d12f01a9
+Arg[5]: --vrde
+Arg[6]: config
+AddRef: illegal refcnt=3221225469 state=2

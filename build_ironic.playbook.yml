@@ -1,0 +1,50 @@
+---
+
+- name: "Create a temporary rhel builder"
+  hosts: localhost
+  connection: local
+  tasks:
+  
+  - name: "vagrant start a rhel8 sclbuilder"
+    shell: "vagrant up"
+  - name: "save old ssh config file"
+    shell: "vagrant ssh-config >  ~/.ssh/config"
+  - name: "copy key to servers"
+    shell: "vagrant scp ~/.ssh/scldistro scldistro"
+
+- name: Setup python
+  hosts: sclbuilder
+  roles:
+  - role: ansible_role_init_pip
+  - role: ansible_role_init_rpmbuild_environment
+    rpmbuild_build_dir: "/root/rpmbuild"
+  become: true
+
+- name: Add the miracle opensource project repo
+  hosts: all
+  tasks:
+    - name: add repo
+      yum_repository:
+        name: miracle-ironic
+        description: "awx-rpm"
+        baseurl: http://repos.pip2scl.dk/RPMS
+        gpgcheck: no
+        enabled: yes
+      become: true
+
+- name: Build openstack components
+  hosts: sclbuilder
+  roles:
+    - role: miracle-ansible-role-pipfreeze2scl
+      name: 
+      organisation: "miracle"
+      version: "1.0.0"
+      project:  "{{ organisation }}-{{ name }}"
+      project_dir: "/opt/{{ organisation }}/{{ name }}"
+      scl_version: "1.0.0"
+      scl_release: "1"
+      scl_description: "A precompiled package which installed the requirements for running the service"
+      requirementfile: "http://repos.pip2scl.dk/{{ organisation }}.{{ name }}.stein.requirements.txt"
+      repo_url: "https://opendev.org/openstack/ironic.git"
+      release: "wallaby"
+      branch: "stable/{{ release }}"

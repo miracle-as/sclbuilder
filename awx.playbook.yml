@@ -1,0 +1,46 @@
+---
+
+- name: Build openstack components
+  hosts: builders
+  tasks:
+     - name: Build the scl
+       vars:
+         - awx_image_version: "19.1.0"
+         -  awx_db_password: "thesecretdbpassword123"
+         -  postgres_host: "127.0.0.1"
+         -  postgres_port: "5432"
+         -  awx_install_database: "awx"
+         -  awx_install_pg_init_name: "miracle"
+         -  awx_install_redis_init_name: "miracle"
+         -  awx_install_cluster_host: "localhost"
+         -  nginx_disable_https: "True"
+         -  nginx_disable_hsts: "True"
+         -  nginx_http_port: "80"
+         -  awx_operator: "0.11.0"
+         -  awxpassword: "thesecretdbpassword123"
+         -  postgreshost: "localhost"
+         -  postgresport: "5432"
+         -  secret_key: "Drskalbrstanget"
+         -  awx_venv: "/var/awx/venv"
+         -  nodejsversion: "v14.x"
+         -  CLUSTER_HOST_ID: "awx"
+       include_role:
+         name:  miracle-ansible-role-awxrpm-venv-installer
+  become: True
+
+- name: Build openstack components
+  hosts: builders
+  tasks:
+     - name: Build the scl
+       vars:
+          - version: "awxrpm"
+          - project:  "awx"
+          - organisation: "met"
+          - scl_version: "19.0.4"
+          - scl_release: "1"
+          - scl_description: "A precompiled package which installed the requirements for running the service"
+          - requirementfile: /usr/local/etc/awx.requirements.txt
+       include_role:
+         name:  miracle-ansible-role-pipfreeze2scl 
+  become: True
+

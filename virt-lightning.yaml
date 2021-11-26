@@ -1,0 +1,38 @@
+- name: builder
+  distro: rhel-8.4
+  memory: 8192
+  vcpus: 8
+  root_disk_size: 200
+  bootcmd:
+    - subscription-manager register --org=14498519 --activationkey=virt-lightening
+    - subscription-manager repos --enable codeready-builder-for-rhel-8-x86_64-rpms
+    - yum update -y
+    - systemctl enable --now cockpit.socket
+    - dnf -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
+    - dnf clean all
+
+- name: sclbuilder
+  distro: rhel-8.4
+  memory: 4096
+  vcpus: 8
+  root_disk_size: 200
+  bootcmd:
+    - subscription-manager register --org=14498519 --activationkey=virt-lightening
+    - subscription-manager repos --enable codeready-builder-for-rhel-8-x86_64-rpms
+    - yum update -y
+    - systemctl enable --now cockpit.socket
+    - dnf -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
+    - dnf clean all
+
+- name: awx
+  distro: rhel-8.4
+  memory: 4096
+  vcpus: 8
+  root_disk_size: 200
+  bootcmd:
+    - subscription-manager register --org=14498519 --activationkey=virt-lightening
+    - subscription-manager repos --enable codeready-builder-for-rhel-8-x86_64-rpms
+    - yum update -y
+    - systemctl enable --now cockpit.socket
+    - dnf -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
+    - dnf clean all

@@ -1,0 +1,12 @@
+Log created: 2021-10-04T05:12:53.138082000Z
+Process ID:  83498 (0x1462a)
+Parent PID:  1 (0x1)
+Executable:  /usr/lib64/virtualbox/VBoxHeadless
+Arg[0]: /usr/lib64/virtualbox/VBoxHeadless
+Arg[1]: --comment
+Arg[2]: pip2scl_target_1633296797446_87617
+Arg[3]: --startvm
+Arg[4]: 2dad0194-43f6-4503-a07a-4062e90a0597
+Arg[5]: --vrde
+Arg[6]: config
+AddRef: illegal refcnt=3221225469 state=2

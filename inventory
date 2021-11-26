@@ -1,0 +1,8 @@
+[sclbuilders]
+sclbuilder
+
+[awxservers]
+awxserver
+
+[hashicorpvault]
+repos.pip2scl.dk
