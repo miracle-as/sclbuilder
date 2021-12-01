@@ -12,3 +12,19 @@
     become: yes
     become_user: sclbuilder
 
+  - name: Insert query to  in db test_db
+    postgresql_query:
+      db: test_db
+      login_user: "sclbuilder"
+      login_password: "django2know"
+      query: INSERT INTO projects_project (slug, projectname,  projectversion,  projectdescription,  projectstatus,  projecturl,  projectcreated) VALUES('{{ project.name }}',  '{{ project.version }}',  '{{ project.description }}',  'Initial',  '{{ project.url }}',  '{{ ansible_date_time.date }} ');
+    become: yes
+    become_user: sclbuilder
+    loop:
+      - { "slug": "awxrpm", "name": "Miracle Ansible", "version": "1.0.0", "descriptions": "Miracle supported ansible related opensoure projects", "projecturl": "miracle.dk" }
+    loop_control:
+      loop_var: project
+
+
+
+
