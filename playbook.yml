@@ -51,7 +51,8 @@
     become: yes
     become_user: sclbuilder
     loop:
-      - { "slug": "awxrpm", "subprojectname": "AWX-RPM", "name": "19.5.0", "version": "19.5.1", "build": "001", "description": "Miracle supported RPM/SCL based AWX ", "url": "awx-rpm.wiki" }
+      - { "slug": "awxrpm", "subprojectname": "AWX-RPM", "name": "Nitten", "version": "19.4.1", "build": "001", "description": "Miracle supported RPM/SCL based AWX ", "url": "awx-rpm.wiki" }
+      - { "slug": "awxrpm", "subprojectname": "AWX-RPM", "name": "Nitten", "version": "19.5.1", "build": "001", "description": "Miracle supported RPM/SCL based AWX ", "url": "awx-rpm.wiki" }
     loop_control:
       loop_var: release
 #INSERT INTO projects_subprojectrelease (subprojectname_id,  releasename,  releaseversion,  releasebuild,  releasedescription,  releasestatus,  releasecreated) VALUES('awx-rpm',  '19.5.0',  '19.5.0',  '001',  'Autocreated from repo',  'Initial',  '2021-12-01 08:28:11.240412') RETURNING 'projects_subprojectrelease_id' ;
