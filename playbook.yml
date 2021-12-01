@@ -21,7 +21,7 @@
     become: yes
     become_user: sclbuilder
     loop:
-      - { "slug": "awxrpm", "name": "Miracle Ansible", "version": "1.0.0", "description": "Miracle supported ansible related opensoure projects", "projecturl": "miracle.dk" }
+      - { "slug": "awxrpm", "name": "Miracle Ansible", "version": "1.0.0", "description": "Miracle supported ansible related opensoure projects", "url": "miracle.dk" }
     loop_control:
       loop_var: project
 
