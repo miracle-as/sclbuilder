@@ -4,7 +4,9 @@
   tasks:
     - name: Copy data from SELECT query to/tmp/data.csv in CSV format
       community.postgresql.postgresql_copy:
-         db: sclbuilder
+         db: "sclbuilder"
+         login_user: "sclbuilder"
+         login_password: "django2know"
          src: 'SELECT * FROM projects_sclbuilderlogos'
          copy_to: files/sclbuilderlogos.csv
          options:
