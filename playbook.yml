@@ -15,5 +15,5 @@
     become_user: sclbuilder
 
   - debug:
-           var: sclbuilderlogos    
+           var: sclbuilderlogos.stdout_lines    
 
