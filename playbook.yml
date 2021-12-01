@@ -31,7 +31,7 @@
       db: sclbuilder
       login_user: "sclbuilder"
       login_password: "django2know"
-      query: INSERT INTO projects_subproject (slug, projectname_id, subprojectname, subprojectversion,  subprojectdescription,  subprojectstatus,  subprojecturl,  subprojectcreated) VALUES( '{{ project.slug }}', '{{ subproject.projectname }}', '{{ subproject.name }}',  '{{ subproject.version }}',  '{{ subproject.description }}',  'Initial',  '{{ subproject.url }}',  '{{ ansible_date_time.date }} ') ON CONFLICT (projectname) DO NOTHING;
+      query: INSERT INTO projects_subproject (slug, projectname_id, subprojectname, subprojectversion,  subprojectdescription,  subprojectstatus,  subprojecturl,  subprojectcreated) VALUES( '{{ subproject.slug }}', '{{ subproject.projectname }}', '{{ subproject.name }}',  '{{ subproject.version }}',  '{{ subproject.description }}',  'Initial',  '{{ subproject.url }}',  '{{ ansible_date_time.date }} ') ON CONFLICT (projectname) DO NOTHING;
     become: yes
     become_user: sclbuilder
     loop:
