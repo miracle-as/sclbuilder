@@ -14,7 +14,7 @@
 
   - name: Insert query to  in db test_db
     postgresql_query:
-      db: test_db
+      db: sclbuilder
       login_user: "sclbuilder"
       login_password: "django2know"
       query: INSERT INTO projects_project (slug, projectname,  projectversion,  projectdescription,  projectstatus,  projecturl,  projectcreated) VALUES('{{ project.slug }}, {{ project.name }}',  '{{ project.version }}',  '{{ project.description }}',  'Initial',  '{{ project.url }}',  '{{ ansible_date_time.date }} ');
