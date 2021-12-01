@@ -1,14 +1,3 @@
 ---
 
-- name: "Create a temporary rhel builder"
-  hosts: localhost
-  connection: local
-  tasks:
-  - name: "vagrant start a rhel8 sclbuilder"
-    shell: "vagrant up"
-
-
-
--name: setup repo
- hosts: awxservers
 

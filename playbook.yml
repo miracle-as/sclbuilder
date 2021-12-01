@@ -1,32 +1,10 @@
 ---
-- name: "Create a temporary rhel builder"
-  hosts: localhost
-  connection: local
+- name: Initial database seed
+  hosts: sclbuilder
   tasks:
-  - name: "vagrant start a rhel8 builder"
-    shell: "vagrant up"
-  - name: "save old ssh config file"
-    shell: "vagrant ssh-config >  builder.conf"
-
-- name: Build openstack components
-  hosts: builders
-  tasks:
-     - name: Build the scl
-       vars:
-          - version: "1.0.0"
-          - project:  "pip2scl-demo"
-          - organisation: miracle
-          - sclname: flask
-          - repo_url: "https://github.com/JakobHolstDK/pip2scl-demo.git"
-       include_role:
-         name:  miracle-ansible-role-pipfreeze2scl 
-  become: True
-
-
-
-- name: "Playing with Ansible and Git"
-  hosts: localhost
-  connection: local
-  tasks:
-  - name: "vagrant destroy"
-    shell: "echo vagrant destroy -f"
+    - name: Copy data from SELECT query to/tmp/data.csv in CSV format
+      community.postgresql.postgresql_copy:
+         src: 'SELECT * FROM projects_sclbuilderlogos'
+         copy_to: files/sclbuilderlogos.csv
+         options:
+         format: csv
