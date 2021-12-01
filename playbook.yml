@@ -4,10 +4,10 @@
   tasks:
     - name: Copy data from SELECT query to/tmp/data.csv in CSV format
       community.postgresql.postgresql_copy:
+         db: sclbuilder
          src: 'SELECT * FROM projects_sclbuilderlogos'
          copy_to: files/sclbuilderlogos.csv
          options:
            format: csv
       become: yes
       become_user: sclbuilder
-      
