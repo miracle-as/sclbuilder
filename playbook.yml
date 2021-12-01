@@ -8,3 +8,6 @@
          copy_to: files/sclbuilderlogos.csv
          options:
            format: csv
+      become: yes
+      become_user: sclbuilder
+      
