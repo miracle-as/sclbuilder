@@ -7,4 +7,4 @@
          src: 'SELECT * FROM projects_sclbuilderlogos'
          copy_to: files/sclbuilderlogos.csv
          options:
-         format: csv
+           format: csv
