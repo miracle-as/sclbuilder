@@ -1,17 +1,6 @@
 ---
-
-- name: "Create a temporary rhel builder"
-  hosts: localhost
-  connection: local
-  tasks:
-  
-  - name: "vagrant start a rhel8 sclbuilder"
-    shell: "vagrant up"
-
-
-
 - name: Setup python
-  hosts: sclbuilder
+  hosts: prod_sclbuilder_worker
   roles:
   - role: ansible_role_init_pip
   - role: ansible_role_init_rpmbuild_environment
@@ -19,7 +8,7 @@
   become: true
 
 - name: Build openstack components
-  hosts: all
+  hosts: prod_sclbuilder_worker
   tasks:
     - name: add repo
       yum_repository:
@@ -31,7 +20,7 @@
       become: true
 
 - name: Build openstack components
-  hosts: sclbuilder
+  hosts: prod_sclbuilder_worker
   tasks:
     - name: Build the scl
       vars:
