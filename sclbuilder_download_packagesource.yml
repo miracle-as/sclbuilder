@@ -61,3 +61,12 @@
       group: root 
       mode: '0755'
 
+  - name: Run download on our targets
+    command: "/usr/local/bin/sclbuilder_download {{ item.packagename }}=={{ item.packageversion }}"
+    become: yes
+    become_user: sclbuilder
+    register: download
+    with_items:
+    - "{{ result.query_all_results.0 }}"
+
+
