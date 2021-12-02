@@ -89,6 +89,13 @@
     with_items:
     - "{{ result.query_all_results.0 }}"
 
+  - name: Run download on our targets
+    uri:
+      url: "http://repos.pip2scl.dk/SOURCES/{{ item.packagename }}-{{ item.version }}.tar.gz"
+    register: urlcheck
+    with_items:
+    - "{{ result.query_all_results.0 }}"
+
 
   - debug: 
-      var: download
+      var: urlcheck
