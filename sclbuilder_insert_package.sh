@@ -2,7 +2,7 @@
 
 URL=$1
 
-for REQ in `cat $URL |tr -d ' '|tr -d '\r'`
+for REQ in `curl $URL |tr -d ' '|tr -d '\r'`
 do
     echo $REQ
 done
