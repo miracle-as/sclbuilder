@@ -4,6 +4,7 @@ export PRETTYSPEC="/usr/local/bin/prettyspec.sh"
 export NAME=`echo $PACKAGE | awk -F'==' '{ print $1 }'`
 export VERSION=`echo $PACKAGE | awk -F'==' '{ print $2 }'`
 
+export SRCDIR="${BUILDDIR}/SOURCES"
 export ORGSPECDIR="${BUILDDIR}/SPECS"
 export VERSPECDIR="${BUILDDIR}/VERSPECS"
 export PRESPECDIR="${BUILDDIR}/PRESPECS"
@@ -14,6 +15,7 @@ export DOWNLOADDIR="${BUILDDIR}/DOWMLOADS"
 
 export QUIET="no"
 
+mkdir -p  ${SRCDIR} >/dev/null 2>&1
 mkdir -p  ${VERSPECDIR} >/dev/null 2>&1
 mkdir -p  ${PRESPECDIR} >/dev/null 2>&1
 mkdir -p  ${PRESCLDIR} >/dev/null 2>&1
