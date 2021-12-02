@@ -69,6 +69,15 @@
       group: root 
       mode: '0755'
 
+  - name: Copy the downloader env script
+    ansible.builtin.template:
+      src:  setbuildenv.sh.j2
+      dest: /usr/local/bin/setbuildenv.sh
+      owner: root
+      group: root 
+      mode: '0755'
+
+
 
   - name: Run download on our targets
     command: "/usr/local/bin/sclbuilder_download.sh {{ item.packagename }}=={{ item.packageversion }}"
