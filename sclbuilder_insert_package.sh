@@ -2,7 +2,7 @@
 
 URL=$1
 FILENAME="/tmp/upload.requirement.txt"
-url $URL > $FILENAME
+curl $URL > $FILENAME
 if [[ $? != 0 ]]
 then
     echo "`date`: File not found"
