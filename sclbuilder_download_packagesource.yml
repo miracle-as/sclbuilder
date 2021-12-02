@@ -91,7 +91,7 @@
 
   - name: Run download on our targets
     uri:
-      url: "http://repos.pip2scl.dk/SOURCES/{{ item.packagename }}-{{ item.version }}.tar.gz"
+      url: "http://repos.pip2scl.dk/SOURCES/{{ item.packagename }}-{{ item.packageversion }}.tar.gz"
     register: urlcheck
     with_items:
     - "{{ result.query_all_results.0 }}"
