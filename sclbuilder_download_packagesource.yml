@@ -98,7 +98,7 @@
 
   - name: update database if based on curl
     debug:
-      msg: item
+      msg: item.status
     register: result
     with_items:
       - "{{ urlcheck.results }}"
