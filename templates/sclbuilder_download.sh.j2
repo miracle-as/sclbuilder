@@ -1,0 +1,270 @@
+#!/usr/bin/env bash
+
+CMD=$0
+PACKAGE=$1
+PERSIST=$2
+
+source /usr/local/bin/setbuildenv.sh
+
+usage ()
+{
+echo "usage $CMD"
+echo $1
+exit 1
+}
+
+check_args ()
+{
+if [[ $PACKAGE == "" ]];
+then
+	usage "Package missing"
+fi
+}
+
+logme ()
+{
+if [[ $QUIET != "yes" ]];
+then
+	TEXT=`echo $1 | tr ' ' '¤'`
+	TS=`date |tr ' ' '¤'`
+	printf "%-20s : %-32s %s \n" $TS $PACKAGE  $TEXT |tr '¤' ' '
+fi
+
+}
+
+touchthem ()
+{
+	/usr/bin/rm -rf /tmp/touchthem >/dev/null 2>&1
+	mkdir /tmp/touchthem
+	cd /tmp/touchthem
+	FILE=$1
+	FILETYPE=`file $1`
+	if [[ $? == 0 ]];
+	then
+		logme "The file $FILE is $FILETYPE"
+		echo tar xzf $FILE
+		tar xzf $FILE
+		MYDIRINTAR=`ls -1`
+		logme "DIR in tar is $MYDIRINTAR"
+		MYVERINTAR=`echo $MYDIRINTAR |rev |awk -F'-' '{ print $1 }'|rev`
+		MYNAMEINTAR=`echo $MYDIRINTAR |awk -F"-$MYVERINTAR" '{ print $1 }'`
+		logme "Name in tar is $MYNAMEINTAR"
+		logme "Version in tar is $MYVERINTAR"
+		MYDIR="${NAME}-${VERSION}"
+		if   [[ $MYDIRINTAR != $MYDIR ]];
+		then
+			mv $MYDIRINTAR $MYDIR
+		fi	
+		touch ${MYDIR}/README.md
+        	touch ${MYDIR}/CHANGELOG.rst
+		tar czf $FILE  $MYDIR >/dev/null 2>&1
+		scp $FILE root@repos.pip2scl.dk:/usr/share/nginx/html/SOURCES/ >/dev/null 2>&1
+		logme "Source file copied to remote site"
+	else
+		logme "Something weird happened"
+		exit
+	fi
+}
+
+tgz2tgz ()
+{
+	logme "tar gz file to tar gz"
+}
+
+
+
+zip2tgz ()
+{
+	logme "Zip to tgz"
+    logme "Repacking $SRCFILE"
+    logme "clean /tmp/repack"
+    /usr/bin/rm -r /tmp/repack >/dev/null 2>&1
+    logme "create a repack dir"
+    mkdir /tmp/repack >/dev/null 2>&1
+    logme "Jump in to zip repack dir"
+    cd /tmp/repack
+	cp ${OURZIPSOURCE} /tmp/repack.zip >/dev/null 2>&1
+
+	logme "Our source ${OURZIPSOURCE} copied to tmp"
+	unzip /tmp/repack.zip >/dev/null 2>&1
+	if [[ $? == 0 ]];
+	then
+		logme "file unzipped"
+	else
+		logme "unzip failed"
+		exit
+	fi
+
+	NEWNAMEINTAR=`ls -1`
+	logme "name i archive is $NEWNAMEINTAR"
+	logme "touch files thar we really need"
+    touch ${NEWNAMEINTAR}/README.md
+    touch ${NEWNAMEINTAR}/CHANGELOG.rst
+    tar czf ${OURSOURCE} $NEWNAMEINTAR
+	if [[ $? == 0 ]];
+	then
+		logme "file repacked as $OURSOURCE "
+	else
+		logme "repacking failed"
+		exit
+	fi
+        logme "Uploading repacked tar"
+        scp ${OURSOURCE} root@repos.pip2scl.dk:/usr/share/nginx/html/SOURCES/${OURNAME}  >/dev/null 2>&1
+        logme "clean /tmp/repack"
+        OURURL="http://repos.pip2scl.dk/SOURCES/${OURNAME}"
+        redis-cli set $MYURL "$OURURL"  >/dev/null 2>&1
+        redis-cli set $MYEXT "tar.gz"  >/dev/null 2>&1
+        logme "$PACKAGE Package converted to tgz"
+        /usr/bin/rm -r /tmp/repack >/dev/null 2>&1
+}
+
+
+bz2tgz ()
+{
+	logme "bzip to tgz"
+	MYURL="url:${PACKAGE}"
+    EXTENTION="tar.gz"
+	/usr/bin/rm /tmp/bzfile >/dev/null 2>&1
+    logme "save my current work dir "
+    logme "clean /tmp/repack"
+    /usr/bin/rm -r /tmp/repack >/dev/null 2>&1
+    logme "create a repack dir"
+    mkdir /tmp/repack >/dev/null 2>&1
+    logme "Jump in to zip repack dir"
+    cd /tmp/repack
+	cp ${OURBZSOURCE} /tmp/bzfile.bz2
+    bunzip2  /tmp/bzfile.bz2  >/dev/null 2>&1
+	cp /tmp/bzfile ${OURTARSOURCE} >/dev/null 2>&1
+	gzip -f ${OURTARSOURCE} >/dev/null 2>&1
+    logme "Uploading repacked tar"
+    scp ${OURSOURCE} root@repos.pip2scl.dk:/usr/share/nginx/html/SOURCES/${OURNAME} >/dev/null 2>&1
+    logme "clean /tmp/repack"
+    logme "$PACKAGE Package converted to tgz"
+    /usr/bin/rm -r /tmp/repack >/dev/null 2>&1
+}
+
+
+
+download_source ()
+{
+	logme "This is a new file - Download" 
+   	echo $PACKAGE > /tmp/requirements.txt
+    cd /tmp && DOWNLOAD=`python3 /usr/local/bin/pip-downloader.py `
+    FILEPATH=`echo $DOWNLOAD | awk -F"Downloading:" '{ print $2 }' |awk '{ print $1 }' `
+	echo $FILEPATH  |grep -i http >/dev/null 2>&1
+	if [[ $? == 0 ]];
+	then
+		logme "File has an URL  $FILEPATH"
+		redis-cli set $MYSRCURL $FILEPATH >/dev/null 2>&1
+		if [[ $? == 0 ]];
+		then
+			logme "Filepath saved in redis"
+		else
+			logme "Redis save failed"
+			exit
+		fi
+	else
+		logme "File is unknown"
+		exit
+	fi
+	FILENAME=`echo $FILEPATH |rev |awk -F'/' '{ print $1 }'|rev`
+	LAST=`echo $FILENAME |rev | awk -F'-' '{ print $1 }'|rev`
+	FIRST=`echo $FILENAME |awk -F"-${LAST}" '{ print $1 }'`
+	if [[ $FIRST == $NAME ]];
+	then
+		logme "name  $FIRST is $NAME is correct in downloaded file"
+	else
+		logme "name $FIRST is not $NAME and is wrong in downloaded file"
+		REALNAME="${NAME}-${LAST}"
+		cp -f $BUILDDIR/DOWNLOADS/$FILENAME $BUILDDIR/DOWNLOADS/$REALNAME
+		if [[ $? == 0 ]];
+		then
+			logme "$FILENAME is copied to $REALNAME"
+		else
+			logme "$FILENAME is copied to $REALNAME"
+		fi
+	fi
+	FILENAME="${NAME}-${LAST}"
+	redis-cli set $MYSRCNAME $FILENAME >/dev/null 2>&1
+	logme "Filename $FILENAME stored in redis"
+	EXTENTION=`echo $FILENAME | rev |awk -F'.' '{ print $1}'|rev `
+	logme "File extention is $EXTENTION"
+	KNOWNEXT="no"
+	OURNAME="${NAME}-${VERSION}.${EXTENTION}"
+	logme "$FILENAME downloaded"
+
+ 	if [[ $EXTENTION == "gz" ]];
+               then
+		KNOWNEXT="yes"
+		####################
+		#Her should the check for name i tar be moved
+		SUM=`sum $BUILDDIR/DOWNLOADS/$FILENAME `
+		if [[ $? == 0 ]];
+		then
+		logme "SUM: $SUM"
+			redis-cli set $MYSUM $SUM >/dev/null 2>&1
+		else
+			logme "noSUM: Unexpected error "
+			exit
+		fi
+		cp $BUILDDIR/DOWNLOADS/$FILENAME $BUILDDIR/SOURCES/$FILENAME
+		if [[ $? == 0 ]];
+		then
+			logme "file placed in SOURCES"
+		else
+			logme "File not copied to sources"
+			exit
+		fi
+               fi
+
+	if [[ $EXTENTION == "zip" ]];
+	then
+		KNOWNEXT="yes"
+		FILENAME=`echo $FILENAME |sed 's/zip/tar.gz/'`
+		#repack to tar gz
+		logme "Repack to tar gz"
+		zip2tgz 
+		ls -l  $BUILDDIR/SOURCES/$FILENAME >/dev/null 2>&1
+		if [[ $? == 0 ]];
+		then
+			logme "We have a tgz version of the file"
+		else
+			logme "We dont have a tgz version of the file"
+			exit
+		fi
+	fi
+
+	if [[ $EXTENTION == "bz2" ]];
+	then
+		KNOWNEXT="yes"
+                       OURURL="http://repos.pip2scl.dk/SOURCES/${OURNAME}"
+                       redis-cli set $MYURL "$OURURL"  >/dev/null 2>&1
+                       redis-cli set $MYEXT "$EXTENTION"  >/dev/null 2>&1
+                       URL=`redis-cli get $MYURL`
+		bz2tgz
+	fi
+	EXTENTION="tar.gz"
+
+	SRCURL=`echo $DOWNLOAD | awk -F"URL:" '{ print $2 }'`
+	redis-cli set $MYSRCURL "$SRCURL"  >/dev/null 2>&1
+	touchthem $BUILDDIR/SOURCES/${NAME}-${VERSION}.tar.gz 
+	scp $BUILDDIR/SOURCES/${NAME}-${VERSION}.tar.gz root@repos.pip2scl.dk:/usr/share/nginx/html/SOURCES/${NAME}-${VERSION}.tar.gz >/dev/null 2>&1
+	if [[ $? == 0 ]];
+	then
+		logme "Package downloaded"
+	else
+		logme "Package download failed"
+		exit
+	fi
+    logme "tar file refreshed"
+}
+
+
+
+logme "Start Download $PACKAGE"
+check_args
+logme "$PACKAGE"
+logme "Download source "
+download_source
+logme "Download enden"
+exit 0

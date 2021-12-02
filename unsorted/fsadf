@@ -1,0 +1,7 @@
+sed -i 's#^"#"/opt/miracle/miracle-awx/root/#' INSTALLED_FILES
+
+
+
+#ENDOFPRETTYSPEC%{?scl:EOF}
+
+

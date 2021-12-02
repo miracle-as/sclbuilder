@@ -1,0 +1,210 @@
+#!/usr/bin/env bash
+
+CMD=$0
+PACKAGE=$1
+PERSIST=$2
+
+source /usr/local/bin/setbuildenv.sh
+
+usage ()
+{
+echo "usage $CMD"
+echo $1
+exit 1
+}
+
+check_args ()
+{
+if [[ $PACKAGE == "" ]];
+then
+	usage "Package missing"
+fi
+}
+
+logme ()
+{
+if [[ $QUIET != "yes" ]];
+then
+	TEXT=`echo $1 | tr ' ' '¤'`
+	TS=`date |tr ' ' '¤'`
+	printf "%-20s : %-32s %s \n" $TS $PACKAGE  $TEXT |tr '¤' ' '
+fi
+
+}
+
+lastbuild ()
+{
+	curl http://repos.pip2scl.dk/header.html >  $INDEX
+	echo "<pre>" >> $INDEX
+	cat $LASTBUILD >> $INDEX
+	echo "</pre>" >> $INDEX
+	curl http://repos.pip2scl.dk/footer.html >> $INDEX
+	scp $INDEX root@repos.pip2scl.dk:/usr/share/nginx/html/index.html 
+}
+
+
+
+tgz2tgz ()
+{
+	logme "tar gz file to tar gz"
+}
+
+
+
+build_wheels ()
+{
+	python3 setup.py bdist_wheel >/tmp/buildwheels.log 2>&1
+}
+
+
+checkpackage ()
+{
+        NAME=`echo $PACKAGE | awk -F'==' '{ print $1 }'`
+        VERSION=`echo $PACKAGE | awk -F'==' '{ print $2 }'`
+        MYKEY="filename:${PACKAGE}"
+        MYURL="url:${PACKAGE}"
+        MYCRC="crc:$PACKAGE"
+	MYDIRKEY="pkgdir:${PACKAGE}"
+	EXTENTION="tar.gz"
+	SPECFILECREATE="no"
+	TARFILE="${BUILDDIR}/SOURCES/${NAME}-${VERSION}.${EXTENTION}"
+	if [[ -f $TARFILE ]];
+	then
+		logme "$TARFILE is here"
+	else
+		redis-cli get $MYURL
+	fi
+
+
+	/usr/bin/rm -r /tmp/sandbox >/dev/null 2>&1 || logme "cleaner"
+	mkdir /tmp/sandbox
+	cd /tmp/sandbox
+	logme "Is file a gz file"
+	if [[ $EXTENTION == "tar.gz" ]];
+	then
+		logme "Extract the source from $FILE"
+		tar xf $TARFILE
+		if [[ $? == 0 ]];
+		then
+			logme "Source extrated"
+			NIT=`ls -1`
+			redis-cli set $MYNIT $NIT >/dev/null 2>&1
+		else
+			logme "Extration failed"
+			exit 22
+		fi
+	fi
+	
+	logme "name in tar $NIT"
+	logme "Check $NIT"
+	MYDIRKEY="pkgdir:${PACKAGE}"
+	redis-cli set $MYDIRKEY "${NIT}" >/dev/null 2>&1
+ 	cd $NIT
+	if [[ $? == 0 ]];
+	then
+		logme "Entered tar dir $NIT"
+	else
+		logme "Error changing to dest $NIT" 
+		exit
+	fi
+
+	logme "Pretty"
+	touch README.md
+	touch CHANGELOG.rst
+
+
+	##########################################################
+	# check if a handcrafted hardcoded spec file exists
+	###########################################################
+
+	#curl "http://repos.pip2scl.dk/SPECS/${NAME}-${VERSION}.hardcoded.spec" >/tmp/hardcoded.spec
+	#if [[ $? == 0 ]];
+	#then
+#		logme "Spec file is hardcoded"
+#		mkdir dist >/dev/null 2>&1
+#		curl "http://repos.pip2scl.dk/SPECS/${NAME}-${VERSION}.hardcoded.spec" >dist/${NAME}-${VERSION}.spec
+#		SPECFILECREATE="HARD"
+#	fi
+
+
+        if [[ $SPECFILECREATE == "no" ]];
+        then
+                python3 setup.py bdist_rpm --spec-only >/dev/null 2>&1
+                if [[ $? == 0 ]];
+                then
+			logme "Spec file is working on python 3"
+                        PYCMD="python3"
+                        SPECFILECREATE="yes"
+                fi
+        fi
+
+	
+	if [[ $SPECFILECREATE != "HARD" ]];
+	then
+		python3.8 setup.py bdist_rpm --spec-only >/dev/null 2>&1
+		if [[ $? == 0 ]];
+		then
+			logme "Spec file is working on python 3.8"
+			PYCMD="python3.8"
+			SPECFILECREATE="yes"
+		fi
+	fi
+
+	if [[ $SPECFILECREATE == "no" ]];
+	then
+		python2 setup.py bdist_rpm --spec-only >/dev/null 2>&1
+		if [[ $? == 0 ]];
+		then
+			logme "Spec file is working on python 2"
+			PYCMD="python2"
+			SPECFILECREATE="yes"
+		fi
+	fi
+
+	if [ $SPECFILECREATE == "yes" ];
+	then
+		$PYCMD setup.py bdist_rpm --spec-only >/tmp/specfile.$PACKAGE.log 2>&1
+		if [[ $? == 0 ]]
+		then
+			logme "spec file created"
+		else
+			echo "error: $PACKAGE - spec creation failed"
+			cat /tmp/specfile.$package.log
+			exit
+		fi
+	else
+		if [ $SPECFILECREATE == "HARD" ];
+		then
+			logme "Spec file is hardcoded"
+		else
+			logme "Spec file creation failed"
+			exit
+		fi
+	fi
+
+		
+	cd dist
+	SPEC=`ls -1`
+	
+	sed -i "s/^python /$PYCMD /" $SPEC
+	sed -i "s/^%{__python} /$PYCMD /" $SPEC
+
+	NAMEINSPEC=`grep "define name " $SPEC |awk '{ print $2 }' `
+	logme "SPEC $SPEC created and saving it"
+	###################
+	cp $SPEC $ORGSPECFILE
+	if [[ $? == 0 ]];
+	then
+        	redis-cli set  $MYORGSPECKEY  $ >/dev/null 2>&1
+	else
+		logme "copy failed"
+		exit
+	fi
+	/usr/bin/rm -r /tmp/sandbox /dev/null 2>&1
+}
+
+check_args
+logme "$PACKAGE"
+logme "check source "
+checkpackage
+logme "check source END"

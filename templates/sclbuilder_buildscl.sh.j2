@@ -1,0 +1,290 @@
+#!/usr/bin/env bash
+
+CMD=$0
+PACKAGE=$1
+PERSIST=$2
+
+NAME=`echo $PACKAGE | awk -F'==' '{ print $1 }'`
+VERSION=`echo $PACKAGE | awk -F'==' '{ print $2 }'`
+SCL=$2
+QUIET="no"
+BUILDDIR="/root/rpmbuild"
+BUILDOUT="$BUILDDIR/OUTPUT"
+BUILDOUT="$BUILDDIR/OUTPUT"
+AUTOPATCHDIR="$BUILDDIR/AUTOPATCH"
+mkdir $AUTOPATCHDIR >/dev/null 2>&1 || touch AUTOPATCHDIR
+MYAUTOPATCH="autopath:$AUTOPATCHDIR/$NAME-$VERSION.patch.sh"
+AUTOPATCH="$AUTOPATCHDIR/$NAME-$VERSION.patch.sh"
+FAILEDRPMS="$BUILDDIR/OUTPUT/failed.txt"
+mkdir $BUILDOUT >/dev/null 2>&1 || touch $BUILDOUT
+touch $FAILEDRPMS
+MYCRC="crc:$PACKAGE"
+MYEXT="ext:${PACKAGE}"
+MYDIRKEY="pkgdir:${PACKAGE}"
+MYKEY="filename:${PACKAGE}"
+MYRPM="rpm:${PACKAGE}"
+MYSPEC="specfile:${PACKAGE}"
+MYVERSPEC="verifiedspecfile:${PACKAGE}"
+MYRPMSPEC="specfile:RPM:${PACKAGE}"
+MYSRPM="rpms:${PACKAGE}"
+MYSUM="sum:${PACKAGE}"
+MYURL="url:${PACKAGE}"
+MYSRCNAME="sourcefilename:${PACKAGE}"
+MYERR="error:{$PACKAGE}"
+MYNIT="NIT:${PACKAGE}"
+NIT=""
+PYCMD="python3"
+PRETTYSPEC="/usr/local/bin/prettyspec.sh"
+EXTENTION=""
+FILE=""
+LASTBUILD="${BUILDDIR}/OUTPUT/${NAME}-${VERSION}.build.log"
+INDEX="${BUILDDIR}/OUTPUT/${NAME}-${VERSION}.build.html"
+VERSPEC=
+
+
+usage ()
+{
+echo "usage $CMD"
+echo $1
+exit 1
+}
+
+check_args ()
+{
+if [[ $PACKAGE == "" ]];
+then
+	usage "Package missing"
+fi
+}
+
+logme ()
+{
+if [[ $QUIET != "yes" ]];
+then
+	TEXT=`echo $1 | tr ' ' '¤'`
+	TS=`date |tr ' ' '¤'`
+	printf "%-20s : %-32s %s \n" $TS $PACKAGE  $TEXT |tr '¤' ' '
+fi
+
+}
+
+lastbuild ()
+{
+	curl http://repos.pip2scl.dk/header.html >  $INDEX
+	echo "<pre>" >> $INDEX
+	cat $LASTBUILD >> $INDEX
+	echo "</pre>" >> $INDEX
+	curl http://repos.pip2scl.dk/footer.html >> $INDEX
+	scp $INDEX root@repos.pip2scl.dk:/usr/share/nginx/html/index.html 
+}
+
+build_scl ()
+{
+	logme "adding $PACKAGE to software collection $SCL"
+	MYSPEC="specfile:${PACKAGE}"
+	MYSCLSRPM="sclsrpm:${PACKAGE}"
+	MYSCLRPM="sclrpm:${PACKAGE}"
+	VERSPECURL=`redis-cli get $MYVERSPEC`
+	mkdir $BUILDDIR/VERSPEC >/dev/null 2>&1
+	mkdir $BUILDDIR/PRESPEC >/dev/null 2>&1
+	mkdir $BUILDDIR/SCLSPEC >/dev/null 2>&1
+	URL=`redis-cli get $MYURL `
+	
+	NAMEINTAR=`tar tvf $BUILDDIR/SOURCES/${NAME}-${VERSION}.tar.gz |head -1 |awk '{ print $6 }' |sed 's(/(('`
+	wget -O $VERSPEC   $VERSPECURL >/dev/null 2>&1
+    logme "curl \"http://repos.pip2scl.dk/SPECS/${NAME}-${VERSION}.hardcoded.scl.spec\""
+
+	CURL=`curl "http://repos.pip2scl.dk/SPECS/${NAME}-${VERSION}.hardcoded.scl.spec" 2>/dev/null|grep "The page you are looking for is not found"`
+    if [[ $? != 0 ]];
+    then
+       	logme "scl Spec file is hardcoded"
+       	CURL=`curl "http://repos.pip2scl.dk/SPECS/${NAME}-${VERSION}.hardcoded.scl.spec" >$SCLFILEHARD 2>/dev/null`
+       	SPECFILECREATE="HARD"
+	else
+		logme "Create spec file"
+		spec2scl  $BUILDDIR/VERSPEC/${NAME}-${VERSION}.verified.spec > $SCLFILEPRE  2>/dev/null
+		logme "Our SCL specfile before mod is i$SCLFILEPRE"
+		SCLFILEPRE="$BUILDDIR/PRESPEC/${NAME}-${VERSION}.scl.spec.pre"
+		SCLFILE="$BUILDDIR/PRESPEC/${NAME}-${VERSION}.scl.spec"
+		logme "Check if the spec file has been prettified"
+		AFTERLINE=`cat $SCLFILEPRE | grep "python3 setup.py install" -A1 | tail -1`
+		echo "$AFTERLINE"  |grep '%{?scl:EOF}' >/dev/null 2>&1
+		if [[ $? == 0 ]];
+		then
+			logme "We need to append this line in the the scl spec file after python setup and before scl"
+			grep "python3 setup.py install" -B1000000 $SCLFILEPRE >/tmp/header
+			grep "python3 setup.py install" -A1000000 $SCLFILEPRE | grep -v "python3 setup.py install" >/tmp/footer
+		fi
+        	sed -i 's#root=$RPM_BUILD_ROOT#root=$RPM_BUILD_ROOT/opt/miracle/miracle-awx/root#'  $SCLFILEPRE
+        	sed -i "s#%setup.*#%setup -n ${NAMEINTAR}#" $SCLFILEPRE
+		logme "mandatory_after_setup.sh $SCLFILEPRE"
+
+		mandatory_after_setup.sh $SCLFILEPRE > $SCLFILEPRE.added
+		if [[ $? == 0 ]];
+		then
+			logme "We have added the mandatory part"
+			cp $SCLFILEPRE.added $SCLFILEPRE
+		else
+			logme "Add failed"
+			exit 3
+
+		fi
+
+	##################################
+	#
+	####################################
+        	if [[ $PACKAGE == "pyOpenSSL==19.1.0" ]];
+       		then
+			logme "hack require"
+			sed -i "s/BuildRequires: %{?scl_prefix}openssl-devel %{?scl_prefix}python3-devel %{?scl_prefix}python3-sphinx/BuildRequires: openssl-devel python3-devel python3-sphinx/" $SCLFILEPRE
+		
+		fi
+
+	##################################
+	#
+	####################################
+        	if [[ $PACKAGE == "xmlsec==1.3.3" ]];
+        	then
+			logme "hack require"
+			sed -i "s/BuildRequires: %{?scl_prefix}pkg-config %{?scl_prefix}xmlsec1-devel %{?scl_prefix}libxml2-devel %{?scl_prefix}xmlsec1-openssl-devel/BuildRequires: pkg-config xmlsec1-devel libxml2-devel xmlsec1-openssl-devel/" $SCLFILEPRE
+		
+		fi	
+
+
+
+
+	##################################
+	#
+	####################################
+        	if [[ $PACKAGE == "Django==2.2.16" ]];
+        	then
+			logme "DJango hack"
+        # Sort the filelist so that directories appear before files. This avoids
+        # Make sure we match foo.pyo and foo.pyc along with foo.py (but only once each)
+
+                	grep -P "Sort the filelist so that directories appear before files. This avoids" $SCLFILEPRE -B100000 |grep -v "Sort the filelist so that directories appear before files. This avoids" > PART1
+                	echo 'sed -i "s(//(/(" INSTALLED_FILES' >> PART1
+                	grep -P "^EOF$" $SCLFILEPRE -A100000 |grep -v "^EOF$" > PART2
+
+
+                	cat PART1 PART2 |grep -v " DIRS FILES" |grep -v /usr/share/man/man1/django-admin.1.gz  |grep  -v '%doc' > $SCLFILEPRE
+        	fi
+
+        ##################################
+        #
+        ####################################
+        	if [[ $PACKAGE == "uWSGI==2.0.18" ]];
+        	then
+	  		sed -i 's#"/usr/bin/uwsgi"##' $SCLFILEPRE
+	  		echo "/opt/miracle/miracle-awx/root/usr/bin/uwsgi" >> $SCLFILEPRE
+          		echo "/usr/lib/debug/opt/miracle/miracle-awx/root/usr/bin/uwsgi-2.0.18-1.x86_64.debug" >> $SCLFILEPRE
+        	fi
+
+        ##################################
+        #
+        ####################################
+        	if [[ $PACKAGE == "ruamel.yaml.clib==0.2.0" ]];
+        	then
+	  		sed -i 's#"/usr/bin/uwsgi"##' $SCLFILEPRE
+	  		echo "/opt/miracle/miracle-awx/root/usr/bin/uwsgi" >> $SCLFILEPRE
+          		echo "/usr/lib/debug/opt/miracle/miracle-awx/root/usr/bin/uwsgi-2.0.18-1.x86_64.debug" >> $SCLFILEPRE
+        	fi
+
+        ##################################
+        #
+        ####################################
+        	if [[ $PACKAGE == "ruamel.yaml.clib==0.2.0" ]];
+		then	
+			echo 'mkdir -p /root/rpmbuild/BUILDROOT/miracle-awx-ruamel.yaml.clib-0.2.0-1.x86_64/opt/miracle/miracle-awx/root/usr/bin' >$SCLFILEPRE.ruamel.yaml.clib-0.2.0.add
+			echo 'touch /root/rpmbuild/BUILDROOT/miracle-awx-ruamel.yaml.clib-0.2.0-1.x86_64/opt/miracle/miracle-awx/root/usr/bin/uwsgi' >> $SCLFILEPRE.ruamel.yaml.clib-0.2.0.add
+			echo 'mkdir -p /root/rpmbuild/BUILDROOT/miracle-awx-ruamel.yaml.clib-0.2.0-1.x86_64/usr/lib/debug/opt/miracle/miracle-awx/root/usr/bin' >>$SCLFILEPRE.ruamel.yaml.clib-0.2.0.add
+			echo 'touch /root/rpmbuild/BUILDROOT/miracle-awx-ruamel.yaml.clib-0.2.0-1.x86_64/usr/lib/debug/opt/miracle/miracle-awx/root/usr/bin/uwsgi-2.0.18-1.x86_64.debug' >>$SCLFILEPRE.ruamel.yaml.clib-0.2.0.add
+	       	 	/usr/local/bin/mergefiles.sh ${SCLFILEPRE}  ${SCLFILEPRE}.ruamel.yaml.clib-0.2.0.add "%clean" before   >/dev/null 2>&1
+		fi
+
+
+
+        ##################################
+        #
+        ####################################
+	        if [[ $PACKAGE == "ruamel.yaml==0.16.10" ]];
+		then
+			echo "/usr/lib/python3.6/site-packages/ruamel/yaml/LICENSE"  >> $SCLFILEPRE
+		fi
+
+        ##################################
+        #
+        ####################################
+        	if [[ $PACKAGE == "jaraco.text==3.2.0" ]]
+        	then
+                	logme "Hack. add files"
+      			echo 'mkdir -p "/root/rpmbuild/BUILDROOT/miracle-awx-jaraco.text-3.2.0-1.x86_64/usr/lib/python3.6/site-packages/jaraco/text" ' >  $SCLFILEPRE.add
+      			echo 'touch "/root/rpmbuild/BUILDROOT/miracle-awx-jaraco.text-3.2.0-1.x86_64/usr/lib/python3.6/site-packages/jaraco/text/Lorem ipsum.txt" ' >>  $SCLFILEPRE.add
+       	 		/usr/local/bin/mergefiles.sh ${SCLFILEPRE}  ${SCLFILEPRE}.add "%clean" before   >/dev/null 2>&1
+                	echo '"/opt/miracle/miracle-awx/root/usr/lib/python3.6/site-packages/jaraco/text/Lorem ipsum.txt"' >> $SCLFILEPRE
+        	fi
+	fi
+
+	logme "rpmbuild -ba -D 'debug_package %{nil}' --clean $SCLFILEPRE --define \"scl miracle-awx\" "
+	rpmbuild -ba -D 'debug_package %{nil}' --clean $SCLFILEPRE --define "scl miracle-awx" >/tmp/prebuild.log 2>&1
+	grep "Wrote:" /tmp/prebuild.log >/dev/null 2>&1
+	if [[ $? == 0 ]];
+	then
+		logme "scl build succeeded"
+		cp $SCLFILEPRE $SCLFILE
+		for FILE in  `cat  /tmp/prebuild.log |grep "^Wrote:"   |awk '{ print $2 }'`
+		do
+			logme "$FILE created"
+		done
+		if [[ $PERSIST == '-persist=yes' ]];
+		then
+
+              		scp $SCLFILE root@repos.pip2scl.dk:/usr/share/nginx/html/SPECS/${NAME}-${VERSION}.hardcoded.scl.spec  >/dev/null 2>&1
+                	if [[ $? == 0 ]];
+                	then
+                        	logme "scl specfile copied"
+                	else
+                        	logme "scl specfile copied"
+                        	exit
+                	fi
+		fi
+
+		scp $SCLFILE root@repos.pip2scl.dk:/usr/share/nginx/html/SPECS/	 >/dev/null 2>&1
+		if [[ $? == 0 ]];
+		then
+			logme "scl specfile copied"
+		else
+			logme "scl specfile copied"
+			exit
+		fi
+
+		rsync -avzc $BUILDDIR/RPMS/* root@repos.pip2scl.dk:/usr/share/nginx/html/RPMS/ >/dev/null 2>&1
+		if [[ $? == 0 ]];
+		then
+			logme "scl rpm synced"
+		else
+			logme "scl rpm sync failed"
+			exit
+		fi
+
+		rsync -avzc $BUILDDIR/SRPMS/* root@repos.pip2scl.dk:/usr/share/nginx/html/SRPMS/ >/dev/null 2>&1
+		if [[ $? == 0 ]];
+		then
+			logme "scl srpm synced"
+			
+		else
+			logme "scl srpm sync failed"
+			exit
+		fi
+	else
+		logme "scl build failed in $NAME $VERSION"
+	fi
+	
+}
+	
+
+check_args
+logme "$PACKAGE"
+LOOP=1
+build_scl
+logme "scl build ende

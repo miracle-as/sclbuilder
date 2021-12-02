@@ -1,0 +1,10 @@
+[miracle]
+# No spaces allowed in that [repo-name] or you get a "bad id for repo" error
+name=My RPMs $releasever - $basearch
+baseurl=http://repos.pip2scl.dk/RPMS/
+enabled=1
+metadata_expire=1d
+gpgcheck=0
+#gpgcheck=1
+#gpgkey=file:///<path to GPG key>/key.asc
+#gpgkey=https://<URL to GPG key>/key.asc

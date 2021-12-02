@@ -1,0 +1,431 @@
+#!/usr/bin/env bash
+
+CMD=$0
+PACKAGE=$1
+PERSIST=$2
+
+source /usr/local/bin/setbuildenv.sh
+
+usage ()
+{
+echo "usage $CMD"
+echo $1
+exit 1
+}
+
+check_args ()
+{
+if [[ $PACKAGE == "" ]];
+then
+	usage "Package missing"
+fi
+}
+
+logme ()
+{
+if [[ $QUIET != "yes" ]];
+then
+	TEXT=`echo $1 | tr ' ' '¤'`
+	TS=`date |tr ' ' '¤'`
+	printf "%-20s : %-32s %s \n" $TS $PACKAGE  $TEXT |tr '¤' ' '
+fi
+
+}
+
+lastbuild ()
+{
+	curl http://repos.pip2scl.dk/header.html >  $INDEX
+	echo "<pre>" >> $INDEX
+	cat $LASTBUILD >> $INDEX
+	echo "</pre>" >> $INDEX
+	curl http://repos.pip2scl.dk/footer.html >> $INDEX
+	scp $INDEX root@repos.pip2scl.dk:/usr/share/nginx/html/index.html 
+}
+
+
+
+build_rpm ()
+{
+	logme "We are ready to build"
+	logme "My spec file is : $ORGSPECFILE"
+	if [[ -f $ORGSPECFILE ]];
+	then
+		logme "File $ORGSPECFILE is found"
+	else
+		logme "File $ORGSPECFILE not  found"
+		exit
+	fi
+	cp $ORGSPECFILE $PRESCLFILE
+
+	NAMEINSPEC=`grep "define name" $PRESPECFILE |awk '{ print $3 }'`
+	EXTENTION="tar.gz"
+	TARFILE="${BUILDDIR}/SOURCES/${NAME}-${VERSION}.${EXTENTION}"
+	URL=`redis-cli get  $MYURL`
+	logme "We want to build $VERSPECFILE "
+	logme "We are ready to pretty $PRESPECFILE"
+	sed -i "s/define version 0.0.0/define version ${VERSION}/" $PRESPECFILE
+	sed -i "s/define unmangled_version 0.0.0/define unmangled_version ${VERSION}/" $PRESPECFILE
+ 	sed -i 's(%{__python}(/usr/bin/python3(' $PRESPECFILE	
+	sed -i "s(Source0: .*(Source0: http://repos.pip2scl.dk/SOURCES/${NAME}-${VERSION}.${EXTENTION}(" $PRESPECFILE
+
+
+
+	if [[ $PACKAGE == "pyOpenSSL==19.1.0" ]];
+	then
+		logme "Hack we need bleeeding edge"
+		echo "python3 -m pip install --upgrade pip" > $PRESPECFILE.add
+		echo "python3 -m pip install --upgrade setuptools_rust" >> $PRESPECFILE.add
+		echo "python3 -m pip install --upgrade wheel"  >> $PRESPECFILE.add
+		/usr/local/bin/mergefiles.sh ${PRESPECFILE}   $PRESPECFILE.add "%build"     >/dev/null 2>&1
+		/usr/local/bin/mergefiles.sh ${PRESPECFILE}   $PRESPECFILE.add "%install"   >/dev/null 2>&1
+	fi
+
+
+
+	if [[ $PACKAGE == "pyOpenSSL==19.1.0" ]];
+	then
+		sed -i "s(BuildRequires:.*(BuildRequires: openssl-devel python3-devel python3-sphinx(" $PRESPECFILE
+	fi
+
+
+
+        if [[ $PACKAGE == "Django==2.2.16" ]];
+        then
+		logme "Do some django patch"
+#		sed -i "s(# Sort the filelist so that directories appear before files. This avoids(sed -i 's)#!/usr/bin/env python*.)#!/usr/bin/env python3)'  \${RPM_BUILD_ROOT}/usr/lib/python3.6/site-packages/django/conf/project_template/manage.py-tpl(" $PRESPECFILE
+#		sed -i "s(# duplicate filename problems on some systems.(sed -i 's)#!/usr/bin/env python*.)#!/usr/bin/env python3)'  \${RPM_BUILD_ROOT}/usr/lib/python3.6/site-packages/django/bin/django-admin.py(" $PRESPECFILE
+
+	fi
+
+        ##########################################################################################################################################################
+        if [[ $PACKAGE == "importlib-metadata==4.8.1" ]]
+        then
+		logme "Force pyton 3.8"
+		sed -i "s/python3 /python3.8 /" $PRESPECFILE
+        fi
+
+        ##########################################################################################################################################################
+        if [[ $PACKAGE == "importlib-resources==5.2.2" ]]
+        then
+		logme "Force pyton 3.8"
+		sed -i "s/python3 /python3.8 /" $PRESPECFILE
+        fi
+
+
+
+
+
+	##########################################################################################################################################################
+	if [[ $PACKAGE == "ruamel.yaml==0.16.10" ]]
+	then
+		logme "Hack. add files"
+		echo 'mkdir -p ${RPM_BUILD_ROOT}/usr/lib/python3.6/site-packages/ruamel/yaml' > /tmp/ruamel.yaml.add
+		echo 'touch ${RPM_BUILD_ROOT}/usr/lib/python3.6/site-packages/ruamel/yaml/LICENSE' >> /tmp/ruamel.yaml.add
+		/usr/local/bin/mergefiles.sh ${PRESPECFILE}   /tmp/ruamel.yaml.add "%clean"  before    >/dev/null 2>&1
+	fi
+
+
+	##########################################################################################################################################################
+	if [[ $PACKAGE == "netaddr==0.7.19" ]]
+	then	
+		logme "TEST"
+		/usr/local/bin/mergefiles.sh ${PRESPECFILE}  ${PRETTYSPEC}.netaddr "%install"    >/dev/null 2>&1
+		
+	fi
+	
+
+
+	logme "PrettySPEC"	
+	####################  Run Pretty spec ####################################################################################################################
+	/usr/local/bin/mergefiles.sh ${PRESPECFILE}  ${PRETTYSPEC} "%clean" before   >/dev/null 2>&1
+	logme "Spec pretty"
+
+
+	############## Run a plain Standart Python 3 build #######################################################################################################
+        ##########################################################################################################################################################
+	ALTBUILD="no"
+	BUILD="no"
+	logme "rpmbuild -ba -D 'debug_package %{nil}' --clean  $PRESPECFILE "
+	rpmbuild -ba -D 'debug_package %{nil}' --clean  $PRESPECFILE  >$BUILDOUT/${NAME}-${VERSION}.rpmbuild.log 2>&1
+	cat $BUILDOUT/${NAME}-${VERSION}.rpmbuild.log |grep "^Wrote:" >/dev/null 2>&1
+	if [[ $? == 0 ]];
+	then
+		logme "RPMs build"
+		redis-cli set $MYRPMSPEC "$PRESPECFILE"  >/dev/null 2>&1
+		for RPM in `cat $BUILDOUT/${NAME}-${VERSION}.rpmbuild.log |grep "^Wrote:" | awk -F"Wrote: "  '{ print $2 }' `
+		do	
+			MYRPM="rpm:${PACKAGE}"
+			MYSRPM="rpms:${PACKAGE}"
+			SRPM=`echo $RPM |grep "/SRPMS/"`
+			RPM=`echo $RPM |grep "/RPMS/"`
+			redis-cli set $MYRPM "$RPM"  >/dev/null 2>&1
+			redis-cli set $MYSRPM "$SRPM"    >/dev/null 2>&1
+			BUILD="ok"
+		done
+	else
+        ##########################################################################################################################################################
+		logme "RPMS Failed to build with std python setup "		
+		# Sometimes python3.8 is needed
+		cat $BUILDOUT/${NAME}-${VERSION}.rpmbuild.log | grep "find_namespace:" >/dev/null 2>&1
+		if [[ $? == 0 ]];
+		then
+			ALTBUILD="python3.8"
+			sed -i "s(python3 setup.py (python3.8 setup.py  (" $PRESPECFILE
+			rpmbuild -ba -D 'debug_package %{nil}' --clean  $PRESPECFILE  >$BUILDOUT/${NAME}-${VERSION}.rpmbuild.log 2>&1
+			cat $BUILDOUT/${NAME}-${VERSION}.rpmbuild.log |grep "^Wrote:" >/dev/null 2>&1
+			if [[ $? == 0 ]];
+			then
+				logme "RPMs build with python 3.8"
+                		redis-cli set $MYRPMSPEC "$PRESPECFILE"  >/dev/null 2>&1
+                		for RPM in `cat $BUILDOUT/${NAME}-${VERSION}.rpmbuild.log |grep "^Wrote:" | awk -F"Wrote: "  '{ print $2 }' `
+                		do
+                        		MYRPM="rpm:${PACKAGE}"
+                        		MYSRPM="rpms:${PACKAGE}"
+                        		SRPM=`echo $RPM |grep "/SRPMS/"`
+                        		RPM=`echo $RPM |grep "/RPMS/"`
+                        		redis-cli set $MYRPM "$RPM"  >/dev/null 2>&1
+                        		redis-cli set $MYSRPM "$SRPM"    >/dev/null 2>&1
+					BUILD="ok"
+				done
+			fi
+		fi
+
+
+
+		#sometimes they just 'forgot some files
+        ##########################################################################################################################################################
+		cat $BUILDOUT/${NAME}-${VERSION}.rpmbuild.log | grep "Installed (but unpackaged) file(s) found:" >/dev/null 2>&1
+		if [[ $? == 0 ]];
+		then
+			ALTBUILD="ADD files"
+               		logme "add some files to the spec file"
+			grep " Installed (but unpackaged) file(s) found:" -A100000  $BUILDOUT/${NAME}-${VERSION}.rpmbuild.log  |grep  "RPM build errors:" -B100000 |  sed -e 's/^[ \t]*//' |  grep '^/' | sed 's/^/"/' |sed 's/$/"/' >> $PRESPECFILE
+		        rpmbuild -ba -D 'debug_package %{nil}' --clean  $PRESPECFILE  >$BUILDOUT/${NAME}-${VERSION}.rpmbuild.log 2>&1
+        		cat $BUILDOUT/${NAME}-${VERSION}.rpmbuild.log |grep "^Wrote:"
+        		cat $BUILDOUT/${NAME}-${VERSION}.rpmbuild.log |grep "^Wrote:" >/dev/null 2>&1
+        		if [[ $? == 0 ]];
+        		then
+               			logme "RPMs build and some files added"
+				BUILD="ok"
+                		redis-cli set $MYRPMSPEC "$PRESPECFILE"  >/dev/null 2>&1
+                		for RPM in `cat $BUILDOUT/${NAME}-${VERSION}.rpmbuild.log |grep "^Wrote:" | awk -F"Wrote: "  '{ print $2 }' `
+                		do
+                        		MYRPM="rpm:${PACKAGE}"
+                        		MYSRPM="rpms:${PACKAGE}"
+                        		SRPM=`echo $RPM |grep "/SRPMS/"`
+                        		RPM=`echo $RPM |grep "/RPMS/"`
+                        		redis-cli set $MYRPM "$RPM"  >/dev/null 2>&1
+                        		redis-cli set $MYSRPM "$SRPM"    >/dev/null 2>&1
+					BUILD="ok"
+                		done
+			fi
+		fi
+
+                #sometimes they just 'forgot  the shebang must be forced 
+        ##########################################################################################################################################################
+                cat $BUILDOUT/${NAME}-${VERSION}.rpmbuild.log | grep '*** ERROR: ./' | grep 'has shebang which doesn'  >/dev/null 2>&1
+                if [[ $? == 0 ]];
+                then
+                        ALTBUILD="Shebang error"
+                	cat $BUILDOUT/${NAME}-${VERSION}.rpmbuild.log | grep '*** ERROR: ./' | grep 'has shebang which doesn'    \
+                        |awk -F'ERROR: ' '{ print $2 }' |awk -F' has shebang which doesn' '{ print $1 }' | sed 's(^./(\${RPM_BUILD_ROOT}/('  |xargs -i{}  echo "sed -i \"1,1s(.*(#!/usr/bin/env python3(\" {} " > SHEBANGFILES
+                	/usr/local/bin/mergefiles.sh ${PRESPECFILE} SHEBANGFILES  "%clean" before 
+                        logme "Clean some scripts"
+                        rpmbuild -ba -D 'debug_package %{nil}' --clean  $PRESPECFILE  >$BUILDOUT/${NAME}-${VERSION}.rpmbuild.log 2>&1
+                        cat $BUILDOUT/${NAME}-${VERSION}.rpmbuild.log |grep "^Wrote:"
+                        cat $BUILDOUT/${NAME}-${VERSION}.rpmbuild.log |grep "^Wrote:" >/dev/null 2>&1
+                        if [[ $? == 0 ]];
+                        then
+                                logme "RPMs build and some files added"
+                                BUILD="ok"
+                                redis-cli set $MYRPMSPEC "$PRESPECFILE"  >/dev/null 2>&1
+                                for RPM in `cat $BUILDOUT/${NAME}-${VERSION}.rpmbuild.log |grep "^Wrote:" | awk -F"Wrote: "  '{ print $2 }' `
+                                do
+                                        MYRPM="rpm:${PACKAGE}"
+                                        MYSRPM="rpms:${PACKAGE}"
+                                        SRPM=`echo $RPM |grep "/SRPMS/"`
+                                        RPM=`echo $RPM |grep "/RPMS/"`
+                                        redis-cli set $MYRPM "$RPM"  >/dev/null 2>&1
+                                        redis-cli set $MYSRPM "$SRPM"    >/dev/null 2>&1
+                                        BUILD="ok"
+                                done
+                        fi
+                fi
+
+        ##########################################################################################################################################################
+		cat $BUILDOUT/${NAME}-${VERSION}.rpmbuild.log | grep   "No such file or directory"  >/dev/null 2>&1
+		if [[ $? == 0  ]];
+		then
+			logme "No such file or directory"
+			if [[ $EXTENTION == "tar.gz" ]];
+			then
+				NAMEINBUILD=`cat $BUILDOUT/${NAME}-${VERSION}.rpmbuild.log | grep   "No such file or directory" |awk -F'cd:' '{ print $2 }' |awk '{ print $1 }'  |awk -F':' '{ print $1 }'| grep -i [a-z] ` 
+				if [[ $NAMEINBUILD != "" ]]
+				then
+					logme "name in build: $NAMEINBUILD"
+					NAMEINTAR=`tar tvf ${BUILDDIR}/SOURCES/${NAME}-${VERSION}.${EXTENTION} |head -1 | awk -F':' '{ print $2 }' |cut -c 4- |awk -F'/' '{ print $1 }' `
+					logme "name in tar: $NAMEINTAR"
+					if [[ $NAMEINBUILD != $NAMEINTAR ]];
+					then
+						logme "name in builds differs from tar . Repack $NAMEINTAR : $NAMEINBUILD"
+						repack $NAMEINTAR $NAMEINBUILD
+						rpmbuild -ba -D 'debug_package %{nil}' --clean  $PRESPECFILE  >$BUILDOUT/${NAME}-${VERSION}.rpmbuild.log 2>&1
+		                	        cat $BUILDOUT/${NAME}-${VERSION}.rpmbuild.log |grep "^Wrote:" >/dev/null 2>&1
+                        			if [[ $? == 0 ]];
+                        			then
+                                			logme "RPMs build and some files added"
+                                			BUILD="ok"
+                                			redis-cli set $MYRPMSPEC "$PRESPECFILE"  >/dev/null 2>&1
+                                			for RPM in `cat $BUILDOUT/${NAME}-${VERSION}.rpmbuild.log |grep "^Wrote:" | awk -F"Wrote: "  '{ print $2 }' `
+                                			do
+                                        			MYRPM="rpm:${PACKAGE}"
+                                        			MYSRPM="rpms:${PACKAGE}"
+                                       		 		SRPM=`echo $RPM |grep "/SRPMS/"`
+                                        			RPM=`echo $RPM |grep "/RPMS/"`
+                                        			redis-cli set $MYRPM "$RPM"  >/dev/null 2>&1
+                                        			redis-cli set $MYSRPM "$SRPM"    >/dev/null 2>&1
+                                        			BUILD="ok"
+                                			done
+                        			fi
+					fi
+				fi
+			fi
+		fi
+        ##########################################################################################################################################################
+
+        ##########################################################################################################################################################
+		cat $BUILDOUT/${NAME}-${VERSION}.rpmbuild.log | grep   "Arch dependent binaries in noarch package"  >/dev/null 2>&1
+		if [[ $? == 0  ]];
+		then
+			logme "Arch dependent binaries in noarch package"
+			sed -i "s/BuildArch: noarch/BuildArch: x86_64/" ${PRESPECFILE} 
+			rpmbuild -ba -D 'debug_package %{nil}' --clean  $PRESPECFILE  >$BUILDOUT/${NAME}-${VERSION}.rpmbuild.log 2>&1
+                        cat $BUILDOUT/${NAME}-${VERSION}.rpmbuild.log |grep "^Wrote:" >/dev/null 2>&1
+                        if [[ $? == 0 ]];
+                        then
+                        	logme "RPMs build and some files added"
+                                BUILD="ok"
+                                redis-cli set $MYRPMSPEC "$PRESPECFILE"  >/dev/null 2>&1
+                                for RPM in `cat $BUILDOUT/${NAME}-${VERSION}.rpmbuild.log |grep "^Wrote:" | awk -F"Wrote: "  '{ print $2 }' `
+                                do
+                                        MYRPM="rpm:${PACKAGE}"
+                                        MYSRPM="rpms:${PACKAGE}"
+                                        SRPM=`echo $RPM |grep "/SRPMS/"`
+                                        RPM=`echo $RPM |grep "/RPMS/"`
+                                        redis-cli set $MYRPM "$RPM"  >/dev/null 2>&1
+                                        redis-cli set $MYSRPM "$SRPM"    >/dev/null 2>&1
+                                        BUILD="ok"
+                                done
+                         fi
+		fi
+
+
+        ##########################################################################################################################################################
+
+        ##########################################################################################################################################################
+                cat $BUILDOUT/${NAME}-${VERSION}.rpmbuild.log | grep   "ambiguous python shebang in"  >/dev/null 2>&1
+                if [[ $? == 0  ]];
+                then
+                        logme "No such file or directory"
+                        if [[ $EXTENTION == "gz" ]];
+                        then
+                                find  . -type f |grep "\.py" |xargs -i{} sed -i "1,1s(#!/usr/bin/env python.*(#!/usr/bin/env python3(" {}  > /tmp/AUTOPATCH
+                                /usr/local/bin/mergefiles.sh ${PRESPECFILE}  /tmp/AUTOPATCH "%install"
+                                rpmbuild -ba -D 'debug_package %{nil}' --clean  $PRESPECFILE  >$BUILDOUT/${NAME}-${VERSION}.rpmbuild.log 2>&1
+                                cat $BUILDOUT/${NAME}-${VERSION}.rpmbuild.log |grep "^Wrote:" >/dev/null 2>&1
+                                if [[ $? == 0 ]];
+                                then
+                                     logme "RPMs build and some files added"
+                                     BUILD="ok"
+                                     redis-cli set $MYRPMSPEC "$PRESPECFILE"  >/dev/null 2>&1
+                                     for RPM in `cat $BUILDOUT/${NAME}-${VERSION}.rpmbuild.log |grep "^Wrote:" | awk -F"Wrote: "  '{ print $2 }' `
+                                     do
+                                          MYRPM="rpm:${PACKAGE}"
+                                          MYSRPM="rpms:${PACKAGE}"
+                                          SRPM=`echo $RPM |grep "/SRPMS/"`
+                                          RPM=`echo $RPM |grep "/RPMS/"`
+                                          redis-cli set $MYRPM "$RPM"  >/dev/null 2>&1
+                                          redis-cli set $MYSRPM "$SRPM"    >/dev/null 2>&1
+                                          BUILD="ok"
+                                     done
+                                fi
+                        fi
+                fi
+
+
+        ##########################################################################################################################################################
+
+
+        ##########################################################################################################################################################
+                cat $BUILDOUT/${NAME}-${VERSION}.rpmbuild.log | grep   "FileNotFoundError:"  >/dev/null 2>&1
+                if [[ $? == 0  ]];
+                then
+                        logme "FileNotFoundError:"
+                        if [[ $EXTENTION == "gz" ]];
+                        then
+				NAMEINTAR=`tar tvf ${BUILDDIR}/SOURCES/${NAME}-${VERSION}.${EXTENTION} |head -1 | awk -F':' '{ print $2 }' |cut -c 4- |awk -F'/' '{ print $1 }' `
+				repack  $NAMEINTAR $NAMEINTAR
+                                rpmbuild -ba -D 'debug_package %{nil}' --clean  $PRESPECFILE  >$BUILDOUT/${NAME}-${VERSION}.rpmbuild.log 2>&1
+                                cat $BUILDOUT/${NAME}-${VERSION}.rpmbuild.log |grep "^Wrote:" >/dev/null 2>&1
+                                if [[ $? == 0 ]];
+                                then
+                                     logme "RPMs build and some files added"
+                                     BUILD="ok"
+                                     redis-cli set $MYRPMSPEC "$PRESPECFILE"  >/dev/null 2>&1
+                                     for RPM in `cat $BUILDOUT/${NAME}-${VERSION}.rpmbuild.log |grep "^Wrote:" | awk -F"Wrote: "  '{ print $2 }' `
+                                     do
+                                          MYRPM="rpm:${PACKAGE}"
+                                          MYSRPM="rpms:${PACKAGE}"
+                                          SRPM=`echo $RPM |grep "/SRPMS/"`
+                                          RPM=`echo $RPM |grep "/RPMS/"`
+                                          redis-cli set $MYRPM "$RPM"  >/dev/null 2>&1
+                                          redis-cli set $MYSRPM "$SRPM"    >/dev/null 2>&1
+                                          BUILD="ok"
+                                     done
+                                fi
+
+
+
+                        fi
+                fi
+
+
+        ##########################################################################################################################################################
+
+
+		cat $BUILDOUT/${NAME}-${VERSION}.rpmbuild.log    |grep "error: Bad source: "
+		if [[ $? == 0  ]];
+		then
+			logme "Bad Source"
+			exit
+		fi
+	fi
+
+
+
+
+
+	if [[ $BUILD == "ok" ]];
+	then
+		logme "RPMS build with std : remarks $ALTBUILD "		
+		MYVERIFIEDSPEC="SPEC_VERIFY:${PACKAGE}"
+		scp $PRESPECFILE root@repos.pip2scl.dk:/usr/share/nginx/html/SPECS/${NAME}-${VERSION}.verified.spec
+	else
+		logme "RPMS build failed	"
+		redis-cli set $MYERR "$BUILDOUT/${NAME}-${VERSION}.rpmbuild.log" >/dev/null 2>&1  
+	fi
+}	
+	
+	
+	
+
+check_args
+logme "$PACKAGE"
+LOOP=1
+while [[ $LOOP != 0 ]];
+do
+	build_rpm
+	LOOP=$((LOOP-1))
+done
+
+logme "Build loop ended"

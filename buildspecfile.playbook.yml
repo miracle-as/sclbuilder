@@ -23,19 +23,5 @@
   hosts: prod_sclbuilder_worker
   tasks:
     - name: Build the scl
-      vars:
-         - version: "awxrpm"
-         - project:  "awx"
-         - project_dir: "/opt/awx"
-         - organisation: "miracle"
-         - scl_version: "19.4.0"
-         - scl_release: "1"
-         - scl_description: "A precompiled package which installed the requirements for running the service"
-         - requirementsfile: "http://repos.pip2scl.dk/awx.requirements.txt"
-         - requirementfile: "http://repos.pip2scl.dk/awx.requirements.txt"
-         - repo_url: "https://github.com/ansible/awx.git"
-         - branch: "19.4.0"
-      include_role:
-         name:  miracle-ansible-role-pipfreeze2scl 
-  become: True
+    
 
