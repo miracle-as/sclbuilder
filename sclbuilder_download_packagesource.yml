@@ -96,6 +96,13 @@
     with_items:
     - "{{ result.query_all_results.0 }}"
 
+  - name: update database if based on curl
+    debug:
+      msg: item
+    register: result
+    with_items:
+    - "{{ urlcheck.results }}"
+
 
   - debug: 
       var: urlcheck
