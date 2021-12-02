@@ -63,7 +63,7 @@
 
   - name: Copy the downloader python script
     ansible.builtin.template:
-      src: templates/pip-downloader.py.sh.j2
+      src: templates/pip-downloader.py.j2
       dest: /usr/local/bin/pip-downloader.py
       owner: root
       group: root 
