@@ -53,13 +53,22 @@
     become: yes
     become_user: sclbuilder
   
-  - name: Template a file to /etc/file.conf
+  - name: Copy the downloader script
     ansible.builtin.template:
       src: templates/sclbuilder_download.sh.j2
-      dest: /usr/local/bin/sclbuilder_download.sh.j2
+      dest: /usr/local/bin/sclbuilder_download.sh
       owner: root
       group: root 
       mode: '0755'
+
+  - name: Copy the downloader python script
+    ansible.builtin.template:
+      src: templates/pip-downloader.py.sh.j2
+      dest: /usr/local/bin/pip-downloader.py
+      owner: root
+      group: root 
+      mode: '0755'
+
 
   - name: Run download on our targets
     command: "/usr/local/bin/sclbuilder_download.sh {{ item.packagename }}=={{ item.packageversion }}"
