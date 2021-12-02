@@ -17,13 +17,9 @@
       db: sclbuilder
       login_user: "sclbuilder"
       login_password: "django2know"
-      query: INSERT INTO projects_packages (slug, packagname, packaversion, releasebuild, releasedescription,  releasestatus,  releasecreated) VALUES( '{{ release.slug }}', '{{ release.subprojectname }}', '{{ release.name }}',  '{{ release.version }}', '{{ release.build }}', '{{ release.description }}',  'Initial',  '{{ ansible_date_time.date }} ') ON CONFLICT (releasename) DO NOTHING;
+      query: INSERT INTO projects_packages (slug, packageident, packagename, packageversion, packagestatus,  packagecreated) VALUES( '{{ package.slug }}', '{{ package.name }}',  '{{ package.version }}' 'Initial',  '{{ ansible_date_time.date }} ') ON CONFLICT (slug) DO NOTHING;
     become: yes
     become_user: sclbuilder
-    loop:
-      - { "slug": "awxrpm", "subprojectname": "AWX-RPM", "name": "Nitten", "version": "19.4.1", "build": "001", "description": "Miracle supported RPM/SCL based AWX ", "url": "awx-rpm.wiki" }
-    loop_control:
-      loop_var: release
 #INSERT INTO projects_subprojectrelease (subprojectname_id,  releasename,  releaseversion,  releasebuild,  releasedescription,  releasestatus,  releasecreated) VALUES('awx-rpm',  '19.5.0',  '19.5.0',  '001',  'Autocreated from repo',  'Initial',  '2021-12-01 08:28:11.240412') RETURNING 'projects_subprojectrelease_id' ;
 
 
