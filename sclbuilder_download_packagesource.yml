@@ -88,3 +88,5 @@
     - "{{ result.query_all_results.0 }}"
 
 
+  - debug: 
+      var: download
