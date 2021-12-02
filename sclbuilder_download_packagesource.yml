@@ -102,4 +102,5 @@
     register: result
     with_items:
       - "{{ urlcheck.results }}"
+    when:  item.status == 200
 
