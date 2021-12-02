@@ -105,6 +105,3 @@
     when:
       item.status = "200"
 
-
-  - debug: 
-      var: urlcheck
