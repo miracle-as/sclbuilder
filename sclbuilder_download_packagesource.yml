@@ -60,6 +60,7 @@
       owner: root
       group: root 
       mode: '0755'
+    become: yes
 
   - name: Copy the downloader python script
     ansible.builtin.template:
@@ -68,6 +69,7 @@
       owner: root
       group: root 
       mode: '0755'
+    become: yes
 
   - name: Copy the downloader env script
     ansible.builtin.template:
@@ -76,6 +78,7 @@
       owner: root
       group: root 
       mode: '0755'
+    become: yes
 
 
 
