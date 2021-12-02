@@ -103,5 +103,5 @@
     with_items:
       - "{{ urlcheck.results }}"
     when:
-      item.status = "200"
+      item.status == "200"
 
