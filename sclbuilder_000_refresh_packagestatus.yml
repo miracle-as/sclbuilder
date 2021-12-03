@@ -42,6 +42,29 @@
     with_items:
     - "{{ result.query_all_results.0 }}"
 
+  - name: get all packages
+    postgresql_query:
+      db: sclbuilder
+      login_user: "sclbuilder"
+      login_password: "django2know"
+      query: select * from  projects_package;
+    register: allpackages
+    become: yes
+    become_user: sclbuilder
+
+  - name: set expected urls
+    postgresql_query:
+      db: sclbuilder
+      login_user: "sclbuilder"
+      login_password: "django2know"
+      query: "update projects_package set packagestatusurl = 'http://repos.pip2scl.dk:/PACKAGE/status', packagesourcefileurlorg = '', packagesourcefileurl = 'http://repos.pip2scl.dk:/SOURCE/{{ item.packagename }}-{{ item.packageversion }}', packageorgspecfileurl = 'http://repos.pip2scl.dk:/SPECS/{{ item.packagename }}-{{ item.packageversion }}.original.spec', packagespecfileurl = 'http://repos.pip2scl.dk:/SPECS/{{ item.packagename }}-{{ item.packageversion }}.spec', packageSclfileurl = 'http://repos.pip2scl.dk:/SPECS/{{ item.packagename }}-{{ item.packageversion }}.original.scl', packagetweakscript = 'http://repos.pip2scl.dk:/TWEAKS/{{ item.packagename }}-{{ item.packageversion }}.tweak' where id = {{ item.id }} ; " 
+    register: result
+    become: yes
+    become_user: sclbuilder
+    with_items:
+    - "{{ allpackages.query_all_results.0 }}"
+
+
   - name: Insert package
     postgresql_query:
       db: sclbuilder
