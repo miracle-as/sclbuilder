@@ -195,7 +195,7 @@ checkpackage ()
 	cp $SPEC $ORGSPECFILE
 	if [[ $? == 0 ]];
 	then
-        	redis-cli set  $MYORGSPECKEY  $ >/dev/null 2>&1
+        	redis-cli set  $MYORGSPECKEY  $SPEC >/dev/null 2>&1
 	else
 		logme "copy failed"
 		exit
