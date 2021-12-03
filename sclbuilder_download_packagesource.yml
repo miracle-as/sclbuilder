@@ -119,7 +119,7 @@
       db: sclbuilder
       login_user: "sclbuilder"
       login_password: "django2know"
-      query: "update projects_package set packagesourcefilestatus = 'Completed' where  packagesourcefileurl = 'http://repos.pip2scl.dk/SOURCES/{{ item.packagename }}-{{ item.packageversion }}.tar.gz' ; " 
+      query: "update projects_package set packagesourcefilestatus = 'Completed' where  packagesourcefileurl = {{ item.url }} ; " 
     register: result
     with_items:
       - "{{ urlcheck.results }}"
