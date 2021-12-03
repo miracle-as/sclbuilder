@@ -104,8 +104,6 @@
       mode: '0755'
     become: yes
 
-
-
   - name: Run download on our targets
     command: "/usr/local/bin/sclbuilder_download.sh {{ item.packagename }}=={{ item.packageversion }}"
     become: yes
@@ -120,6 +118,10 @@
     with_items:
     - "{{ result.query_all_results.0 }}"
 
+  - debug: 
+      var: urlcheck
+
+      
   - name: update database if based on curl
     postgresql_query:
       db: sclbuilder
