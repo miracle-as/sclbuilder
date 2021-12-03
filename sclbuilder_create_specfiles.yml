@@ -12,12 +12,12 @@
     become: yes
     become_user: sclbuilder
 
-  - name: Select the all packages where packagesourcefileurl is NULL
+  - name: Select the all packages where packagespecfileurl is NULL
     postgresql_query:
       db: sclbuilder
       login_user: "sclbuilder"
       login_password: "django2know"
-      query: select * from  projects_package where packagesourcefileurl IS NULL;
+      query: select * from  projects_package where packagespecfileurl IS NULL;
     register: sourceurlmissingpackages
     become: yes
     become_user: sclbuilder
@@ -27,7 +27,7 @@
       db: sclbuilder
       login_user: "sclbuilder"
       login_password: "django2know"
-      query: "update projects_package set packagesourcefilestatus = 'Building' , packagesourcefileurl = 'http://repos.pip2scl.dk/SOURCES/{{ item.packagename }}-{{ item.packageversion}}.tar.gz'  where id = {{ item.id }} ; " 
+      query: "update projects_package set packagespecfilestatus = 'Building' , packagesourcefileurl = 'http://repos.pip2scl.dk/SPECS/{{ item.packagename }}-{{ item.packageversion}}.SPEC'  where id = {{ item.id }} ; " 
     register: adoptedpackages
     become: yes
     become_user: sclbuilder
@@ -40,7 +40,7 @@
       db: sclbuilder
       login_user: "sclbuilder"
       login_password: "django2know"
-      query: select * from  projects_package where packagesourcefilestatus 	IS NULL;;
+      query: select * from  projects_package where packagespecfilestatus 	IS NULL;;
     register: newpackages
     become: yes
     become_user: sclbuilder
@@ -50,8 +50,7 @@
       db: sclbuilder
       login_user: "sclbuilder"
       login_password: "django2know"
-      query: "update projects_package set packagesourcefilestatus = 'Building'  where id = {{ item.id }} ; " 
-      #query: "update projects_package set packagesourcefilestatus = 'Building', packagesourcefileurl = 'http://repos.pip2scl.dk/SOURCES/{{ item.packagename }}-{{ item.packageversion}}.tar.gz'  where id = {{ item.id }} ; " 
+      query: "update projects_package set packagespecfilestatus = 'Building'  where id = {{ item.id }} ; " 
     register: adoptedpackages
     become: yes
     become_user: sclbuilder
@@ -65,23 +64,14 @@
       login_user: "sclbuilder"
       login_password: "django2know"
       query: select packagename, packageversion from  projects_package where packagesourcefilestatus = 'Building';
-    register: result
+    register: buildingresult
     become: yes
     become_user: sclbuilder
   
   - name: Copy the downloader script
     ansible.builtin.template:
-      src: sclbuilder_download.sh.j2
-      dest: /usr/local/bin/sclbuilder_download.sh
-      owner: root
-      group: root 
-      mode: '0755'
-    become: yes
-
-  - name: Copy the downloader python script
-    ansible.builtin.template:
-      src: pip-downloader.py.j2
-      dest: /usr/local/bin/pip-downloader.py
+      src: sclbuilder_createspecfile.sh.j2
+      dest: /usr/local/bin/sclbuilder_createspecile.sh
       owner: root
       group: root 
       mode: '0755'
@@ -96,19 +86,19 @@
       mode: '0755'
     become: yes
 
-  - name: Run download on our targets
-    command: "/usr/local/bin/sclbuilder_download.sh {{ item.packagename }}=={{ item.packageversion }}"
+  - name: Run sclbuilder_createspecfile.sh  on our targets
+    command: "/usr/local/bin/sclbuilder_createspecfilei.sh {{ item.packagename }}=={{ item.packageversion }}"
     become: yes
-    register: download
+    register: specfiles
     with_items:
-    - "{{ result.query_all_results.0 }}"
+    - "{{ buildingresult.query_all_results.0 }}"
 
   - name: Run download on our targets
     uri:
-      url: "http://repos.pip2scl.dk/SOURCES/{{ item.packagename }}-{{ item.packageversion }}.tar.gz"
+      url: "http://repos.pip2scl.dk/SPECS/{{ item.packagename }}-{{ item.packageversion }}.spec"
     register: urlcheck
     with_items:
-    - "{{ result.query_all_results.0 }}"
+    - "{{ buildingresult.query_all_results.0 }}"
 
 #  - debug: 
 #      var: urlcheck
@@ -119,7 +109,7 @@
       db: sclbuilder
       login_user: "sclbuilder"
       login_password: "django2know"
-      query: "update projects_package set packagesourcefilestatus = 'Completed' where  packagesourcefileurl = '{{ item.url }}' ; " 
+      query: "update projects_package set packagespecfilestatus = 'Completed' where  packagespecfileurl = '{{ item.url }}' ; " 
     register: result
     become: yes
     become_user: sclbuilder
