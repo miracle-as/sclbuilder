@@ -64,7 +64,7 @@
       db: sclbuilder
       login_user: "sclbuilder"
       login_password: "django2know"
-      query: select packagename, packageversion from  projects_package where packagesourcefilestatus == 'Building';
+      query: select packagename, packageversion from  projects_package where packagesourcefilestatus = 'Building';
     register: result
     become: yes
     become_user: sclbuilder
