@@ -18,7 +18,7 @@
       login_user: "sclbuilder"
       login_password: "django2know"
       query: select * from  projects_package where packagespecfileurl IS NULL;
-    register: sourceurlmissingpackages
+    register: specurlmissingpackages
     become: yes
     become_user: sclbuilder
 
@@ -27,12 +27,12 @@
       db: sclbuilder
       login_user: "sclbuilder"
       login_password: "django2know"
-      query: "update projects_package set packagespecfilestatus = 'Building' , packagesourcefileurl = 'http://repos.pip2scl.dk/SPECS/{{ item.packagename }}-{{ item.packageversion}}.SPEC'  where id = {{ item.id }} ; " 
+      query: "update projects_package set packagespecfilestatus = 'Building' , packagespecfileurl = 'http://repos.pip2scl.dk/SPECS/{{ item.packagename }}-{{ item.packageversion}}.SPEC'  where id = {{ item.id }} ; " 
     register: adoptedpackages
     become: yes
     become_user: sclbuilder
     with_items:
-    - "{{ sourceurlmissingpackages.query_all_results.0 }}"
+    - "{{ specurlmissingpackages.query_all_results.0 }}"
 
 
   - name: Select the new ones 
@@ -63,7 +63,7 @@
       db: sclbuilder
       login_user: "sclbuilder"
       login_password: "django2know"
-      query: select packagename, packageversion from  projects_package where packagesourcefilestatus = 'Building';
+      query: select packagename, packageversion from  projects_package where packagespecfilestatus = 'Building';
     register: buildingresult
     become: yes
     become_user: sclbuilder
