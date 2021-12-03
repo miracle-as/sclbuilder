@@ -43,6 +43,14 @@
     with_items:
     - "{{ result.query_all_results.0 }}"
 
+  - name: Show effect on update
+    debug:
+       msg: item
+    register: result
+    with_items:
+      - "{{ result }}"
+
+
 
   - name: Select the building candidates
     postgresql_query:
