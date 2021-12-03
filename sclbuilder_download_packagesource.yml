@@ -121,6 +121,8 @@
       login_password: "django2know"
       query: "update projects_package set packagesourcefilestatus = 'Completed' where  packagesourcefileurl = {{ item.url }} ; " 
     register: result
+    become: yes
+    become_user: sclbuilder
     with_items:
       - "{{ urlcheck.results }}"
     when:  item.status == 200
