@@ -45,14 +45,6 @@
     become: yes
     become_user: sclbuilder
   
-#  - debug: 
-#      var: newpackages.query_all_results.0
-#
-# - name: loop packages
-#    debug: msg="HERWEGO :{{ item.id }}"
-#    with_items:
-#    - "{{ result.query_all_results.0 }}"
-#
   - name: Set them to building
     postgresql_query:
       db: sclbuilder
@@ -72,7 +64,7 @@
       db: sclbuilder
       login_user: "sclbuilder"
       login_password: "django2know"
-      query: select packagename, packageversion from  projects_package where packagesourcefilestatus IS NULL;
+      query: select packagename, packageversion from  projects_package where packagesourcefilestatus IS 'Building';
     register: result
     become: yes
     become_user: sclbuilder
@@ -121,7 +113,7 @@
   - debug: 
       var: urlcheck
 
-      
+
   - name: update database if based on curl
     postgresql_query:
       db: sclbuilder
