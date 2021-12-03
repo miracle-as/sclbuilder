@@ -17,7 +17,7 @@
       db: sclbuilder
       login_user: "sclbuilder"
       login_password: "django2know"
-      query: select * from  projects_package where packagestatus != "Completed";
+      query: select * from  projects_package where packagestatus != 'Completed';
     register: result
     become: yes
     become_user: sclbuilder
