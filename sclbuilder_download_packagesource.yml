@@ -110,8 +110,8 @@
     with_items:
     - "{{ result.query_all_results.0 }}"
 
-  - debug: 
-      var: urlcheck
+#  - debug: 
+#      var: urlcheck
 
 
   - name: update database if based on curl
