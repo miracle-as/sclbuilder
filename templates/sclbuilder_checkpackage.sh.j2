@@ -192,7 +192,7 @@ checkpackage ()
 	NAMEINSPEC=`grep "define name " $SPEC |awk '{ print $2 }' `
 	logme "SPEC $SPEC created and saving it"
 	###################
-	cp $SPEC $ORGSPECFILE
+    scp $SPEC root@repos.pip2scl.dk:/usr/share/nginx/html/SPECS/$NAME-$VERSION.original.spec
 	if [[ $? == 0 ]];
 	then
         	redis-cli set  $MYORGSPECKEY  $SPEC >/dev/null 2>&1
