@@ -32,18 +32,6 @@ fi
 
 }
 
-lastbuild ()
-{
-	curl http://repos.pip2scl.dk/header.html >  $INDEX
-	echo "<pre>" >> $INDEX
-	cat $LASTBUILD >> $INDEX
-	echo "</pre>" >> $INDEX
-	curl http://repos.pip2scl.dk/footer.html >> $INDEX
-	scp $INDEX root@repos.pip2scl.dk:/usr/share/nginx/html/index.html 
-}
-
-
-
 tgz2tgz ()
 {
 	logme "tar gz file to tar gz"
@@ -196,6 +184,7 @@ checkpackage ()
     scp $SPEC root@repos.pip2scl.dk:/usr/share/nginx/html/SPECS/${FILENAME}
 	if [[ $? == 0 ]];
 	then
+			echo "$FILENAME"
         	redis-cli set  $MYORGSPECKEY  $SPEC >/dev/null 2>&1
 	else
 		logme "copy failed"
