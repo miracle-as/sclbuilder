@@ -68,10 +68,10 @@
     become: yes
     become_user: sclbuilder
   
-  - name: Copy the downloader script
+  - name: Copy the rpmbuilder script
     ansible.builtin.template:
-      src: sclbuilder_createspecfile.sh.j2
-      dest: /usr/local/bin/sclbuilder_createspecile.sh
+      src: sclbuilder_buildrpm.sh.j2
+      dest: /usr/local/bin/sclbuilder_buildrpm.sh
       owner: root
       group: root 
       mode: '0755'
