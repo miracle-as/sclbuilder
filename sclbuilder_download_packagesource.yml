@@ -119,7 +119,7 @@
       db: sclbuilder
       login_user: "sclbuilder"
       login_password: "django2know"
-      query: "update projects_package set packagesourcefilestatus = 'Completed' where  packagesourcefileurl = {{ item.url }} ; " 
+      query: "update projects_package set packagesourcefilestatus = 'Completed' where  packagesourcefileurl = '{{ item.url }}' ; " 
     register: result
     become: yes
     become_user: sclbuilder
