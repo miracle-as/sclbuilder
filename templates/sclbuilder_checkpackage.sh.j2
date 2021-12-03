@@ -101,32 +101,6 @@ checkpackage ()
 	touch CHANGELOG.rst
 
 
-	##########################################################
-	# check if a handcrafted hardcoded spec file exists
-	###########################################################
-
-	#curl "http://repos.pip2scl.dk/SPECS/${NAME}-${VERSION}.hardcoded.spec" >/tmp/hardcoded.spec
-	#if [[ $? == 0 ]];
-	#then
-#		logme "Spec file is hardcoded"
-#		mkdir dist >/dev/null 2>&1
-#		curl "http://repos.pip2scl.dk/SPECS/${NAME}-${VERSION}.hardcoded.spec" >dist/${NAME}-${VERSION}.spec
-#		SPECFILECREATE="HARD"
-#	fi
-
-
-        if [[ $SPECFILECREATE == "no" ]];
-        then
-                python3 setup.py bdist_rpm --spec-only >/dev/null 2>&1
-                if [[ $? == 0 ]];
-                then
-			logme "Spec file is working on python 3"
-                        PYCMD="python3"
-                        SPECFILECREATE="yes"
-                fi
-        fi
-
-	
 	if [[ $SPECFILECREATE != "HARD" ]];
 	then
 		python3.8 setup.py bdist_rpm --spec-only >/dev/null 2>&1
@@ -134,17 +108,6 @@ checkpackage ()
 		then
 			logme "Spec file is working on python 3.8"
 			PYCMD="python3.8"
-			SPECFILECREATE="yes"
-		fi
-	fi
-
-	if [[ $SPECFILECREATE == "no" ]];
-	then
-		python2 setup.py bdist_rpm --spec-only >/dev/null 2>&1
-		if [[ $? == 0 ]];
-		then
-			logme "Spec file is working on python 2"
-			PYCMD="python2"
 			SPECFILECREATE="yes"
 		fi
 	fi
@@ -158,14 +121,6 @@ checkpackage ()
 		else
 			echo "error: $PACKAGE - spec creation failed"
 			cat /tmp/specfile.$package.log
-			exit
-		fi
-	else
-		if [ $SPECFILECREATE == "HARD" ];
-		then
-			logme "Spec file is hardcoded"
-		else
-			logme "Spec file creation failed"
 			exit
 		fi
 	fi
