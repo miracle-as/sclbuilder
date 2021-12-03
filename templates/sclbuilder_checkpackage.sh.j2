@@ -192,7 +192,8 @@ checkpackage ()
 	NAMEINSPEC=`grep "define name " $SPEC |awk '{ print $2 }' `
 	logme "SPEC $SPEC created and saving it"
 	###################
-    scp $SPEC root@repos.pip2scl.dk:/usr/share/nginx/html/SPECS/$NAME-$VERSION.original.spec
+	FILENAME=`echo ${NAME}-${VERSION}.original.spec |tr -d '_' '-' | tr '[A-Z]' '[a-z]'`
+    scp $SPEC root@repos.pip2scl.dk:/usr/share/nginx/html/SPECS/${FILENAME}
 	if [[ $? == 0 ]];
 	then
         	redis-cli set  $MYORGSPECKEY  $SPEC >/dev/null 2>&1
@@ -200,7 +201,7 @@ checkpackage ()
 		logme "copy failed"
 		exit
 	fi
-	/usr/bin/rm -r /tmp/sandbox >/dev/null 2>&1
+	/usr/bin/rm -r /tmp/sandbox /dev/null 2>&1
 }
 
 check_args
