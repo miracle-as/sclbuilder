@@ -22,14 +22,14 @@
     become: yes
     become_user: sclbuilder
   
-  - debug: 
-      var: newpackages.query_all_results.0
-
-  - name: loop packages
-    debug: msg="HERWEGO :{{ item.id }}"
-    with_items:
-    - "{{ result.query_all_results.0 }}"
-
+#  - debug: 
+#      var: newpackages.query_all_results.0
+#
+# - name: loop packages
+#    debug: msg="HERWEGO :{{ item.id }}"
+#    with_items:
+#    - "{{ result.query_all_results.0 }}"
+#
   - name: Set them to building
     postgresql_query:
       db: sclbuilder
@@ -42,14 +42,6 @@
     become_user: sclbuilder
     with_items:
     - "{{ newpackages.query_all_results.0 }}"
-
-  - name: Show effect on update
-    debug:
-       msg: item
-    register: result
-    with_items:
-      - "{{ result }}"
-
 
 
   - name: Select the building candidates
