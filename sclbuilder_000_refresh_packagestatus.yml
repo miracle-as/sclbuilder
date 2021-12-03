@@ -85,5 +85,5 @@
     become: yes
     become_user: sclbuilder
     with_items:
-    - "{{ ibuilding.query_all_results.0 }}"
+    - "{{ building.query_all_results.0 }}"
   
