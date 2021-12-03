@@ -12,6 +12,29 @@
     become: yes
     become_user: sclbuilder
 
+  - name: Select the all packages where packagesourcefileurl is NULL
+    postgresql_query:
+      db: sclbuilder
+      login_user: "sclbuilder"
+      login_password: "django2know"
+      query: select * from  projects_package where packagesourcefileurl IS NULL;
+    register: sourceurlmissingpackages
+    become: yes
+    become_user: sclbuilder
+
+  - name: Set them to building
+    postgresql_query:
+      db: sclbuilder
+      login_user: "sclbuilder"
+      login_password: "django2know"
+      query: "update projects_package set packagesourcefilestatus = 'Building' , packagesourcefileurl = 'http://repos.pip2scl.dk/SOURCES/{{ item.packagename }}-{{ item.packageversion}}.tar.gz'  where id = {{ item.id }} ; " 
+    register: adoptedpackages
+    become: yes
+    become_user: sclbuilder
+    with_items:
+    - "{{ sourceurlmissingpackages.query_all_results.0 }}"
+
+
   - name: Select the new ones 
     postgresql_query:
       db: sclbuilder
