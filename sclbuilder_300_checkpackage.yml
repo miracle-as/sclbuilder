@@ -117,3 +117,6 @@
       - "{{ urlcheck.results }}"
     when:  item.status == 200
 
+
+  - debug: 
+      var: result
