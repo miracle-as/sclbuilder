@@ -200,7 +200,7 @@ checkpackage ()
 		logme "copy failed"
 		exit
 	fi
-	/usr/bin/rm -r /tmp/sandbox /dev/null 2>&1
+	/usr/bin/rm -r /tmp/sandbox >/dev/null 2>&1
 }
 
 check_args
