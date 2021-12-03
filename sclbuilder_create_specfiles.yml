@@ -86,8 +86,8 @@
       mode: '0755'
     become: yes
 
-  - name: Run sclbuilder_createspecfile.sh  on our targets
-    command: "/usr/local/bin/sclbuilder_createspecfilei.sh {{ item.packagename }}=={{ item.packageversion }}"
+  - name: Run sclbuilder_buildrpm.sh  on our targets
+    command: "/usr/local/bin/sclbuilder_buildrpm.sh {{ item.packagename }}=={{ item.packageversion }}"
     become: yes
     register: specfiles
     with_items:
