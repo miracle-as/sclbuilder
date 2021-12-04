@@ -101,15 +101,14 @@ checkpackage ()
 	touch CHANGELOG.rst
 
 
-		python3.8 setup.py bdist_rpm --spec-only >/dev/null 2>&1
-		if [[ $? == 0 ]];
-		then
-			logme "Spec file is working on python 3.8"
-			PYCMD="python3.8"
-			SPECFILECREATE="yes"
-		fi
+	python3.8 setup.py bdist_rpm --spec-only >/dev/null 2>&1
+	if [[ $? == 0 ]];
+	then
+		logme "Spec file is working on python 3.8"
+		PYCMD="python3.8"
+		SPECFILECREATE="yes"
 	fi
-
+	
 	cd dist
 	SPEC=`ls -1`
 	echo "$SPEC" > /tmp/$NAME-$VERSION.original_specfile_name
