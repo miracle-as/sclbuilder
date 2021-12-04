@@ -9,7 +9,7 @@ do
     VERS=`echo $REQ | awk -F'==' '{ print $2 }'`
     SLUG=`echo ${NAME}___${VERS} | tr '.' '_'`
     EXTRAVAR="'{ \"slug\": \"$SLUG\", \"name\": \"$NAME\", \"version\": \"$VERS\" }'"
-    echo ansible-playbook -i inventory sclbuilder_insert_package.yml --extra-vars $EXTRAVAR >> $SCRIPT
+    echo ansible-playbook -i inventory sclbuilder_100_insert_package.yml --extra-vars $EXTRAVAR >> $SCRIPT
 done
 
 
