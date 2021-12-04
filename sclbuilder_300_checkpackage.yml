@@ -71,7 +71,7 @@
   - name: Copy the rpmbuilder script
     ansible.builtin.template:
       src: sclbuilder_create_original_specfile.sh.j2
-      dest: /usr/local/bin/sclbuilder_checkpackage.sh
+      dest: /usr/local/bin/sclbuilder_create_original_specfile.sh
       owner: root
       group: root 
       mode: '0755'
@@ -87,7 +87,7 @@
     become: yes
 
   - name: Run sclbuilder_buildrpm.sh  on our targets
-    command: "/usr/local/bin/sclbuilder_crate_original_specfile.sh {{ item.packagename }}=={{ item.packageversion }}"
+    command: "/usr/local/bin/sclbuilder_create_original_specfile.sh {{ item.packagename }}=={{ item.packageversion }}"
     become: yes
     register: specfiles
     with_items:
