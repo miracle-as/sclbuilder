@@ -47,11 +47,11 @@ build_wheels ()
 
 checkpackage ()
 {
-        NAME=`echo $PACKAGE | awk -F'==' '{ print $1 }'`
-        VERSION=`echo $PACKAGE | awk -F'==' '{ print $2 }'`
-        MYKEY="filename:${PACKAGE}"
-        MYURL="url:${PACKAGE}"
-        MYCRC="crc:$PACKAGE"
+    NAME=`echo $PACKAGE | awk -F'==' '{ print $1 }'`
+    VERSION=`echo $PACKAGE | awk -F'==' '{ print $2 }'`
+    MYKEY="filename:${PACKAGE}"
+    MYURL="url:${PACKAGE}"
+    MYCRC="crc:$PACKAGE"
 	MYDIRKEY="pkgdir:${PACKAGE}"
 	EXTENTION="tar.gz"
 	SPECFILECREATE="no"
@@ -101,8 +101,6 @@ checkpackage ()
 	touch CHANGELOG.rst
 
 
-	if [[ $SPECFILECREATE != "HARD" ]];
-	then
 		python3.8 setup.py bdist_rpm --spec-only >/dev/null 2>&1
 		if [[ $? == 0 ]];
 		then
@@ -112,45 +110,11 @@ checkpackage ()
 		fi
 	fi
 
-	if [ $SPECFILECREATE == "yes" ];
-	then
-		$PYCMD setup.py bdist_rpm --spec-only >/tmp/specfile.$PACKAGE.log 2>&1
-		if [[ $? == 0 ]]
-		then
-			logme "spec file created"
-		else
-			echo "error: $PACKAGE - spec creation failed"
-			cat /tmp/specfile.$package.log
-			exit
-		fi
-	fi
-
-		
 	cd dist
 	SPEC=`ls -1`
 	echo "$SPEC" > /tmp/$NAME-$VERSION.original_specfile_name
-
-	
 	scp  $SPEC root@repos.pip2scl.dk:/usr/share/nginx/html/SPECS 
 	scp  /tmp/$NAME-$VERSION.original_specfile_name root@repos.pip2scl.dk:/usr/share/nginx/html/SPECS 
-	
-	sed -i "s/^python /$PYCMD /" $SPEC
-	sed -i "s/^%{__python} /$PYCMD /" $SPEC
-
-	NAMEINSPEC=`grep "define name " $SPEC |awk '{ print $2 }' `
-	logme "SPEC $SPEC created and saving it"
-	###################
-	FILENAME=`echo ${NAME}-${VERSION}.original.spec |tr -d '_' '-' | tr '[A-Z]' '[a-z]'`
-    scp $SPEC root@repos.pip2scl.dk:/usr/share/nginx/html/SPECS/${FILENAME}
-	if [[ $? == 0 ]];
-	then
-			echo "$FILENAME"
-        	redis-cli set  $MYORGSPECKEY  $SPEC >/dev/null 2>&1
-	else
-		logme "copy failed"
-		exit
-	fi
-	/usr/bin/rm -r /tmp/sandbox /dev/null 2>&1
 }
 
 check_args
