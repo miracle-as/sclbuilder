@@ -80,7 +80,9 @@ checkpackage ()
 			exit 22
 		fi
 	fi
-	
+
+
+
 	logme "name in tar $NIT"
 	logme "Check $NIT"
 	MYDIRKEY="pkgdir:${PACKAGE}"
@@ -129,7 +131,7 @@ checkpackage ()
 	echo "$SPEC" > /tmp/$NAME-$VERSION.original_specfile_name
 
 	
-	scp  $SPEC root@repos.pip2scl.dk:/usr/share/nginx/html/SPECS 
+	scp  $SPEC root@repos.pip2scl.dk:/usr/share/nginx/html/SPECS/$NAME-$VERSION.original.spec
 	scp  /tmp/$NAME-$VERSION.original_specfile_name root@repos.pip2scl.dk:/usr/share/nginx/html/SPECS 
     
 
