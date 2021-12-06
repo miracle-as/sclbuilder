@@ -45,27 +45,8 @@ build_wheels ()
 }
 
 
-checkpackage ()
+repackpackage ()
 {
-    NAME=`echo $PACKAGE | awk -F'==' '{ print $1 }'`
-    VERSION=`echo $PACKAGE | awk -F'==' '{ print $2 }'`
-    MYKEY="filename:${PACKAGE}"
-    MYURL="url:${PACKAGE}"
-    MYCRC="crc:$PACKAGE"
-	MYDIRKEY="pkgdir:${PACKAGE}"
-	EXTENTION="tar.gz"
-	SPECFILECREATE="no"
-	TARFILE="${BUILDDIR}/SOURCES/${NAME}-${VERSION}.${EXTENTION}"
-	if [[ -f $TARFILE ]];
-	then
-		logme "$TARFILE is here"
-	else
-		redis-cli get $MYURL
-	fi
-	/usr/bin/rm -r /tmp/sandbox >/dev/null 2>&1 || logme "cleaner"
-	mkdir /tmp/sandbox
-	cd /tmp/sandbox
-	logme "Is file a gz file"
 	if [[ $EXTENTION == "tar.gz" ]];
 	then
 		logme "Extract the source from $FILE"
@@ -131,9 +112,7 @@ checkpackage ()
 	
 	scp  $SPEC root@repos.pip2scl.dk:/usr/share/nginx/html/SPECS 
 	scp  /tmp/$NAME-$VERSION.original_specfile_name root@repos.pip2scl.dk:/usr/share/nginx/html/SPECS 
-    
-
-
+	
 	sed -i "s/^python /$PYCMD /" $SPEC
 	sed -i "s/^%{__python} /$PYCMD /" $SPEC
 
