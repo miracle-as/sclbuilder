@@ -100,22 +100,22 @@
     with_items:
     - "{{ buildingresult.query_all_results.0 }}"
 
-#  - debug: 
-#      var: urlcheck
+  - debug: 
+      var: urlcheck
 
 
-  - name: update database if based on curl
-    postgresql_query:
-      db: sclbuilder
-      login_user: "sclbuilder"
-      login_password: "django2know"
-      query: "update projects_package set packageorgspecfilestatus = 'Completed' where  packageorgspecfileurl = '{{ item.url }}' ; " 
-    register: result
-    become: yes
-    become_user: sclbuilder
-    with_items:
-      - "{{ urlcheck.results }}"
-    when:  item.status == 200
+#  - name: update database if based on curl
+#    postgresql_query:
+#      db: sclbuilder
+#      login_user: "sclbuilder"
+#      login_password: "django2know"
+#      query: "update projects_package set packageorgspecfilestatus = 'Completed' where  packageorgspecfileurl = '{{ item.url }}' ; " 
+#    register: result
+#    become: yes
+#    become_user: sclbuilder
+#    with_items:
+#      - "{{ urlcheck.results }}"
+#    when:  item.status == 200
 
 
   - debug: 
