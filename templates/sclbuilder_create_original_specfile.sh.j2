@@ -113,7 +113,7 @@ checkpackage ()
 	SPEC=`ls -1`
 	echo "$SPEC" > /tmp/$NAME-$VERSION.original.spec
 	scp  $SPEC root@repos.pip2scl.dk:/usr/share/nginx/html/SPECS 
-	scp  /tmp/$NAME-$VERSION.original_spec root@repos.pip2scl.dk:/usr/share/nginx/html/SPECS 
+	scp  /tmp/$NAME-$VERSION.original.spec root@repos.pip2scl.dk:/usr/share/nginx/html/SPECS 
 }
 
 check_args
