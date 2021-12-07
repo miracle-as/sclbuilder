@@ -6,7 +6,7 @@
     - version:  "1.0.0"
     - organisation: "miracle"
     - project: "awx-rpm"
-    - scl_version: "stein"
+    - scl_version: "1.0.0"
     - scl_release: "1"
     - scl_description: "Software collection for {{ project }}"
 
