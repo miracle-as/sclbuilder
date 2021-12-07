@@ -12,7 +12,7 @@ export PRESCLDIR="${BUILDDIR}/PRESCLS"
 export VERSCLDIR="${BUILDDIR}/VERSCLS"
 export OUTPUTDIR="${BUILDDIR}/OUTPUT"
 export DOWNLOADDIR="${BUILDDIR}/DOWNLOADS"
-export REPO="http://repos.pip2scl.dk/SPECS"
+export REPO="http://repos.pip2scl.dk"
 
 export QUIET="no"
 
@@ -28,6 +28,7 @@ export ORGSPECFILEURL="${REPO}/SPECS/${NAME}-${VERSION}.original.spec"
 export ORGSPECFILE="${ORGSPECDIR}/${NAME}-${VERSION}.original.spec"
 export VERSPECFILE="${VERSPECDIR}/${NAME}-${VERSION}.verified.spec"
 export PRESPECFILE="${PRESPECDIR}/${NAME}-${VERSION}.pre.spec"
+export SCLFILE="${VERSCLDIR}/${NAME}-${VERSION}.scl.spec"
 export VERSCLFILE="${VERSCLDIR}/${NAME}-${VERSION}.verified.scl.spec"
 export PRESCLFILE="${PRESCLDIR}/${NAME}-${VERSION}.pre.scl"
 
@@ -41,7 +42,7 @@ export OURTARSOURCE="${BUILDDIR}/SOURCES/${OURTARNAME}"
 export OURZIPSOURCE="${BUILDDIR}/SOURCES/${OURZIPNAME}"
 export OURBZSOURCE="${BUILDDIR}/SOURCES/${OURBZNAME}"
 
-export OURURL="http://repos.pip2scl.dk/SOURCES/${OURNAME}"
+export OURURL="${REPO}/SOURCES/${OURNAME}"
 
 export FAILEDRPMS="${OUTPUTDIR}/failed.txt"
 export LOGFILE="${OUTPUTDIR}/${NAME}-${VERSION}.package.log"
