@@ -45,7 +45,14 @@ lastbuild ()
 build_scl ()
 {
 	logme "adding $PACKAGE to software collection $SCL"
-	wget -O  $OURURL $OURSOURCE  >/dev/null 2>&1
+	wget  $OURURL -O $OURSOURCE  >/dev/null 2>&1
+	if [[ $? == 0 ]];
+	then	
+		logme "Download complete"
+	else	
+		logme "Download Fauild"
+		exit	
+	fi
 	NAMEINTAR=`tar tvf $OURSOURCE |head -1 |awk '{ print $6 }' |sed 's(/(('`
 	wget -O $VERSPECFILE   $VERSPECFILEURL >/dev/null 2>&1
 	logme "Create spec file"
