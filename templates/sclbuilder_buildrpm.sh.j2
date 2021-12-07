@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-set -e 
 CMD=$0
 PACKAGE=$1
 PERSIST=$2
@@ -379,7 +378,7 @@ build_rpm ()
                                 if [[ $? == 0 ]];
                                 then
                                      logme "RPMs build and some files added"
-									 scl  /tmp/${NAME}-${VERSION}.rpmfiles root@repos.pip2scl.dk:/usr/share/nginx/html/META/${NAME}-${VERSION}.rpmfiles
+									 scp /tmp/${NAME}-${VERSION}.rpmfiles root@repos.pip2scl.dk:/usr/share/nginx/html/META/${NAME}-${VERSION}.rpmfiles
                                      BUILD="ok"
                                      redis-cli set $MYRPMSPEC "$PRESPECFILE"  >/dev/null 2>&1
                                      for RPM in `cat $BUILDOUT/${NAME}-${VERSION}.rpmbuild.log |grep "^Wrote:" | awk -F"Wrote: "  '{ print $2 }' `
@@ -393,13 +392,8 @@ build_rpm ()
                                           BUILD="ok"
                                      done
                                 fi
-
-
-
                         fi
                 fi
-
-
         ##########################################################################################################################################################
 
 
