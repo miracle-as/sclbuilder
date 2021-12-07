@@ -4,6 +4,7 @@
   hosts: sclbuilder
   vars:
     - version:  "1.0.0"
+    - organisation: "miracle"
 
   tasks:
   - name:  create_specfiles | create a tailored script
