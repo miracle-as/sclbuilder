@@ -48,8 +48,12 @@ build_rpm ()
 	logme "We are ready to build"
 	logme "My spec file is : $ORGSPECFILE"
 
-	SPECFILENAME=`curl  ${REPO}/SPECS/${NAME}-${VERSION}.original_specfile_name`
-	curl  ${REPO}/${SPECFILENAME} > $ORGSPECFILE >/dev/null 2>&1
+	logme "${REPO}/SPECS/${NAME}-${VERSION}.original_specfile_name"
+	SPECFILENAME=`curl  ${REPO}/SPECS/${NAME}-${VERSION}.original_specfile_name 2>/dev/null`
+	logme "$SPECFILENAME is our name"
+	logme   ${REPO}/SPECS/${SPECFILENAME} 
+	curl  ${REPO}/SPECS/${SPECFILENAME} > $ORGSPECFILE 2>/dev/null
+	head -10 $ORGSPECFILE	
 	logme "Original spec file is $ORGSPECFILE"
 	logme "Our copy is file is $PRESPECFILE"
 	cp -f  $ORGSPECFILE $PRESPECFILE
