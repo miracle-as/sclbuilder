@@ -1,0 +1,41 @@
+#!/usr/bin/env bash
+
+# if it doesnt exist
+SCLSPECFILE=$1
+if [[ ! -f $SCLSPECFILE ]];
+then
+        exit 1
+fi
+
+# if it isnt a spec file
+grep '%{?scl:%scl_package %{name}}' $SCLSPECFILE >/dev/null 2>&1
+if [[ $? != 0 ]];
+then
+        exit 2
+fi
+
+#if italread is added
+cat $SCLSPECFILE |grep "This must be after setup in the scl spec files" >/dev/null
+if [[ $? == 0 ]];
+then
+        exit 0
+fi
+INSTALLPOINT="python3 setup.py install"
+INSTALLLINE=`grep "$INSTALLPOINT" $SCLSPECFILE`
+
+PART1="/tmp/specfilepart1"
+PART2="/tmp/specfilepart2"
+rm $PART1 >/dev/null 2>&1
+rm $PART2 >/dev/null 2>&1
+grep -P "$INSTALLPOINT" $SCLSPECFILE -B100000 |grep -v "$INSTALLLINE" > $PART1
+grep -P "$INSTALLPOINT" $SCLSPECFILE -A100000 |grep -v "$INSTALLLINE" > $PART2
+
+cat $PART1
+echo $INSTALLLINE
+cat /usr/local/bin/mandatory_after_setup.add
+cat $PART2
+
+rm $PART1 >/dev/null 2>&1
+rm $PART2 >/dev/null 2>&1
+exit 0
+

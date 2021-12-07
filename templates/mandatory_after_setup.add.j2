@@ -1,0 +1,9 @@
+
+# This must be after setup in the scl spec files
+sed -i 's#/#/opt/{{ organisation }}/{{ organisation }}-{{ project }}/root/#' INSTALLED_FILES
+find $RPM_BUILD_ROOT -name "__pycache__"  -type d    | tee PYCACHE_DIRS
+for DIR in `cat PYCACHE_DIRS`
+do
+        rm -rf $DIR
+done
+# This must be after setup in the scl spec files : EOM
