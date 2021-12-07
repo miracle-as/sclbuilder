@@ -375,10 +375,11 @@ build_rpm ()
 				NAMEINTAR=`tar tvf ${BUILDDIR}/SOURCES/${NAME}-${VERSION}.${EXTENTION} |head -1 | awk -F':' '{ print $2 }' |cut -c 4- |awk -F'/' '{ print $1 }' `
 				repack  $NAMEINTAR $NAMEINTAR
                                 rpmbuild -ba -D 'debug_package %{nil}' --clean  $PRESPECFILE  >$BUILDOUT/${NAME}-${VERSION}.rpmbuild.log 2>&1
-                                cat $BUILDOUT/${NAME}-${VERSION}.rpmbuild.log |grep "^Wrote:" >/dev/null 2>&1
+                                cat $BUILDOUT/${NAME}-${VERSION}.rpmbuild.log |grep "^Wrote:" > /tmp/${NAME}-${VERSION}.rpmfiles
                                 if [[ $? == 0 ]];
                                 then
                                      logme "RPMs build and some files added"
+									 scl  /tmp/${NAME}-${VERSION}.rpmfiles root@repos.pip2scl.dk:/usr/share/nginx/html/META/${NAME}-${VERSION}.rpmfiles
                                      BUILD="ok"
                                      redis-cli set $MYRPMSPEC "$PRESPECFILE"  >/dev/null 2>&1
                                      for RPM in `cat $BUILDOUT/${NAME}-${VERSION}.rpmbuild.log |grep "^Wrote:" | awk -F"Wrote: "  '{ print $2 }' `
