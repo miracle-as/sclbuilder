@@ -38,10 +38,6 @@ echo "" >> $BUILDSH
 echo "`date`: {{ organisation }} {{ project }} Creating software Collection for {{ organisation }} - project {{ project }}."
 #PREPARE
 echo "`date`: {{ organisation }} {{ project }} Prepare run."
-mkdir ~/.ssh >/dev/null 2>&1
-chmod 700 ~/.ssh
-cp /home/vagrant/scldistro ~/.ssh/id_rsa
-chmod 600 ~/.ssh/id_rsa
 touch /root/rpmbuild/SOURCES/README
 touch /root/rpmbuild/SOURCES/LICENSE
 
