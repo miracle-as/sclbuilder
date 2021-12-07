@@ -1,0 +1,40 @@
+- name: 
+  find:
+    paths: /root/rpmbuild/SOURCES
+    recurse: yes
+    depth: 1
+    file_type: directory
+  register: sources
+
+- name:  create_specfiles | create a tailored script
+  ansible.builtin.template:
+    src: create.sclspec.sh.j2
+    dest: /usr/local/bin/create.sclspec.sh
+    mode: 755
+    force: yes
+  become: True
+
+- name:  create_specfiles | create a tailored metaspecfile
+  ansible.builtin.template:
+    src: metascl.spec.j2
+    dest: /root/{{ organisation }}.{{ project }}.meta.scl.spec
+    mode: 644
+    force: yes
+  become: True
+
+- name:  create_specfiles | create a tailored metaspecfile for {{ project }}
+  ansible.builtin.template:
+    src: project.specfile.spec.j2
+    dest: /root/{{ organisation }}.{{ project }}.project.spec
+    mode: 644
+    force: yes
+  become: True
+
+- name: create_specfiles | Touch /root/rpmbuild/SOURCES/LICENSE
+  shell: touch /root/rpmbuild/SOURCES/LICENSE
+  become: True
+
+- name: create_specfiles | run the builder script
+  shell: /usr/local/bin/create.sclspec.sh
+  become: True
+  
