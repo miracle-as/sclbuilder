@@ -147,7 +147,7 @@ build_rpm ()
 	####################  Run Pretty spec ####################################################################################################################
 	/usr/local/bin/mergefiles.sh ${PRESPECFILE}  ${PRETTYSPEC} "%clean" before   >/dev/null 2>&1
 	logme "Spec pretty"
-
+	rm /tmp/${NAME}-${VERSION}.rpmfiles >/dev/null 2>&1
 
 	############## Run a plain Standart Python 3 build #######################################################################################################
         ##########################################################################################################################################################
@@ -155,7 +155,7 @@ build_rpm ()
 	BUILD="no"
 	logme "rpmbuild -ba -D 'debug_package %{nil}' --clean  $PRESPECFILE "
 	rpmbuild -ba -D 'debug_package %{nil}' --clean  $PRESPECFILE  >$BUILDOUT/${NAME}-${VERSION}.rpmbuild.log 2>&1
-	cat $BUILDOUT/${NAME}-${VERSION}.rpmbuild.log |grep "^Wrote:" >/dev/null 2>&1
+	cat $BUILDOUT/${NAME}-${VERSION}.rpmbuild.log |grep "^Wrote:" > /tmp/${NAME}-${VERSION}.rpmfiles
 	if [[ $? == 0 ]];
 	then
 		logme "RPMs build"
@@ -180,7 +180,7 @@ build_rpm ()
 			ALTBUILD="python3.8"
 			sed -i "s(python3 setup.py (python3.8 setup.py  (" $PRESPECFILE
 			rpmbuild -ba -D 'debug_package %{nil}' --clean  $PRESPECFILE  >$BUILDOUT/${NAME}-${VERSION}.rpmbuild.log 2>&1
-			cat $BUILDOUT/${NAME}-${VERSION}.rpmbuild.log |grep "^Wrote:" >/dev/null 2>&1
+			cat $BUILDOUT/${NAME}-${VERSION}.rpmbuild.log |grep "^Wrote:" > /tmp/${NAME}-${VERSION}.rpmfiles
 			if [[ $? == 0 ]];
 			then
 				logme "RPMs build with python 3.8"
@@ -209,8 +209,7 @@ build_rpm ()
                		logme "add some files to the spec file"
 			grep " Installed (but unpackaged) file(s) found:" -A100000  $BUILDOUT/${NAME}-${VERSION}.rpmbuild.log  |grep  "RPM build errors:" -B100000 |  sed -e 's/^[ \t]*//' |  grep '^/' | sed 's/^/"/' |sed 's/$/"/' >> $PRESPECFILE
 		        rpmbuild -ba -D 'debug_package %{nil}' --clean  $PRESPECFILE  >$BUILDOUT/${NAME}-${VERSION}.rpmbuild.log 2>&1
-        		cat $BUILDOUT/${NAME}-${VERSION}.rpmbuild.log |grep "^Wrote:"
-        		cat $BUILDOUT/${NAME}-${VERSION}.rpmbuild.log |grep "^Wrote:" >/dev/null 2>&1
+        		cat $BUILDOUT/${NAME}-${VERSION}.rpmbuild.log |grep "^Wrote:" > /tmp/${NAME}-${VERSION}.rpmfiles
         		if [[ $? == 0 ]];
         		then
                			logme "RPMs build and some files added"
@@ -240,8 +239,7 @@ build_rpm ()
                 	/usr/local/bin/mergefiles.sh ${PRESPECFILE} SHEBANGFILES  "%clean" before 
                         logme "Clean some scripts"
                         rpmbuild -ba -D 'debug_package %{nil}' --clean  $PRESPECFILE  >$BUILDOUT/${NAME}-${VERSION}.rpmbuild.log 2>&1
-                        cat $BUILDOUT/${NAME}-${VERSION}.rpmbuild.log |grep "^Wrote:"
-                        cat $BUILDOUT/${NAME}-${VERSION}.rpmbuild.log |grep "^Wrote:" >/dev/null 2>&1
+                        cat $BUILDOUT/${NAME}-${VERSION}.rpmbuild.log |grep "^Wrote:" > /tmp/${NAME}-${VERSION}.rpmfiles
                         if [[ $? == 0 ]];
                         then
                                 logme "RPMs build and some files added"
@@ -278,7 +276,7 @@ build_rpm ()
 						logme "name in builds differs from tar . Repack $NAMEINTAR : $NAMEINBUILD"
 						repack $NAMEINTAR $NAMEINBUILD
 						rpmbuild -ba -D 'debug_package %{nil}' --clean  $PRESPECFILE  >$BUILDOUT/${NAME}-${VERSION}.rpmbuild.log 2>&1
-		                	        cat $BUILDOUT/${NAME}-${VERSION}.rpmbuild.log |grep "^Wrote:" >/dev/null 2>&1
+		                	        cat $BUILDOUT/${NAME}-${VERSION}.rpmbuild.log |grep "^Wrote:" > /tmp/${NAME}-${VERSION}.rpmfiles
                         			if [[ $? == 0 ]];
                         			then
                                 			logme "RPMs build and some files added"
@@ -308,7 +306,7 @@ build_rpm ()
 			logme "Arch dependent binaries in noarch package"
 			sed -i "s/BuildArch: noarch/BuildArch: x86_64/" ${PRESPECFILE} 
 			rpmbuild -ba -D 'debug_package %{nil}' --clean  $PRESPECFILE  >$BUILDOUT/${NAME}-${VERSION}.rpmbuild.log 2>&1
-                        cat $BUILDOUT/${NAME}-${VERSION}.rpmbuild.log |grep "^Wrote:" >/dev/null 2>&1
+                        cat $BUILDOUT/${NAME}-${VERSION}.rpmbuild.log |grep "^Wrote:" > /tmp/${NAME}-${VERSION}.rpmfiles
                         if [[ $? == 0 ]];
                         then
                         	logme "RPMs build and some files added"
@@ -340,7 +338,7 @@ build_rpm ()
                                 find  . -type f |grep "\.py" |xargs -i{} sed -i "1,1s(#!/usr/bin/env python.*(#!/usr/bin/env python3(" {}  > /tmp/AUTOPATCH
                                 /usr/local/bin/mergefiles.sh ${PRESPECFILE}  /tmp/AUTOPATCH "%install"
                                 rpmbuild -ba -D 'debug_package %{nil}' --clean  $PRESPECFILE  >$BUILDOUT/${NAME}-${VERSION}.rpmbuild.log 2>&1
-                                cat $BUILDOUT/${NAME}-${VERSION}.rpmbuild.log |grep "^Wrote:" >/dev/null 2>&1
+                                cat $BUILDOUT/${NAME}-${VERSION}.rpmbuild.log |grep "^Wrote:" > /tmp/${NAME}-${VERSION}.rpmfiles
                                 if [[ $? == 0 ]];
                                 then
                                      logme "RPMs build and some files added"
@@ -378,7 +376,6 @@ build_rpm ()
                                 if [[ $? == 0 ]];
                                 then
                                      logme "RPMs build and some files added"
-									 scp /tmp/${NAME}-${VERSION}.rpmfiles root@repos.pip2scl.dk:/usr/share/nginx/html/META/${NAME}-${VERSION}.rpmfiles
                                      BUILD="ok"
                                      redis-cli set $MYRPMSPEC "$PRESPECFILE"  >/dev/null 2>&1
                                      for RPM in `cat $BUILDOUT/${NAME}-${VERSION}.rpmbuild.log |grep "^Wrote:" | awk -F"Wrote: "  '{ print $2 }' `
@@ -412,6 +409,7 @@ build_rpm ()
 	if [[ $BUILD == "ok" ]];
 	then
 		logme "RPMS build with std : remarks $ALTBUILD "		
+        scp /tmp/${NAME}-${VERSION}.rpmfiles root@repos.pip2scl.dk:/usr/share/nginx/html/META/${NAME}-${VERSION}.rpmfiles
 		MYVERIFIEDSPEC="SPEC_VERIFY:${PACKAGE}"
 		scp $PRESPECFILE root@repos.pip2scl.dk:/usr/share/nginx/html/SPECS/${NAME}-${VERSION}.verified.spec
 	else
