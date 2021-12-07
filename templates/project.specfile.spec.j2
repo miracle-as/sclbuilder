@@ -1,0 +1,21 @@
+#
+# Meta spec file for {{ project }} in {{ organisation }}
+#
+Summary: "metapackage fon installing {{ project }} in software collections :  {{ scl_version }}
+Name: {{organisation}}.{{ project }}.software_collection 
+Version: {{ scl_version }}
+Release: {{ scl_release }}
+License: GPL
+Group: Applications/automation
+Source: ftp://repos.pip2scl.dk/SOURCES/{{ project }}.{{ scl_version }}.{{ scl_release }}.tar.gz
+URL: http://repos.pip2scl.dk/{{ organisation }}/{{ project }}"
+Distribution: Linux
+Vendor: Miracle.
+Packager: miracle <miracle@miracle.dk>
+
+%description
+{{ scl_description }}
+
+%install
+
+
