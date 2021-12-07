@@ -1,25 +1,5 @@
 #!/usr/bin/env bash
 
-init_html () {
-  echo "<HTML>" > $HTML
-  echo "<HR>`date`<HR>" >>$HTML
-  echo '<meta http-equiv="refresh" content="5" >'  >> $HTML
-  echo "<table border="1">" >>$HTML
-  scp $HTML root@repos.pip2scl.dk:/usr/share/nginx/html/{{ version }}.html
-}
-
-add_line_html () {
-  echo "<tr><td>$1</td><tr>" >> $HTML
-  scp $HTML root@repos.pip2scl.dk:/usr/share/nginx/html/{{ version }}.html
-}
-
-
-
-
-HTML="/tmp/{{ version }}.html"
-init_html
-
-
 BUILDSH="/root/{{ organisation }}.{{ project }}.{{ scl_version }}.{{ scl_release }}.build.sh"
 DEPENDECIES="/tmp/dependecies.{{ project }}.{{ scl_version}}.lst"
 echo > $DEPENDECIES
@@ -42,13 +22,9 @@ touch /root/rpmbuild/SOURCES/README
 touch /root/rpmbuild/SOURCES/LICENSE
 
 # Prep the reposerver
-
 ssh repos.pip2scl.dk mkdir /usr/share/nginx/html/RPMS/x86_64 >/dev/null 2>&1
-
-
 #META package
 echo "`date`: {{ organisation }} {{ project }} Build the metapackage."
-
 cd  >/dev/null 2>&1
 if [[ -f /root/rpmbuild/RPMS/x86_64/{{ organisation }}-{{ project }}-runtime-{{ scl_version }}-{{ scl_release }}.el8.x86_64.rpm ]];
 then
