@@ -2,6 +2,9 @@
 
 - name: Initial database seed
   hosts: sclbuilder
+  vars:
+  - versio "1.0.0"
+
   tasks:
   - name:  create_specfiles | create a tailored script
     ansible.builtin.template:
