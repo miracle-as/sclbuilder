@@ -5,6 +5,7 @@
   vars:
     - version:  "1.0.0"
     - organisation: "miracle"
+    - project: "awx-rpm"
 
   tasks:
   - name:  create_specfiles | create a tailored script
