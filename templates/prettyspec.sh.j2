@@ -1,0 +1,28 @@
+for FILE in `find ${RPM_BUILD_ROOT}  -type f 2>/dev/null |grep -i "py$" `
+do
+        sed -i "1,1s(#!/usr/bin/env python.*(#!/usr/bin/env python3(" ${FILE}
+done
+
+for FILE in `find ${RPM_BUILD_ROOT}  -type f 2>/dev/null |grep -i "py-tpl$" `
+do
+        sed -i "1,1s(#!/usr/bin/env python.*(#!/usr/bin/env python3(" ${FILE}
+done
+
+	
+for INSTALLED_FILE in `cat INSTALLED_FILES |tr ' ' '¤' |grep -v "__pycache__" `
+do
+	MYFILE=`echo $INSTALLED_FILE  | tr '¤' ' '`
+	if [[ -f ${RPM_BUILD_ROOT}/${MYFILE} ]];
+	then
+		echo $INSTALLED_FILE | tr '¤' ' ' >> INSTALLED_FILES.new
+	fi
+done
+mv INSTALLED_FILES.new INSTALLED_FILES
+
+sed -i 's/^/\"/' INSTALLED_FILES 
+sed -i 's/$/\"/' INSTALLED_FILES  
+sed -i 's/\"\"/\"/g' INSTALLED_FILES  
+#SCLPATHREPLACE
+
+
+#END PRETTY

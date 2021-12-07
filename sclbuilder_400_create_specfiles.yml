@@ -77,6 +77,15 @@
       mode: '0755'
     become: yes
 
+  - name: Copy the prettyspec file
+    ansible.builtin.template:
+      src: prettyspec.sh.j2
+      dest: /usr/local/bin/prettyspec.sh
+      owner: root
+      group: root 
+      mode: '0755'
+    become: yes
+
   - name: Copy the rpmbuilder script
     ansible.builtin.template:
       src: sclbuilder_buildrpm.sh.j2
