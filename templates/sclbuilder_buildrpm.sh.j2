@@ -47,20 +47,7 @@ build_rpm ()
 {
 	logme "We are ready to build"
 	logme "My spec file is : $ORGSPECFILE"
-	if [[ -f $ORGSPECFILE ]];
-	then
-		logme "File $ORGSPECFILE is found"
-	else
-		logme "File $ORGSPECFILE not  found"
-		curl  $ORGSPECFILEURL > $ORGSPECFILE >/dev/null 2>&1
-		if [[ $? == 0 ]];
-		then
-			logme "spec file downloaded $ORGSPECFILEURL"
-		else
-			logme "specfile dowdload faled"
-			exit
-		fi		
-	fi
+	curl  $ORGSPECFILEURL > $ORGSPECFILE >/dev/null 2>&1
 	logme "Original spec file is $ORGSPECFILE"
 	logme "Our copy is file is $PRESPECFILE"
 	cp -f  $ORGSPECFILE $PRESPECFILE
