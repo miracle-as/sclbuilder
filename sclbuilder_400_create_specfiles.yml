@@ -70,6 +70,15 @@
   
   - name: Copy the rpmbuilder script
     ansible.builtin.template:
+      src: mergefiles.sh.j2
+      dest: /usr/local/bin/mergefiles.sh
+      owner: root
+      group: root 
+      mode: '0755'
+    become: yes
+
+  - name: Copy the rpmbuilder script
+    ansible.builtin.template:
       src: sclbuilder_buildrpm.sh.j2
       dest: /usr/local/bin/sclbuilder_buildrpm.sh
       owner: root

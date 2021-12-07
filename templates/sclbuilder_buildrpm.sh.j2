@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-
+set -e 
 CMD=$0
 PACKAGE=$1
 PERSIST=$2
@@ -53,9 +53,18 @@ build_rpm ()
 		logme "File $ORGSPECFILE is found"
 	else
 		logme "File $ORGSPECFILE not  found"
-		exit
+		curl  $ORGSPECFILEURL > $ORGSPECFILE >/dev/null 2>&1
+		if [[ $? == 0 ]];
+		then
+			logme "spec file downloaded $ORGSPECFILEURL"
+		else
+			logme "specfile dowdload faled"
+			exit
+		fi		
 	fi
-	cp $ORGSPECFILE $PRESCLFILE
+	logme "Original spec file is $ORGSPECFILE"
+	logme "Our copy is file is $PRESPECFILE"
+	cp -f  $ORGSPECFILE $PRESPECFILE
 
 	NAMEINSPEC=`grep "define name" $PRESPECFILE |awk '{ print $3 }'`
 	EXTENTION="tar.gz"
@@ -137,7 +146,7 @@ build_rpm ()
 
 	logme "PrettySPEC"	
 	####################  Run Pretty spec ####################################################################################################################
-	/usr/local/bin/mergefiles.sh ${PRESPECFILE}  ${PRETTYSPEC} "%clean" before   >/dev/null 2>&1
+	echo /usr/local/bin/mergefiles.sh ${PRESPECFILE}  ${PRETTYSPEC} "%clean" before   >/dev/null 2>&1
 	logme "Spec pretty"
 
 

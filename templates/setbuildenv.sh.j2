@@ -11,7 +11,8 @@ export PRESPECDIR="${BUILDDIR}/PRESPECS"
 export PRESCLDIR="${BUILDDIR}/PRESCLS"
 export VERSCLDIR="${BUILDDIR}/VERSCLS"
 export OUTPUTDIR="${BUILDDIR}/OUTPUT"
-export DOWNLOADDIR="${BUILDDIR}/DOWMLOADS"
+export DOWNLOADDIR="${BUILDDIR}/DOWNLOADS"
+export REPO="http://repos.pip2scl.dk/SPECS"
 
 export QUIET="no"
 
@@ -20,9 +21,10 @@ mkdir -p  ${VERSPECDIR} >/dev/null 2>&1
 mkdir -p  ${PRESPECDIR} >/dev/null 2>&1
 mkdir -p  ${PRESCLDIR} >/dev/null 2>&1
 mkdir -p  ${VERSCLDIR} >/dev/null 2>&1
-mkdir -p  ${OUTPPUTDIR} >/dev/null 2>&1
+mkdir -p  ${OUTPUTDIR} >/dev/null 2>&1
 mkdir -p  ${DOWNLOADDIR} >/dev/null 2>&1
 
+export ORGSPECFILEURL="${REPO}/SPECS/${NAME}-${VERSION}.original.spec"
 export ORGSPECFILE="${ORGSPECDIR}/${NAME}-${VERSION}.original.spec"
 export VERSPECFILE="${VERSPECDIR}/${NAME}-${VERSION}.verified.spec"
 export PRESPECFILE="${PRESPECDIR}/${NAME}-${VERSION}.pre.spec"
