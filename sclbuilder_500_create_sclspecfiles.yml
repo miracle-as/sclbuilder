@@ -70,8 +70,8 @@
   
   - name: Copy the rpmbuilder script
     ansible.builtin.template:
-      src: sclbuilder_buildrpm.sh.j2
-      dest: /usr/local/bin/sclbuilder_buildrpm.sh
+      src: sclbuilder_buildscl.sh.j2
+      dest: /usr/local/bin/sclbuilder_buildscl.sh
       owner: root
       group: root 
       mode: '0755'
@@ -86,7 +86,7 @@
       mode: '0755'
     become: yes
 
-  - name: Run sclbuilder_buildrpm.sh  on our targets
+  - name: Run sclbuilder_buildscl.sh  on our targets
     command: "/usr/local/bin/sclbuilder_buildrpm.sh {{ item.packagename }}=={{ item.packageversion }}"
     become: yes
     register: specfiles
@@ -95,7 +95,7 @@
 
   - name: Run download on our targets
     uri:
-      url: "http://repos.pip2scl.dk/SPECS/{{ item.packagename }}-{{ item.packageversion }}.spec"
+      url: "http://repos.pip2scl.dk/SPECS/{{ item.packagename }}-{{ item.packageversion }}.scl.spec"
     register: urlcheck
     with_items:
     - "{{ buildingresult.query_all_results.0 }}"
@@ -109,7 +109,7 @@
       db: sclbuilder
       login_user: "sclbuilder"
       login_password: "django2know"
-      query: "update projects_package set packagespecfilestatus = 'Completed' where  packagespecfileurl = '{{ item.url }}' ; " 
+      query: "update projects_package set packagesclfilestatus = 'Completed' where  packagespecfileurl = '{{ item.url }}' ; " 
     register: result
     become: yes
     become_user: sclbuilder
