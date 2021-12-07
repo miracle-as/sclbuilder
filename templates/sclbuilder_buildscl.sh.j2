@@ -225,7 +225,7 @@ build_scl ()
         	fi
 	fi
 
-	logme "rpmbuild -ba -D 'debug_package %{nil}' --clean $SCLFILEPRE --define \"scl miracle-awx\" "
+	logme "rpmbuild -ba -D 'debug_package %{nil}' --clean $SCLFILEPRE --define \"scl miracle-awxrpm\" "
 	rpmbuild -ba -D 'debug_package %{nil}' --clean $SCLFILEPRE --define "scl miracle-awx" >/tmp/prebuild.log 2>&1
 	grep "Wrote:" /tmp/prebuild.log >/dev/null 2>&1
 	if [[ $? == 0 ]];

@@ -5,7 +5,7 @@
   vars:
     - version:  "1.0.0"
     - organisation: "miracle"
-    - project: "awx-rpm"
+    - project: "awxrpm"
     - scl_version: "1.0.0"
     - scl_release: "1"
     - scl_description: "Software collection for {{ project }}"
