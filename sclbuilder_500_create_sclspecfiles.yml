@@ -2,6 +2,10 @@
 
 - name: Initial database seed
   hosts: sclbuilder
+  vars:
+    - version:  "1.0.0"
+    - organisation: "miracle"
+    - project: "awxrpm"
   tasks:
   - name: Simple select query to acme db
     postgresql_query:
