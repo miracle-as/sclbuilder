@@ -77,6 +77,15 @@
       mode: '0755'
     become: yes
 
+  - name: Copy the mandatory after setup script
+    ansible.builtin.template:
+      src:   mandatory_after_setup.sh.j2
+      dest: /usr/local/bin/mandatory_after_setup.sh
+      owner: root
+      group: root 
+      mode: '0755'
+    become: yes
+
   - name: Copy the downloader env script
     ansible.builtin.template:
       src:  setbuildenv.sh.j2
