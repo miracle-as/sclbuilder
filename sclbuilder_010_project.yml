@@ -25,14 +25,19 @@
       login_user: "sclbuilder"
       login_password: "django2know"
       query: >-
-        inset into projecs_project set 
-        projectname, projectversion, projectstatus, projectdescription, projectstatus, projectcreated 
+        inset into projecs_project set (
+        projectname, 
+        projectversion, 
+        projectstatus, 
+        projectdescription, 
+        projectcreated 
+        )
         VALUES (
         '{{ project }}',
         '{{ version }}',
         'Initial',
         '{{ description }}',
-        NOW(),
+        NOW()
 
         )
     register: insertproject
