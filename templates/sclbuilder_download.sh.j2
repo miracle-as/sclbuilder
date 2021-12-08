@@ -151,21 +151,9 @@ download_source ()
    	echo $PACKAGE > /tmp/requirements.txt
     cd /tmp && DOWNLOAD=`python3 /usr/local/bin/pip-downloader.py `
     FILEPATH=`echo $DOWNLOAD | awk -F"Downloading:" '{ print $2 }' |awk '{ print $1 }' `
-	echo $FILEPATH  |grep -i http >/dev/null 2>&1
-	if [[ $? == 0 ]];
-	then
-		logme "File has an URL  $FILEPATH"
-		redis-cli set $MYSRCURL $FILEPATH >/dev/null 2>&1
-		if [[ $? == 0 ]];
-		then
-			logme "Filepath saved in redis"
-		else
-			logme "Redis save failed"
-			exit
-		fi
-	else
-		logme "File is unknown"
-		exit
+	logme "The file is downloaded to $FILEPATH"
+	
+
 	fi
 	FILENAME=`echo $FILEPATH |rev |awk -F'/' '{ print $1 }'|rev`
 	LAST=`echo $FILENAME |rev | awk -F'-' '{ print $1 }'|rev`
