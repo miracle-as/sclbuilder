@@ -79,7 +79,7 @@
       db: sclbuilder
       login_user: "sclbuilder"
       login_password: "django2know"
-      query: select id, packagestatus, packagesclrpmfilestatus from  projects_package where packagesclfilestatus IS NULL ;
+      query: select id, packagestatus,  packagesclrpmfilestatus from  projects_package where packagesclfilestatus IS NULL ;
     register: sclpackages
     become: yes
     become_user: sclbuilder
@@ -105,7 +105,7 @@
       db: sclbuilder
       login_user: "sclbuilder"
       login_password: "django2know"
-      query: select id, projectstatus, projectrpmfilestatus from  projects_package where packagerpmfilestatus IS NULL ;
+      query: select id, packagestatus, packagerpmfilestatus from  projects_package where packagerpmfilestatus IS NULL ;
     register: rpmpackages
     become: yes
     become_user: sclbuilder
