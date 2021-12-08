@@ -69,8 +69,10 @@
         packagesclfileurl = 'http://repos.pip2scl.dk/SPECS/{{ item.packagename }}-{{ item.packageversion }}.scl', 
         packagetweakscript = 'http://repos.pip2scl.dk/TWEAKS/{{ item.packagename }}-{{ item.packageversion }}.tweak' 
         where id = {{ item.id }} ; 
+    become: yes
+    become_user: sclbuilder
     with_items:
-    - "{{ result.query_all_results.0 }}"
+    - "{{ allpackages.query_all_results.0 }}"
 
 
 
@@ -94,17 +96,10 @@
         packagestatus = 'Building',
         packagerpmfilestatus = "Building"
         where id = {{ item.id }} ; 
-    with_items:
-    - "{{ rpmpackages.query_all_results.0 }}"
-
-
-#      query: "update projects_package set packagestatusurl = 'http://repos.pip2scl.dk:/PACKAGE/status', packagesourcefileurlorg = '', packagesourcefileurl = 'http://repos.pip2scl.dk:/SOURCE/
-#{{ item.packagename }}-{{ item.packageversion }}', packageorgspecfileurl = 'http://repos.pip2scl.dk:/SPECS/{{ item.packagename }}-{{ item.packageversion }}.original.spec', packagespecfileurl = 'http://repos.pip2scl.dk:/SPECS/{{ item.packagename }}-{{ item.packageversion }}.spec', packageSclfileurl = 'http://repos.pip2scl.dk:/SPECS/{{ item.packagename }}-{{ item.packageversion }}.original.scl', packagetweakscript = 'http://repos.pip2scl.dk:/TWEAKS/{{ item.packagename }}-{{ item.packageversion }}.tweak' where id = {{ item.id }} ; " 
-    register: result
     become: yes
     become_user: sclbuilder
     with_items:
-    - "{{ allpackages.query_all_results.0 }}"
+    - "{{ rpmpackages.query_all_results.0 }}"
 
 
   - name: Insert package
