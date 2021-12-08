@@ -9,7 +9,7 @@
     description: "Miracle supported awx installed with software collections"
 
   tasks:
-  - name: Insert project into 
+  - name: Check if it already exists
     postgresql_query:
       db: sclbuilder
       login_user: "sclbuilder"
