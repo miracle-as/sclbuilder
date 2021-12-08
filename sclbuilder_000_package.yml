@@ -47,7 +47,7 @@
       db: sclbuilder
       login_user: "sclbuilder"
       login_password: "django2know"
-      query: select * from  projects_package;
+      query: select * from  projects_packagei limit 1;
     register: allpackages
     become: yes
     become_user: sclbuilder
