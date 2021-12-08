@@ -110,7 +110,7 @@
     become: yes
     become_user: sclbuilder
 
-  - name: set expected urls
+  - name: set expected sclrpmpackages
     postgresql_query:
       db: sclbuilder
       login_user: "sclbuilder"
@@ -123,7 +123,7 @@
     become: yes
     become_user: sclbuilder
     with_items:
-    - "{{ rpmpackages.query_all_results.0 }}"
+    - "{{ sclrpmpackages.query_all_results.0 }}"
 
 
   - name: get all packages  where packagerpmfilestatus is null
