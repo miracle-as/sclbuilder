@@ -92,7 +92,7 @@
       query: >-
         update projects_package set 
         packagestatus = 'Building',
-        packagesclfilestatus = 'Building'
+        packagesclrpmfilestatus = 'Building'
         where id = {{ item.id }} ; 
     become: yes
     become_user: sclbuilder
