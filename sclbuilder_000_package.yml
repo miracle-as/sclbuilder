@@ -79,7 +79,7 @@
       db: sclbuilder
       login_user: "sclbuilder"
       login_password: "django2know"
-      query: select * from  projects_package where packagesclfilestatus IS NULL ;
+      query: select id, packagestatus, packagesclfilestatus from  projects_package where packagesclfilestatus IS NULL ;
     register: sclpackages
     become: yes
     become_user: sclbuilder
