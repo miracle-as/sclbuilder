@@ -3,7 +3,7 @@
 - name: Initial database seed
   hosts: sclbuilder
   tasks:
-  - name: Simple select query to acme db
+  - name: Simple select query to sclbuilder db
     postgresql_query:
       db: sclbuilder
       login_user: "sclbuilder"

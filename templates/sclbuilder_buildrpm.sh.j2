@@ -49,7 +49,7 @@ build_rpm ()
 	logme "My spec file is : $ORGSPECFILE"
 
 	logme "${REPO}/SPECS/${NAME}-${VERSION}.original_specfile_name"
-	SPECFILENAME=`curl  ${REPO}/SPECS/${NAME}-${VERSION}.original_specfile_name 2>/dev/null`
+	SPECFILENAME=`curl  ${REPO}/SPECS/${NAME}-${VERSION}.original.spec 2>/dev/null`
 	logme "$SPECFILENAME is our name"
 	logme   ${REPO}/SPECS/${SPECFILENAME} 
 	curl  ${REPO}/SPECS/${SPECFILENAME} > $ORGSPECFILE 2>/dev/null
