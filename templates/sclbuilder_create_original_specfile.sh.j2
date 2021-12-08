@@ -55,7 +55,7 @@ checkpackage ()
 	MYDIRKEY="pkgdir:${PACKAGE}"
 	EXTENTION="tar.gz"
 	SPECFILECREATE="no"
-	TARFILE="${BUILDDIR}/SOURCES/${NAME}-${VERSION}.${EXTENTION}"
+	TARFILE="${OURSOURCE}"
 	if [[ -f $TARFILE ]];
 	then
 		logme "$TARFILE is here"
