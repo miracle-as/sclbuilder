@@ -1,0 +1,63 @@
+#!/usr/bin/env bash
+
+BUILDSH="/root/{{ organisation }}.{{ project }}.{{ scl_version }}.{{ scl_release }}.build.sh"
+DEPENDECIES="/tmp/dependecies.{{ project }}.{{ scl_version}}.lst"
+echo > $DEPENDECIES
+echo "#!/usr/bin/env bash"  > $BUILDSH
+echo "" >> $BUILDSH
+echo "yum-config-manager --add-repo http://repos.pip2scl.dk/RPMS/" >> $BUILDSH
+echo 'grep -v "gpgcheck" /etc/yum.repos.d/repos.pip2scl.dk_RPMS_.repo >/dev/null 2>&1'  >> $BUILDSH
+echo 'if [[ $? == 0 ]];' >> $BUILDSH
+echo "then" >>  $BUILDSH
+echo '  echo "gpgcheck = 0" >> /etc/yum.repos.d/repos.pip2scl.dk_RPMS_.repo ' >> $BUILDSH
+echo 'fi' >> $BUILDSH
+echo "yum clean all" >> $BUILDSH
+echo "yum install  -y {{ organisation}}-{{ project }}-runtime.x86_64" >> $BUILDSH
+echo "" >> $BUILDSH
+
+echo "`date`: {{ organisation }} {{ project }} Creating software Collection for {{ organisation }} - project {{ project }}."
+#PREPARE
+echo "`date`: {{ organisation }} {{ project }} Prepare run."
+touch /root/rpmbuild/SOURCES/README
+touch /root/rpmbuild/SOURCES/LICENSE
+
+# Prep the reposerver
+ssh repos.pip2scl.dk mkdir /usr/share/nginx/html/RPMS/x86_64 >/dev/null 2>&1
+#META package
+echo "`date`: {{ organisation }} {{ project }} Build the metapackage."
+cd  >/dev/null 2>&1
+if [[ -f /root/rpmbuild/RPMS/x86_64/{{ organisation }}-{{ project }}-runtime-{{ scl_version }}-{{ scl_release }}.el8.x86_64.rpm ]];
+then
+  echo "`date`: {{ organisation }} {{ project }} SCL metapackage already build "
+else
+
+  rpmbuild -ba -D 'debug_package %{nil}' {{ organisation }}.{{ project }}.meta.scl.spec >/dev/null 2>&1
+  if [[ $? == 0 ]];
+  then
+    echo "`date`: {{ organisation }} {{ project }} SCL metapackage build ok"
+  else
+    echo "`date`: {{ organisation }} {{ project }} SCL metapackage build failed"
+    exit 1
+  fi
+fi
+
+echo "`date`: {{ organisation }} {{ project }} install the metapackage runtime."
+cd 
+rpm -qa |grep "{{ organisation }}-{{ project }}-runtime-{{ scl_version }}-{{ scl_release }}.el8.x86_64" >/dev/null 2>&1
+if [[ $? == 0 ]];
+then
+  echo "`date`: {{ organisation }} {{ project }} metapackage runtime already installed."
+else
+  rpm -i  /root/rpmbuild/RPMS/x86_64/{{ organisation }}-{{ project }}-runtime-{{ scl_version }}-{{ scl_release }}.el8.x86_64.rpm
+  if [[ $? == 0 ]];
+  then
+    echo "`date`: {{ organisation }} {{ project }} SCL metapackage installed ok"
+    scp /root/rpmbuild/RPMS/x86_64/{{ organisation }}-{{ project }}-runtime-{{ scl_version }}-{{ scl_release }}.el8.x86_64.rpm repos.pip2scl.dk:/usr/share/nginx/html/RPMS/x86_64/
+    ssh root@repos.pip2scl.dk sudo createrepo /usr/share/nginx/html/RPMS
+  else
+    echo "`date`: {{ organisation }} {{ project }} SCL metapackage install failed"
+    exit 1
+  fi
+fi
+
+echo "`date`: {{ organisation }} {{ project }} The end"
