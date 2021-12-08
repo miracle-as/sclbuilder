@@ -87,6 +87,15 @@
       mode: '0755'
     become: yes
 
+  - name: Copy the downloar create original spec name
+    ansible.builtin.template:
+      src:  sclbuilder_create_original_specfile.sh.j2
+      dest: /usr/local/bin/sclbuilder_create_original_specfile.sh
+      owner: root
+      group: root 
+      mode: '0755'
+    become: yes
+
   - name: Copy the downloader env script
     ansible.builtin.template:
       src:  setbuildenv.sh.j2
@@ -100,6 +109,21 @@
     command: "/usr/local/bin/sclbuilder_download.sh {{ item.packagename }}=={{ item.packageversion }}"
     become: yes
     register: download
+    with_items:
+    - "{{ buildingsource.query_all_results.0 }}"
+
+  - name: Run download on our targets
+    uri:
+      url: "http://repos.pip2scl.dk/SOURCES/{{ item.packagename }}-{{ item.packageversion }}.tar.gz"
+    register: urlcheck
+    with_items:
+    - "{{ buildingsource.query_all_results.0 }}"
+
+
+  - name: Run download on our targets
+    command: "/usr/local/bin/sclbuilder_create_original_specfile.sh  {{ item.packagename }}=={{ item.packageversion }}"
+    become: yes
+    register: orgspecfile
     with_items:
     - "{{ buildingsource.query_all_results.0 }}"
 
