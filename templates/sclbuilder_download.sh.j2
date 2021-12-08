@@ -76,7 +76,7 @@ tgz2tgz ()
 zip2tgz ()
 {
 	logme "Zip to tgz"
-    logme "Repacking $SRCFILE"
+    logme "Repacking $OURZIPSOURCE"
     logme "clean /tmp/repack"
     /usr/bin/rm -r /tmp/repack >/dev/null 2>&1
     logme "create a repack dir"
@@ -84,7 +84,6 @@ zip2tgz ()
     logme "Jump in to zip repack dir"
     cd /tmp/repack
 	cp ${OURZIPSOURCE} /tmp/repack.zip >/dev/null 2>&1
-
 	logme "Our source ${OURZIPSOURCE} copied to tmp"
 	unzip /tmp/repack.zip >/dev/null 2>&1
 	if [[ $? == 0 ]];
@@ -94,7 +93,6 @@ zip2tgz ()
 		logme "unzip failed"
 		exit
 	fi
-
 	NEWNAMEINTAR=`ls -1`
 	logme "name i archive is $NEWNAMEINTAR"
 	logme "touch files thar we really need"
@@ -225,11 +223,8 @@ download_source ()
 	if [[ $EXTENTION == "zip" ]];
 	then
 		KNOWNEXT="yes"
-		FILENAME=`echo $FILENAME |sed 's/zip/tar.gz/'`
-		#repack to tar gz
-		logme "Repack to tar gz"
-		zip2tgz 
-		ls -l  $BUILDDIR/SOURCES/$FILENAME >/dev/null 2>&1
+		zip2tgz  $OURZIPSOURCE
+		ls $OURSOURCE
 		if [[ $? == 0 ]];
 		then
 			logme "We have a tgz version of the file"
