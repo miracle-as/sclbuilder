@@ -38,7 +38,7 @@
         'Initial',
         '{{ description }}',
         '{{ ansible_date_time.date }} '
-        )
+        );
     register: insertproject
     become: yes
     become_user: sclbuilder
