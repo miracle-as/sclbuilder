@@ -15,7 +15,7 @@
       login_user: "sclbuilder"
       login_password: "django2know"
       query: select * from  projects_project where projectname = '{{ project }}';
-    register: project 
+    register: myproject 
     become: yes
     become_user: sclbuilder
   
