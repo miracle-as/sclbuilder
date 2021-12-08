@@ -252,7 +252,7 @@ download_source ()
 
 	SRCURL=`echo $DOWNLOAD | awk -F"URL:" '{ print $2 }'`
 	redis-cli set $MYSRCURL "$SRCURL"  >/dev/null 2>&1
-	touchthem $OURSOURCE
+#	touchthem $OURSOURCE
 	scp $OURSOURCE root@repos.pip2scl.dk:/usr/share/nginx/html/SOURCES/${NAME}-${VERSION}.tar.gz >/dev/null 2>&1
 	if [[ $? == 0 ]];
 	then
