@@ -37,8 +37,7 @@
         '{{ version }}',
         'Initial',
         '{{ description }}',
-        NOW()
-
+        '{{ ansible_date_time.date }} '
         )
     register: insertproject
     become: yes

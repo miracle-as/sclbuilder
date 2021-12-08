@@ -17,7 +17,24 @@
       db: sclbuilder
       login_user: "sclbuilder"
       login_password: "django2know"
-      query: INSERT INTO projects_package (slug, packagename, packageversion, packagestatus,  packagecreated) VALUES( '{{ slug }}', '{{ name }}',  '{{ version }}', 'Initial',  '{{ ansible_date_time.date }} ') ON CONFLICT (slug) DO NOTHING;
+      query: >-
+        INSERT INTO projects_package 
+        (
+          slug,
+          packagename,
+          packageversion, 
+          packagestatus,  
+          packagecreated
+        ) 
+        VALUES
+        ( 
+          '{{ slug }}',
+          '{{ name }}',
+          '{{ version }}',
+          'Initial',
+          '{{ ansible_date_time.date }} '
+        )
+        ON CONFLICT (slug) DO NOTHING;
     become: yes
     become_user: sclbuilder
 
