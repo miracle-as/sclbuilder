@@ -132,9 +132,6 @@ checkpackage ()
 
 	
 	scp  $SPEC root@repos.pip2scl.dk:/usr/share/nginx/html/SPECS/$NAME-$VERSION.original.spec
-	scp  /tmp/$NAME-$VERSION.original_specfile_name root@repos.pip2scl.dk:/usr/share/nginx/html/SPECS 
-    
-
 
 	sed -i "s/^python /$PYCMD /" $SPEC
 	sed -i "s/^%{__python} /$PYCMD /" $SPEC
