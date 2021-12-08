@@ -169,12 +169,13 @@ build_scl ()
        	echo '"/opt/miracle/miracle-awx/root/usr/lib/python3.6/site-packages/jaraco/text/Lorem ipsum.txt"' >> $PRESCLFILE
     fi
 
-	logme "rpmbuild -ba -D 'debug_package %{nil}' --clean $PRESCLFILE --define \"scl miracle-awxrpm\" "
+	logme "rpmbuild -ba -D 'debug_package %{nil}' --clean $PRESCLFILE --define \"scl {{ organisation }}-{{ project }}\" "
 	rpmbuild -ba -D 'debug_package %{nil}' --clean $PRESCLFILE --define "scl miracle-awx" >/tmp/prebuild.log 2>&1
-	grep "Wrote:" /tmp/prebuild.log >/dev/null 2>&1
+	grep "Wrote:" /tmp/prebuild.log >/tmp/${NAME}-${VERSION}.sclfiles
 	if [[ $? == 0 ]];
 	then
 		logme "scl build succeeded"
+		scp  /tmp/${NAME}-${VERSION}.sclfiles root@repos.pip2scl.dk:/usr/share/nginx/html/META/${NAME}-${VERSION}.sclfiles
 		cp $PRESCLFILE $SCLFILE
 		for FILE in  `cat  /tmp/prebuild.log |grep "^Wrote:"   |awk '{ print $2 }'`
 		do
