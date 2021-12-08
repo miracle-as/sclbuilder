@@ -120,10 +120,7 @@ zip2tgz ()
 bz2tgz ()
 {
 	logme "bzip to tgz"
-	MYURL="url:${PACKAGE}"
-    EXTENTION="tar.gz"
 	/usr/bin/rm /tmp/bzfile >/dev/null 2>&1
-    logme "save my current work dir "
     logme "clean /tmp/repack"
     /usr/bin/rm -r /tmp/repack >/dev/null 2>&1
     logme "create a repack dir"
@@ -132,9 +129,8 @@ bz2tgz ()
     cd /tmp/repack
 	cp ${OURBZSOURCE} /tmp/bzfile.bz2
     bunzip2  /tmp/bzfile.bz2  >/dev/null 2>&1
-	cp /tmp/bzfile ${OURTARSOURCE} >/dev/null 2>&1
-	gzip -f ${OURTARSOURCE} >/dev/null 2>&1
-    logme "Uploading repacked tar"
+	gzip -f /tmp/bzfile >/dev/null 2>&1
+	cp /tmp/bzfile.gz $OURSOURCE
     scp ${OURSOURCE} root@repos.pip2scl.dk:/usr/share/nginx/html/SOURCES/${OURNAME} >/dev/null 2>&1
     logme "clean /tmp/repack"
     logme "$PACKAGE Package converted to tgz"
