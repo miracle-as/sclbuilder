@@ -152,6 +152,26 @@ download_source ()
     cd /tmp && DOWNLOAD=`python3 /usr/local/bin/pip-downloader.py `
     FILEPATH=`echo $DOWNLOAD | awk -F"Downloading:" '{ print $2 }' |awk '{ print $1 }' `
 	logme "The file is downloaded to $FILEPATH"
+	echo $FILEPATH |grep -i "gz$" >/dev/null 2>&1
+	if [[ $? == 0 ]];
+	then
+		logme "get the tgz"
+		wget $FILEPATH  -O $OURTARSOURCE
+	fi
+	echo $FILEPATH |grep -i "bz2$" >/dev/null 2>&1
+	if [[ $? == 0 ]];
+	then
+		logme "get the bz2"
+		wget $FILEPATH  -O $OURBZSOURCE
+	fi
+	echo $FILEPATH |grep -i "zip$" >/dev/null 2>&1
+	if [[ $? == 0 ]];
+	then
+		logme "get the zip"
+		wget $FILEPATH  -O $OURZIPSOURCE
+	fi
+
+
 	FILENAME=`echo $FILEPATH |rev |awk -F'/' '{ print $1 }'|rev`
 	LAST=`echo $FILENAME |rev | awk -F'-' '{ print $1 }'|rev`
 	FIRST=`echo $FILENAME |awk -F"-${LAST}" '{ print $1 }'`
