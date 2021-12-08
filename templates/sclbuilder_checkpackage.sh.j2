@@ -10,7 +10,7 @@ usage ()
 {
 echo "usage $CMD"
 echo $1
-exit 1
+exit 0
 }
 
 check_args ()
@@ -77,7 +77,7 @@ checkpackage ()
 			redis-cli set $MYNIT $NIT >/dev/null 2>&1
 		else
 			logme "Extration failed"
-			exit 22
+			exit 0
 		fi
 	fi
 
@@ -160,3 +160,4 @@ logme "$PACKAGE"
 logme "check source "
 checkpackage
 logme "check source END"
+exit 0
