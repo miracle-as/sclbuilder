@@ -65,7 +65,6 @@
         packagesourcefileurl = 'http://repos.pip2scl.dk/SOURCES/{{ item.packagename }}-{{ item.packageversion }}.tar.gz', 
         packageorgspecfileurl = 'http://repos.pip2scl.dk/SPECS/{{ item.packagename }}-{{ item.packageversion }}.original.spec', 
         packagespecfileurl = 'http://repos.pip2scl.dk/SPECS/{{ item.packagename }}-{{ item.packageversion }}.verified.spec', 
-        packagerpmfilestatus = "Building",
         packagesclfileurl = 'http://repos.pip2scl.dk/SPECS/{{ item.packagename }}-{{ item.packageversion }}.scl', 
         packagetweakscript = 'http://repos.pip2scl.dk/TWEAKS/{{ item.packagename }}-{{ item.packageversion }}.tweak' 
         where id = {{ item.id }} ; 
