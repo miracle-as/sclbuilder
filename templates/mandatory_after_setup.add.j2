@@ -6,4 +6,6 @@ for DIR in `cat PYCACHE_DIRS`
 do
         rm -rf $DIR
 done
+sed -i '/__pycache__/'d INSTALLED_FILES
+
 # This must be after setup in the scl spec files : EOM
