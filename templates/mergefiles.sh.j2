@@ -32,10 +32,11 @@ then
 		grep -P "$INSERTAFTER" $SPECFILE -B100000 |grep -v "^$INSERTAFTER" > $PART1
 		grep -P "$INSERTAFTER" $SPECFILE -A100000 |grep -v "^%INSERTAFTER" > $PART2
 	fi
-	cat $PART1
-	echo $INSTALLLINE
-	cat $ADDON
-	cat $PART2
+	cat $PART1 > $SPECFILE.new
+	echo $INSTALLLINE >> $SPECFILE.new
+	cat $ADDON >> $SPECFILE.new
+	cat $PART2 >> $SPECFILE.new
+	mv -f $SPECFILE.new $SPECFILE
 fi
 
 
@@ -47,8 +48,9 @@ then
 		grep -P "$INSERTAFTER" $SPECFILE -B100000 |grep -v "^$INSERTAFTER" > $PART1
 		grep -P "$INSERTAFTER" $SPECFILE -A100000 |grep -v "^%INSERTAFTER" > $PART2
 	fi
-	cat $PART1
-	cat $ADDON
-	echo $INSTALLLINE
-	cat $PART2
+	cat $PART1 > $SPECFILE.new
+	cat $ADDON >> $SPECFILE.new
+	echo $INSTALLLINE >> $SPECFILE.new
+	cat $PART2 >> $SPECFILE.new
+	mv -f $SPECFILE.new $SPECFILE
 fi
