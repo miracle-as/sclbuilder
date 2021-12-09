@@ -126,7 +126,7 @@
     become: yes
 
   - name: Run sclbuilder_buildscl.sh  on our targets
-    command: "/usr/local/bin/sclbuilder_buildrpm.sh {{ item.packagename }}=={{ item.packageversion }}"
+    command: "/usr/local/bin/sclbuilder_buildscl.sh {{ item.packagename }}=={{ item.packageversion }}"
     become: yes
     register: specfiles
     with_items:
