@@ -118,7 +118,7 @@
 
   - name: Run download on our targets
     uri:
-      url: "http://repos.pip2scl.dk/SPECS/{{ item.packagename }}-{{ item.packageversion }}.scl.spec"
+      url: "http://repos.pip2scl.dk/META/{{ item.packagename }}-{{ item.packageversion }}.scl.spec"
     register: urlcheck
     with_items:
     - "{{ buildingresult.query_all_results.0 }}"
