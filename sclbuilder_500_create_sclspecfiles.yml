@@ -7,6 +7,11 @@
     - organisation: "miracle"
     - project: "awxrpm"
   tasks:
+  - name:
+    package:
+      - python38-psycopg2
+    become: True
+
   - name: Simple select query to acme db
     postgresql_query:
       db: sclbuilder
