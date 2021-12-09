@@ -74,11 +74,11 @@ build_rpm ()
 	if [[ $PACKAGE == "pyOpenSSL==19.1.0" ]];
 	then
 		logme "Hack we need bleeeding edge"
-		echo "python3 -m pip install --upgrade pip" > $PRESPECFILE.add
-		echo "python3 -m pip install --upgrade setuptools_rust" >> $PRESPECFILE.add
-		echo "python3 -m pip install --upgrade wheel"  >> $PRESPECFILE.add
-		/usr/local/bin/mergefiles.sh ${PRESPECFILE}   $PRESPECFILE.add "%build"     >/dev/null 2>&1
-		/usr/local/bin/mergefiles.sh ${PRESPECFILE}   $PRESPECFILE.add "%install"   >/dev/null 2>&1
+		#echo "python3 -m pip install --upgrade pip" > $PRESPECFILE.add
+		#echo "python3 -m pip install --upgrade setuptools_rust" >> $PRESPECFILE.add
+		#echo "python3 -m pip install --upgrade wheel"  >> $PRESPECFILE.add
+		#/usr/local/bin/mergefiles.sh ${PRESPECFILE}   $PRESPECFILE.add "%build"     >/dev/null 2>&1
+		#/usr/local/bin/mergefiles.sh ${PRESPECFILE}   $PRESPECFILE.add "%install"   >/dev/null 2>&1
 	fi
 
 
