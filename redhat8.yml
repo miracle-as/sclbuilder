@@ -4,10 +4,6 @@
   hosts: prod_sclbuilder_worker
   tasks:
 
-  - name: Correct python3
-    community.general.alternatives:
-      name: python38
-
   - name: Install
     ansible.builtin.package:
       name: 
