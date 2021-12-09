@@ -58,8 +58,6 @@ build_scl ()
 	grep  -v '"/.*__pycache__.*/'  $VERSPECFILE.new > $VERSPECFILE
 	logme "Create spec file"
 	spec2scl  $VERSPECFILE > $PRESCLFILE  2>/dev/null
-	cat $PRESCLFILE
-	exit
 	logme "Our SCL specfile before mod is $PRESCLFILE"
 	AFTERLINE=`cat $PRESCLFILE | grep "python3 setup.py install" -A1 | tail -1`
 	echo "$AFTERLINE"  |grep '%{?scl:EOF}' >/dev/null 2>&1
