@@ -1,0 +1,23 @@
+---
+
+- name: Initial database seed
+  hosts: prod_sclbuilder_worker
+  tasks:
+
+  - name: Correct python3
+    community.general.alternatives:
+      name: python38
+
+  - name: Install
+    ansible.builtin.package:
+      name: 
+        - python38-psycopg2
+        - python38-pip
+        - python38-devel
+      state: present
+
+  - name: Install
+    pip:
+      name: psycopg2-binary 
+    
+    
