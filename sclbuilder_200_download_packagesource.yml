@@ -28,10 +28,10 @@
       login_user: "sclbuilder"
       login_password: "django2know"
       query: >-
-        "update projects_package set packagestatus = 'Building', 
+        update projects_package set packagestatus = 'Building', 
         packagesourcefilestatus = 'Building' , 
         packagesourcefileurl = 'http://repos.pip2scl.dk/SOURCES/{{ item.packagename }}-{{ item.packageversion}}.tar.gz'  
-        where id = {{ item.id }} ; " 
+        where id = {{ item.id }} ; 
     register: adoptedpackages
     become: yes
     become_user: sclbuilder
