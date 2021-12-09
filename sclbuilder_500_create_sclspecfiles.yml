@@ -1,25 +1,13 @@
 ---
 
 - name: Initial database seed
-  hosts: prod_prod_sclbuilder_worker_worker
+  hosts: prod_sclbuilder_worker
   vars:
     - version:  "1.0.0"
     - organisation: "miracle"
     - project: "awxrpm"
   tasks:
-  - name: Install
-    ansible.builtin.package:
-      name: 
-        - python38-psycopg2
-        - python38-pip
-        - python38-devel
-      state: present
 
-  - name: Install
-    pip:
-      name: psycopg2-binary 
-    
-    
   - name: Simple select query to acme db
     postgresql_query:
       login_host: sclbuilder
