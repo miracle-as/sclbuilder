@@ -54,10 +54,13 @@ build_scl ()
 		exit	
 	fi
 	NAMEINTAR=`tar tvf $OURSOURCE |head -1 |awk '{ print $6 }' |sed 's(/(('`
-	wget -O $VERSPECFILE   $VERSPECFILEURL >/dev/null 2>&1
+	wget -O $VERSPECFILE.new   $VERSPECFILEURL >/dev/null 2>&1
+	grep  -v '"/.*__pycache__.*/'  $VERSPECFILE.new > $VERSPECFILE
 	logme "Create spec file"
 	spec2scl  $VERSPECFILE > $PRESCLFILE  2>/dev/null
-	logme "Our SCL specfile before mod is i$PRESCLFILE"
+	cat $PRESCLFILE
+	exit
+	logme "Our SCL specfile before mod is $PRESCLFILE"
 	AFTERLINE=`cat $PRESCLFILE | grep "python3 setup.py install" -A1 | tail -1`
 	echo "$AFTERLINE"  |grep '%{?scl:EOF}' >/dev/null 2>&1
 	if [[ $? == 0 ]];
