@@ -1,6 +1,6 @@
 ---
 - name: Build openstack components
-  hosts: sclbuilder
+  hosts: prod_sclbuilder_worker
   tasks:
     - name: Build the scl
       vars:

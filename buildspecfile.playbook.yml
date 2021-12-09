@@ -1,6 +1,6 @@
 ---
 - name: Setup python
-  hosts: prod_sclbuilder_worker
+  hosts: prod_prod_sclbuilder_worker_worker
   roles:
   - role: ansible_role_init_pip
   - role: ansible_role_init_rpmbuild_environment
@@ -8,7 +8,7 @@
   become: true
 
 - name: Build openstack components
-  hosts: prod_sclbuilder_worker
+  hosts: prod_prod_sclbuilder_worker_worker
   tasks:
     - name: add repo
       yum_repository:
@@ -20,7 +20,7 @@
       become: true
 
 - name: Build openstack components
-  hosts: prod_sclbuilder_worker
+  hosts: prod_prod_sclbuilder_worker_worker
   tasks:
     - name: Build the scl
     

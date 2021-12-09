@@ -1,4 +1,4 @@
-- name: prod_sclbuilder_web
+- name: prod_prod_sclbuilder_worker_web
   distro: rhel-8.4
   memory: 4096
   vcpus: 4
@@ -10,7 +10,7 @@
     - dnf -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
     - dnf cAlean all
 
-- name: prod_sclbuilder_db
+- name: prod_prod_sclbuilder_worker_db
   distro: rhel-8.4
   memory: 4096
   vcpus: 4
@@ -22,7 +22,7 @@
     - dnf -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
     - dnf clean all
 
-- name: prod_sclbuilder_worker
+- name: prod_prod_sclbuilder_worker_worker
   distro: rhel-8.4
   memory: 4096
   vcpus: 4

@@ -5,7 +5,7 @@
   connection: local
   tasks:
   
-  - name: "vagrant start a rhel8 sclbuilder"
+  - name: "vagrant start a rhel8 prod_sclbuilder_worker"
     shell: "vagrant up"
   - name: "save old ssh config file"
     shell: "vagrant ssh-config >  ~/.ssh/config"
@@ -13,7 +13,7 @@
     shell: "vagrant scp ~/.ssh/scldistro scldistro"
 
 - name: Setup python
-  hosts: sclbuilder
+  hosts: prod_sclbuilder_worker
   roles:
   - role: ansible_role_init_pip
   - role: ansible_role_init_rpmbuild_environment
@@ -33,7 +33,7 @@
       become: true
 
 - name: Build openstack components
-  hosts: sclbuilder
+  hosts: prod_sclbuilder_worker
   roles:
     - role: miracle-ansible-role-pipfreeze2scl
       name: 

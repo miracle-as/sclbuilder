@@ -1,7 +1,7 @@
 ---
 
 - name: Initial database seed
-  hosts: prod_sclbuilder_worker
+  hosts: prod_prod_sclbuilder_worker_worker
   vars:
     - version:  "1.0.0"
     - organisation: "miracle"
@@ -22,80 +22,80 @@
     
   - name: Simple select query to acme db
     postgresql_query:
-      login_host: sclbuilder
-      db: sclbuilder
-      login_user: "sclbuilder"
+      login_host: prod_sclbuilder_worker
+      db: prod_sclbuilder_worker
+      login_user: "prod_sclbuilder_worker"
       login_password: "django2know"
       query: SELECT version()
     become: yes
-    become_user: sclbuilder
+    become_user: prod_sclbuilder_worker
 
   - name: Select the all packages where packagesclfilestatus is NULL
     postgresql_query:
-      db: sclbuilder
-      login_host: sclbuilder
-      login_user: "sclbuilder"
+      db: prod_sclbuilder_worker
+      login_host: prod_sclbuilder_worker
+      login_user: "prod_sclbuilder_worker"
       login_password: "django2know"
       query: select id, packagesclfilestatus  from  projects_package where packagesclfilestatus IS NULL;
     register: sclfilesstatusnull
     become: yes
-    become_user: sclbuilder
+    become_user: prod_sclbuilder_worker
 
   - name: Set them to building
     postgresql_query:
-      db: sclbuilder
-      login_host: sclbuilder
-      login_user: "sclbuilder"
+      db: prod_sclbuilder_worker
+      login_host: prod_sclbuilder_worker
+      login_user: "prod_sclbuilder_worker"
       login_password: "django2know"
       query: >-
         update projects_package set packagesclfilestatus = 'Building'
         where id = {{ item.id }}; 
     become: yes
-    become_user: sclbuilder
+    become_user: prod_sclbuilder_worker
     with_items:
     - "{{ sclfilesstatusnull.query_all_results.0 }}"
 
 
   - name: Select the new ones 
     postgresql_query:
-      db: sclbuilder
-      login_host: sclbuilder
-      login_user: "sclbuilder"
+      db: prod_sclbuilder_worker
+      login_host: prod_sclbuilder_worker
+      login_user: "prod_sclbuilder_worker"
       login_password: "django2know"
       query: select * from  projects_package where packagespecfilestatus 	IS NULL;;
     register: newpackages
     become: yes
-    become_user: sclbuilder
+    become_user: prod_sclbuilder_worker
   
   - name: Set them to building
     postgresql_query:
-      login_host: sclbuilder
-      db: sclbuilder
-      login_user: "sclbuilder"
+      login_host: prod_sclbuilder_worker
+      db: prod_sclbuilder_worker
+      login_user: "prod_sclbuilder_worker"
       login_password: "django2know"
       query: "update projects_package set packagespecfilestatus = 'Building'  where id = {{ item.id }} ; " 
     register: adoptedpackages
     become: yes
-    become_user: sclbuilder
+    become_user: prod_sclbuilder_worker
     with_items:
     - "{{ newpackages.query_all_results.0 }}"
 
 
   - name: Select the building candidates
     postgresql_query:
-      db: sclbuilder
-      login_host: sclbuilder
-      login_user: "sclbuilder"
+      db: prod_sclbuilder_worker
+      login_host: prod_sclbuilder_worker
+      login_user: "prod_sclbuilder_worker"
       login_password: "django2know"
       query: select packagename, packageversion, packagespecfileurl from  projects_package where packagespecfilestatus = 'Building' limit 1;
     register: buildingresult
     become: yes
-    become_user: sclbuilder
+    become_user: prod_sclbuilder_worker
   
   - name: Copy the rpmbuilder script
     ansible.builtin.template:
-      src: sclbuilder_buildscl.sh.j2
-      dest: /usr/local/bin/sclbuilder_buildscl.sh
+      src: prod_sclbuilder_worker_buildscl.sh.j2
+      dest: /usr/local/bin/prod_sclbuilder_worker_buildscl.sh
       owner: root
       group: root 
       mode: '0755'
@@ -128,8 +128,8 @@
       mode: '0755'
     become: yes
 
-  - name: Run sclbuilder_buildscl.sh  on our targets
-    command: "/usr/local/bin/sclbuilder_buildscl.sh {{ item.packagename }}=={{ item.packageversion }}"
+  - name: Run prod_sclbuilder_worker_buildscl.sh  on our targets
+    command: "/usr/local/bin/prod_sclbuilder_worker_buildscl.sh {{ item.packagename }}=={{ item.packageversion }}"
     become: yes
     register: specfiles
     with_items:
@@ -148,14 +148,14 @@
 
   - name: update database if based on curl
     postgresql_query:
-      db: sclbuilder
-      login_host: sclbuilder
-      login_user: "sclbuilder"
+      db: prod_sclbuilder_worker
+      login_host: prod_sclbuilder_worker
+      login_user: "prod_sclbuilder_worker"
       login_password: "django2know"
-      query: "update projects_package set packagesclfilestatus = 'Completed' where  packagespecfileurl = '{{ item.url }}' ; " 
+      query: "update projects_package set packagesclfilestatus = 'Completed' where  packagesclfileurl = '{{ item.url }}' ; " 
     register: result
     become: yes
-    become_user: sclbuilder
+    become_user: prod_sclbuilder_worker
     with_items:
       - "{{ urlcheck.results }}"
     when:  item.status == 200

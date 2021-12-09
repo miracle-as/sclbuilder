@@ -1,25 +1,25 @@
 ---
 
 - name: Initial database seed
-  hosts: sclbuilder
+  hosts: prod_sclbuilder_worker
   tasks:
   - name: Simple select query to acme db
     postgresql_query:
-      db: sclbuilder
-      login_user: "sclbuilder"
+      db: prod_sclbuilder_worker
+      login_user: "prod_sclbuilder_worker"
       login_password: "django2know"
       query: SELECT version()
     become: yes
-    become_user: sclbuilder
+    become_user: prod_sclbuilder_worker
 
   - name: Insert project
     postgresql_query:
-      db: sclbuilder
-      login_user: "sclbuilder"
+      db: prod_sclbuilder_worker
+      login_user: "prod_sclbuilder_worker"
       login_password: "django2know"
       query: INSERT INTO projects_project (slug, projectname,  projectversion,  projectdescription,  projectstatus,  projecturl,  projectcreated) VALUES( '{{ project.slug }}', '{{ project.name }}',  '{{ project.version }}',  '{{ project.description }}',  'Initial',  '{{ project.url }}',  '{{ ansible_date_time.date }} ') ON CONFLICT (projectname) DO NOTHING;
     become: yes
-    become_user: sclbuilder
+    become_user: prod_sclbuilder_worker
     loop:
       - { "slug": "awxrpm", "name": "Miracle Ansible", "version": "1.0.0", "description": "Miracle supported ansible related opensoure projects", "url": "miracle.dk" }
     loop_control:
@@ -28,12 +28,12 @@
 
   - name: Insert subproject
     postgresql_query:
-      db: sclbuilder
-      login_user: "sclbuilder"
+      db: prod_sclbuilder_worker
+      login_user: "prod_sclbuilder_worker"
       login_password: "django2know"
       query: INSERT INTO projects_subproject (slug, projectname_id, subprojectname, subprojectversion,  subprojectdescription,  subprojectstatus,  subprojecturl,  subprojectcreated) VALUES( '{{ subproject.slug }}', '{{ subproject.projectname }}', '{{ subproject.name }}',  '{{ subproject.version }}',  '{{ subproject.description }}',  'Initial',  '{{ subproject.url }}',  '{{ ansible_date_time.date }} ') ON CONFLICT (subprojectname) DO NOTHING;
     become: yes
-    become_user: sclbuilder
+    become_user: prod_sclbuilder_worker
     loop:
       - { "slug": "awxrpm", "projectname": "Miracle Ansible", "name": "AWX-RPM", "version": "1.0.0", "description": "Miracle supported ansible related opensoure projects", "url": "miracle.dk" }
     loop_control:
@@ -44,12 +44,12 @@
 
   - name: Insert subproject
     postgresql_query:
-      db: sclbuilder
-      login_user: "sclbuilder"
+      db: prod_sclbuilder_worker
+      login_user: "prod_sclbuilder_worker"
       login_password: "django2know"
       query: INSERT INTO projects_subprojectrelease (slug, subprojectname_id, releasename, releaseversion, releasebuild, releasedescription,  releasestatus,  releasecreated) VALUES( '{{ release.slug }}', '{{ release.subprojectname }}', '{{ release.name }}',  '{{ release.version }}', '{{ release.build }}', '{{ release.description }}',  'Initial',  '{{ ansible_date_time.date }} ') ON CONFLICT (releasename) DO NOTHING;
     become: yes
-    become_user: sclbuilder
+    become_user: prod_sclbuilder_worker
     loop:
       - { "slug": "awxrpm", "subprojectname": "AWX-RPM", "name": "Nitten", "version": "19.4.1", "build": "001", "description": "Miracle supported RPM/SCL based AWX ", "url": "awx-rpm.wiki" }
       - { "slug": "awxrpm", "subprojectname": "AWX-RPM", "name": "Nitten", "version": "19.5.1", "build": "001", "description": "Miracle supported RPM/SCL based AWX ", "url": "awx-rpm.wiki" }
@@ -61,12 +61,12 @@
 
   - name: Insert package
     postgresql_query:
-      db: sclbuilder
-      login_user: "sclbuilder"
+      db: prod_sclbuilder_worker
+      login_user: "prod_sclbuilder_worker"
       login_password: "django2know"
       query: INSERT INTO projects_subprojectrelease (slug, subprojectname_id, releasename, releaseversion, releasebuild, releasedescription,  releasestatus,  releasecreated) VALUES( '{{ release.slug }}', '{{ release.subprojectname }}', '{{ release.name }}',  '{{ release.version }}', '{{ release.build }}', '{{ release.description }}',  'Initial',  '{{ ansible_date_time.date }} ') ON CONFLICT (releasename) DO NOTHING;
     become: yes
-    become_user: sclbuilder
+    become_user: prod_sclbuilder_worker
     loop:
       - { "slug": "awxrpm", "subprojectname": "AWX-RPM", "name": "Nitten", "version": "19.4.1", "build": "001", "description": "Miracle supported RPM/SCL based AWX ", "url": "awx-rpm.wiki" }
     loop_control:

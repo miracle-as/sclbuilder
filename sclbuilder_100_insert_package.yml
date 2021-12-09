@@ -1,21 +1,21 @@
 ---
 
 - name: Initial database seed
-  hosts: sclbuilder
+  hosts: prod_sclbuilder_worker
   tasks:
-  - name: Simple select query to sclbuilder db
+  - name: Simple select query to prod_sclbuilder_worker db
     postgresql_query:
-      db: sclbuilder
-      login_user: "sclbuilder"
+      db: prod_sclbuilder_worker
+      login_user: "prod_sclbuilder_worker"
       login_password: "django2know"
       query: SELECT version()
     become: yes
-    become_user: sclbuilder
+    become_user: prod_sclbuilder_worker
 
   - name: Insert package
     postgresql_query:
-      db: sclbuilder
-      login_user: "sclbuilder"
+      db: prod_sclbuilder_worker
+      login_user: "prod_sclbuilder_worker"
       login_password: "django2know"
       query: >-
         INSERT INTO projects_package 
@@ -36,6 +36,6 @@
         )
         ON CONFLICT (slug) DO NOTHING;
     become: yes
-    become_user: sclbuilder
+    become_user: prod_sclbuilder_worker
 
 
