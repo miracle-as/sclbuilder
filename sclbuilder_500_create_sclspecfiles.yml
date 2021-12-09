@@ -31,9 +31,9 @@
       db: sclbuilder
       login_user: "sclbuilder"
       login_password: "django2know"
-      query: ->
-        "update projects_package set packagesclfilestatus = 'Building'
-        where id = {{ item.id }}; " 
+      query: >-
+        update projects_package set packagesclfilestatus = 'Building'
+        where id = {{ item.id }}; 
     become: yes
     become_user: sclbuilder
     with_items:
