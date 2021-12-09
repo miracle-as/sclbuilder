@@ -7,7 +7,7 @@
     - organisation: "miracle"
     - project: "awxrpm"
   tasks:
-  - name:
+  - name: install dep
     package:
       - python38-psycopg2
     become: True
