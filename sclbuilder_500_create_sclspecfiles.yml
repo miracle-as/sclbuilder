@@ -11,7 +11,7 @@
     ansible.builtin.package:
       name: 
         - python38-psycopg2
-        - python38-pip]
+        - python38-pip
         - python38-devel
       state: present
 
