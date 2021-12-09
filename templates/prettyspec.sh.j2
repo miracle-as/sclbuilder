@@ -20,6 +20,8 @@ done
 mv INSTALLED_FILES.new INSTALLED_FILES
 sed -i '/__pycache__/'d INSTALLED_FILES
 sed -i '/LICENSE/'d INSTALLED_FILES
+sed -i '/ipsum.txt/'d INSTALLED_FILES
+sed -i '#/root/rpmbuild/BUILDROOT/ruamel.yaml-0.16.10-1.x86_64/usr/lib/python3.8/site-packages/ruamel/yaml/LICENSE#'d INSTALLED_FILES
 
 sed -i 's/^/\"/' INSTALLED_FILES 
 sed -i 's/$/\"/' INSTALLED_FILES  
