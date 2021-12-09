@@ -5,70 +5,70 @@
   tasks:
   - name: Simple select query to acme db
     postgresql_query:
-      db: prod_sclbuilder_worker
-      login_user: "prod_sclbuilder_worker"
+      db: sclbuilder
+      login_user: "sclbuilder"
       login_password: "django2know"
       query: SELECT version()
     become: yes
-    become_user: prod_sclbuilder_worker
+    become_user: sclbuilder
 
   - name: Select the all packages where packagespecfileurl is NULL
     postgresql_query:
-      db: prod_sclbuilder_worker
-      login_user: "prod_sclbuilder_worker"
+      db: sclbuilder
+      login_user: "sclbuilder"
       login_password: "django2know"
       query: select * from  projects_package where packagespecfileurl IS NULL;
     register: specurlmissingpackages
     become: yes
-    become_user: prod_sclbuilder_worker
+    become_user: sclbuilder
 
   - name: Set them to building
     postgresql_query:
-      db: prod_sclbuilder_worker
-      login_user: "prod_sclbuilder_worker"
+      db: sclbuilder
+      login_user: "sclbuilder"
       login_password: "django2know"
       query: "update projects_package set packagespecfilestatus = 'Building' , packagespecfileurl = 'http://repos.pip2scl.dk/SPECS/{{ item.packagename }}-{{ item.packageversion}}.SPEC'  where id = {{ item.id }} ; " 
     register: adoptedpackages
     become: yes
-    become_user: prod_sclbuilder_worker
+    become_user: sclbuilder
     with_items:
     - "{{ specurlmissingpackages.query_all_results.0 }}"
 
 
   - name: Select the new ones 
     postgresql_query:
-      db: prod_sclbuilder_worker
-      login_user: "prod_sclbuilder_worker"
+      db: sclbuilder
+      login_user: "sclbuilder"
       login_password: "django2know"
       query: select * from  projects_package where packagespecfilestatus 	IS NULL;;
     register: newpackages
     become: yes
-    become_user: prod_sclbuilder_worker
+    become_user: sclbuilder
   
   - name: Set them to building
     postgresql_query:
-      db: prod_sclbuilder_worker
-      login_user: "prod_sclbuilder_worker"
+      db: sclbuilder
+      login_user: "sclbuilder"
       login_password: "django2know"
       query: "update projects_package set packagespecfilestatus = 'Building'  where id = {{ item.id }} ; " 
     register: adoptedpackages
     become: yes
-    become_user: prod_sclbuilder_worker
+    become_user: sclbuilder
     with_items:
     - "{{ newpackages.query_all_results.0 }}"
 
 
   - name: Select the building candidates
     postgresql_query:
-      db: prod_sclbuilder_worker
-      login_user: "prod_sclbuilder_worker"
+      db: sclbuilder
+      login_user: "sclbuilder"
       login_password: "django2know"
       query: >-
         select packagename, packageversion from  projects_package 
         where packagerpmfilestatus != 'Completed' limit 20;
     register: buildingresult
     become: yes
-    become_user: prod_sclbuilder_worker
+    become_user: sclbuilder
   
   - name: Copy the rpmbuilder script
     ansible.builtin.template:
@@ -90,8 +90,8 @@
 
   - name: Copy the rpmbuilder script
     ansible.builtin.template:
-      src: prod_sclbuilder_worker_buildrpm.sh.j2
-      dest: /usr/local/bin/prod_sclbuilder_worker_buildrpm.sh
+      src: sclbuilder_buildrpm.sh.j2
+      dest: /usr/local/bin/sclbuilder_buildrpm.sh
       owner: root
       group: root 
       mode: '0755'
@@ -106,8 +106,8 @@
       mode: '0755'
     become: yes
 
-  - name: Run prod_sclbuilder_worker_buildrpm.sh  on our targets
-    command: "/usr/local/bin/prod_sclbuilder_worker_buildrpm.sh {{ item.packagename }}=={{ item.packageversion }}"
+  - name: Run sclbuilder_buildrpm.sh  on our targets
+    command: "/usr/local/bin/sclbuilder_buildrpm.sh {{ item.packagename }}=={{ item.packageversion }}"
     become: yes
     register: specfiles
     with_items:
@@ -126,13 +126,13 @@
 
   - name: update database if based on curl
     postgresql_query:
-      db: prod_sclbuilder_worker
-      login_user: "prod_sclbuilder_worker"
+      db: sclbuilder
+      login_user: "sclbuilder"
       login_password: "django2know"
       query: "update projects_package set packagerpmfilestatus = 'Completed' where  packagerpmfilesurl = '{{ item.url }}' ; " 
     register: result
     become: yes
-    become_user: prod_sclbuilder_worker
+    become_user: sclbuilder
     with_items:
       - "{{ urlcheck.results }}"
     when:  item.status == 200

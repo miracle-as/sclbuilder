@@ -5,22 +5,23 @@
   tasks:
   - name: Simple select query to acme db
     postgresql_query:
-      db: prod_sclbuilder_worker
-      login_user: "prod_sclbuilder_worker"
+      db: sclbuilder
+      login_host: sclbuilder
+      login_user: "sclbuilder"
       login_password: "django2know"
       query: SELECT version()
     become: yes
-    become_user: prod_sclbuilder_worker
+    become_user: sclbuilder
 
   - name: Insert package
     postgresql_query:
-      db: prod_sclbuilder_worker
-      login_user: "prod_sclbuilder_worker"
+      db: sclbuilder
+      login_user: "sclbuilder"
       login_password: "django2know"
       query: select * from  projects_package where packagestatus IS NULL;
     register: result
     become: yes
-    become_user: prod_sclbuilder_worker
+    become_user: sclbuilder
   
 #  - debug: 
 #      var: result.query_all_results.0
@@ -32,8 +33,8 @@
 
   - name: Copy the rpmbuilder script
     ansible.builtin.template:
-      src: prod_sclbuilder_worker_updaterelease.sh.j2
-      dest: /usr/local/bin/prod_sclbuilder_worker_updaterelease.sh
+      src: sclbuilder_updaterelease.sh.j2
+      dest: /usr/local/bin/sclbuilder_updaterelease.sh
       owner: root
       group: root 
       mode: '0755'
@@ -41,13 +42,14 @@
 
   - name: loop packages
     postgresql_query:
-      db: prod_sclbuilder_worker
-      login_user: "prod_sclbuilder_worker"
+      db: sclbuilder
+      login_host: sclbuilder
+      login_user: "sclbuilder"
       login_password: "django2know"
       query: "update projects_package set packagestatusurl = 'http://repos.pip2scl.dk/logos/amberball.png' where id = {{ item.id }} ; " 
     register: result
     become: yes
-    become_user: prod_sclbuilder_worker
+    become_user: sclbuilder
     with_items:
     - "{{ building.query_all_results.0 }}"
   
