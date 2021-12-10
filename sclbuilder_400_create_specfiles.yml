@@ -1,7 +1,7 @@
 ---
 
 - name: Initial database seed
-  hosts: prod_sclbuilder_worker
+  hosts: prod_sclbuilder_rpmbuilder
   tasks:
   - name: Simple select query to acme db
     postgresql_query:
