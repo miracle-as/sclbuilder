@@ -113,7 +113,10 @@
       login_host: sclbuilder
       login_user: "sclbuilder"
       login_password: "django2know"
-      query: select packagename, packageversion, packagespecfileurl from  projects_package where packagespecfilestatus = 'Building';
+      query: >-
+        select packagename, packageversion, packagespecfileurl 
+        from  projects_package 
+        where packagespecfilestatus = 'Building' limit 4;
     register: buildingresult
     become: yes
     become_user: sclbuilder
@@ -178,7 +181,9 @@
       login_host: sclbuilder
       login_user: "sclbuilder"
       login_password: "django2know"
-      query: "update projects_package set (packagesclfilestatus = 'Completed', packagerpmsclfilestatus = 'Completed') where  packagerpmsclfileurl = '{{ item.url }}' limit 5; " 
+      query: >- 
+        update projects_package set (packagesclfilestatus = 'Completed', packagerpmsclfilestatus = 'Completed') 
+        where  packagerpmsclfileurl = '{{ item.url }}' ; 
     register: result
     become: yes
     become_user: sclbuilder
