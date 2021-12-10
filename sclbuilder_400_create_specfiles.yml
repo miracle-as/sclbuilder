@@ -25,6 +25,7 @@
         - help2man
         - unzip
         - openssl-devel
+        - libtool-ltdl-devel
         - python3-sphinx
         - make
         - gcc
