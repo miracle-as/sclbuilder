@@ -17,7 +17,6 @@
         - python38-devel
         - python3-requests
         - python38-requests
-        - p
         - wget
         - rpm-build
         - scl-utils-build
