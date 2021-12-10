@@ -3,7 +3,7 @@
 - name: Initial database seed
   hosts: prod_sclbuilder_rpmbuilder
   tasks:
-  - name: Add the user 'johnd' with a specific uid and a primary group of 'admin'
+  - name: Add the user 'sclbuilder'
     ansible.builtin.user:
       name: sclbuilder
       comment: service account for scl create
