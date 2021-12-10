@@ -7,6 +7,44 @@
     - organisation: "miracle"
     - project: "awxrpm"
   tasks:
+  - name: Install rhel
+    ansible.builtin.package:
+      name: 
+        - redis
+        - python38-psycopg2
+        - python38-pip
+        - python38-devel
+        - python3-requests
+        - python38-requests
+        - wget
+        - rpm-build
+        - scl-utils-build
+        - scl-utils
+        - help2man
+        - unzip
+        - openssl-devel
+        - libtool-ltdl-devel
+        - python3-sphinx
+        - make
+        - gcc
+        - libffi-devel
+        - openldap-devel
+        - libxml2-devel
+        - xmlsec1-devel 
+        - xmlsec1-openssl-devel
+        - libpq-devel
+        - platform-python-devel
+      state: present
+
+  - name: Install bottle python package
+    pip:
+      name: 
+        - requests
+        - requirements-parser
+        - spec2scl
+        - setuptools_rust
+        - wheel
+
 
   - name: Simple select query to acme db
     postgresql_query:
