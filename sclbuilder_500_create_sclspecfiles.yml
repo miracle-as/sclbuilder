@@ -182,8 +182,10 @@
       login_user: "sclbuilder"
       login_password: "django2know"
       query: >- 
-        update projects_package set (packagesclfilestatus, packagerpmsclfilestatus)
-        VALUES ('Completed', 'Completed') 
+        update projects_package 
+        set 
+        packagesclfilestatus = 'Completed', 
+        packagerpmsclfilestatus = 'Completed' 
         where  packagerpmsclfileurl = '{{ item.url }}' ; 
     register: result
     become: yes
