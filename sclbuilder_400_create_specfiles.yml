@@ -15,6 +15,7 @@
         - python38-psycopg2
         - python38-pip
         - python38-devel
+        - 
         - python3-requests
         - python38-requests
         - wget
@@ -33,6 +34,7 @@
         - xmlsec1-devel 
         - xmlsec1-openssl-devel
         - libpq-devel
+        - platform-python-devel
       state: present
 
   - name: Install bottle python package
