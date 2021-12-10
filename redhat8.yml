@@ -1,7 +1,7 @@
 ---
 
 - name: Initial database seed
-  hosts: prod_sclbuilder_worker
+  hosts: 
   tasks:
 
   - name: Install
