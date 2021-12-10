@@ -33,6 +33,7 @@
         - xmlsec1-devel 
         - xmlsec1-openssl-devel
       state: present
+
   - name: Install bottle python package
     pip:
       name: 
@@ -41,6 +42,10 @@
         - spec2scl
         - setuptools_rust
         - wheel
+        
+  - name: Install psyorg in the platforn python
+    command: /usr/libexec/platform-python -m pip install psycopg2-binary
+    become: True
 
   - name: Correct python3
     community.general.alternatives:

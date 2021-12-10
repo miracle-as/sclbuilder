@@ -1,7 +1,7 @@
-- name: prod_prod_sclbuilder_worker_web
+- name: prod_sclbuilder_web_001
   distro: rhel-8.4
-  memory: 4096
-  vcpus: 4
+  memory: 1024
+  vcpus: 1
   bootcmd:
     - subscription-manager register --org=14498519 --activationkey=virt-lightening
     - subscription-manager repos --enable codeready-builder-for-rhel-8-x86_64-rpms
@@ -10,7 +10,43 @@
     - dnf -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
     - dnf cAlean all
 
-- name: prod_prod_sclbuilder_worker_db
+- name: prod_sclbuilder_web_002
+  distro: rhel-8.4
+  memory: 1024
+  vcpus: 1
+  bootcmd:
+    - subscription-manager register --org=14498519 --activationkey=virt-lightening
+    - subscription-manager repos --enable codeready-builder-for-rhel-8-x86_64-rpms
+    - yum update -y
+    - systemctl enable --now cockpit.socket
+    - dnf -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
+    - dnf cAlean all
+
+- name: prod_sclbuilder_web_003
+  distro: rhel-8.4
+  memory: 1024
+  vcpus: 1
+  bootcmd:
+    - subscription-manager register --org=14498519 --activationkey=virt-lightening
+    - subscription-manager repos --enable codeready-builder-for-rhel-8-x86_64-rpms
+    - yum update -y
+    - systemctl enable --now cockpit.socket
+    - dnf -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
+    - dnf cAlean all
+
+- name: prod_sclbuilder_monitor
+  distro: rhel-8.4
+  memory: 1024
+  vcpus: 1
+  bootcmd:
+    - subscription-manager register --org=14498519 --activationkey=virt-lightening
+    - subscription-manager repos --enable codeready-builder-for-rhel-8-x86_64-rpms
+    - yum update -y
+    - systemctl enable --now cockpit.socket
+    - dnf -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
+    - dnf cAlean all
+
+- name: prod_sclbuilder_db
   distro: rhel-8.4
   memory: 4096
   vcpus: 4
@@ -22,7 +58,7 @@
     - dnf -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
     - dnf clean all
 
-- name: prod_prod_sclbuilder_worker_worker
+- name: prod_sclbuilder_worker
   distro: rhel-8.4
   memory: 4096
   vcpus: 4
@@ -34,3 +70,27 @@
     - dnf -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
     - dnf clean all
 
+- name: prod_sclbuilder_rpmbuilder
+  distro: rhel-8.4
+  memory: 4096
+  vcpus: 4
+  bootcmd:
+    - subscription-manager register --org=14498519 --activationkey=virt-lightening
+    - subscription-manager repos --enable codeready-builder-for-rhel-8-x86_64-rpms
+    - yum update -y
+    - systemctl enable --now cockpit.socket
+    - dnf -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
+    - dnf clean all
+
+
+- name: prod_sclbuilder_sclbuilder
+  distro: rhel-8.4
+  memory: 4096
+  vcpus: 4
+  bootcmd:
+    - subscription-manager register --org=14498519 --activationkey=virt-lightening
+    - subscription-manager repos --enable codeready-builder-for-rhel-8-x86_64-rpms
+    - yum update -y
+    - systemctl enable --now cockpit.socket
+    - dnf -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
+    - dnf clean all
