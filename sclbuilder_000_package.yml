@@ -72,7 +72,7 @@
         packageorgspecfileurl = 'http://repos.pip2scl.dk/SPECS/{{ item.packagename }}-{{ item.packageversion }}.original.spec', 
         packagespecfileurl = 'http://repos.pip2scl.dk/SPECS/{{ item.packagename }}-{{ item.packageversion }}.verified.spec', 
         packagesclfileurl = 'http://repos.pip2scl.dk/SPECS/{{ item.packagename }}-{{ item.packageversion }}.scl', 
-        Packagesclrpmfilesurl = 'http://repos.pip2scl.dk/SPECS/{{ item.packagename }}-{{ item.packageversion }}.sclfiles',
+        Packagesclrpmfilesurl = 'http://repos.pip2scl.dk/META/{{ item.packagename }}-{{ item.packageversion }}.sclfiles',
         packagetweakscript = 'http://repos.pip2scl.dk/TWEAKS/{{ item.packagename }}-{{ item.packageversion }}.tweak' 
         where id = {{ item.id }} ; 
     become: yes
