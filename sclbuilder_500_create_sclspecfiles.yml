@@ -185,8 +185,8 @@
         update projects_package 
         set 
         packagesclfilestatus = 'Completed', 
-        packagerpmsclfilestatus = 'Completed' 
-        where  packagerpmsclfileurl = '{{ item.url }}' ; 
+        packagesclrpmfilestatus = 'Completed' 
+        where  packagesclrpmfilesurl = '{{ item.url }}' ; 
     register: result
     become: yes
     become_user: sclbuilder
