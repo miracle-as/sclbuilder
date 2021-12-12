@@ -613,8 +613,8 @@ build_rpm ()
 	if [[ $PACKAGE == "ruamel.yaml==0.16.10" ]]
 	then
 		logme "Hack. add files"
-		echo 'mkdir -p ${RPM_BUILD_ROOT}/usr/lib/python3.6/site-packages/ruamel/yaml' > /tmp/ruamel.yaml.add
-		echo 'touch ${RPM_BUILD_ROOT}/usr/lib/python3.6/site-packages/ruamel/yaml/LICENSE' >> /tmp/ruamel.yaml.add
+		echo 'mkdir -p ${RPM_BUILD_ROOT}/usr/lib/python3.8/site-packages/ruamel/yaml' > /tmp/ruamel.yaml.add
+		echo 'touch ${RPM_BUILD_ROOT}/usr/lib/python3.8/site-packages/ruamel/yaml/LICENSE' >> /tmp/ruamel.yaml.add
 		/usr/local/bin/mergefiles.sh ${SPEC}   /tmp/ruamel.yaml.add "%clean"  before    >/dev/null 2>&1
 	fi
 
