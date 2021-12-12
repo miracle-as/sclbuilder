@@ -93,8 +93,8 @@ build_rpm ()
         if [[ $PACKAGE == "Django==2.2.16" ]];
         then
 		logme "Do some django patch"
-#		sed -i "s(# Sort the filelist so that directories appear before files. This avoids(sed -i 's)#!/usr/bin/env python*.)#!/usr/bin/env python3)'  \${RPM_BUILD_ROOT}/usr/lib/python3.6/site-packages/django/conf/project_template/manage.py-tpl(" $PRESPECFILE
-#		sed -i "s(# duplicate filename problems on some systems.(sed -i 's)#!/usr/bin/env python*.)#!/usr/bin/env python3)'  \${RPM_BUILD_ROOT}/usr/lib/python3.6/site-packages/django/bin/django-admin.py(" $PRESPECFILE
+#		sed -i "s(# Sort the filelist so that directories appear before files. This avoids(sed -i 's)#!/usr/bin/env python*.)#!/usr/bin/env python3)'  \${RPM_BUILD_ROOT}/usr/lib/python3.8/site-packages/django/conf/project_template/manage.py-tpl(" $PRESPECFILE
+#		sed -i "s(# duplicate filename problems on some systems.(sed -i 's)#!/usr/bin/env python*.)#!/usr/bin/env python3)'  \${RPM_BUILD_ROOT}/usr/lib/python3.8/site-packages/django/bin/django-admin.py(" $PRESPECFILE
 
 	fi
 

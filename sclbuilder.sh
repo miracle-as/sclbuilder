@@ -586,8 +586,8 @@ build_rpm ()
         if [[ $PACKAGE == "Django==2.2.16" ]];
         then
 		logme "Do some django patch"
-#		sed -i "s(# Sort the filelist so that directories appear before files. This avoids(sed -i 's)#!/usr/bin/env python*.)#!/usr/bin/env python3)'  \${RPM_BUILD_ROOT}/usr/lib/python3.6/site-packages/django/conf/project_template/manage.py-tpl(" $SPEC
-#		sed -i "s(# duplicate filename problems on some systems.(sed -i 's)#!/usr/bin/env python*.)#!/usr/bin/env python3)'  \${RPM_BUILD_ROOT}/usr/lib/python3.6/site-packages/django/bin/django-admin.py(" $SPEC
+#		sed -i "s(# Sort the filelist so that directories appear before files. This avoids(sed -i 's)#!/usr/bin/env python*.)#!/usr/bin/env python3)'  \${RPM_BUILD_ROOT}/usr/lib/python3.8/site-packages/django/conf/project_template/manage.py-tpl(" $SPEC
+#		sed -i "s(# duplicate filename problems on some systems.(sed -i 's)#!/usr/bin/env python*.)#!/usr/bin/env python3)'  \${RPM_BUILD_ROOT}/usr/lib/python3.8/site-packages/django/bin/django-admin.py(" $SPEC
 
 	fi
 
@@ -1050,10 +1050,10 @@ build_scl ()
         	if [[ $PACKAGE == "jaraco.text==3.2.0" ]]
         	then
                 	logme "Hack. add files"
-      			echo 'mkdir -p "/root/rpmbuild/BUILDROOT/miracle-awx-jaraco.text-3.2.0-1.x86_64/usr/lib/python3.6/site-packages/jaraco/text" ' >  $SCLFILEPRE.add
-      			echo 'touch "/root/rpmbuild/BUILDROOT/miracle-awx-jaraco.text-3.2.0-1.x86_64/usr/lib/python3.6/site-packages/jaraco/text/Lorem ipsum.txt" ' >>  $SCLFILEPRE.add
+      			echo 'mkdir -p "/root/rpmbuild/BUILDROOT/miracle-awx-jaraco.text-3.2.0-1.x86_64/usr/lib/python3.8/site-packages/jaraco/text" ' >  $SCLFILEPRE.add
+      			echo 'touch "/root/rpmbuild/BUILDROOT/miracle-awx-jaraco.text-3.2.0-1.x86_64/usr/lib/python3.8/site-packages/jaraco/text/Lorem ipsum.txt" ' >>  $SCLFILEPRE.add
        	 		/usr/local/bin/mergefiles.sh ${SCLFILEPRE}  ${SCLFILEPRE}.add "%clean" before   >/dev/null 2>&1
-                	echo '"/opt/miracle/miracle-awx/root/usr/lib/python3.6/site-packages/jaraco/text/Lorem ipsum.txt"' >> $SCLFILEPRE
+                	echo '"/opt/miracle/miracle-awx/root/usr/lib/python3.8/site-packages/jaraco/text/Lorem ipsum.txt"' >> $SCLFILEPRE
         	fi
 	fi
 

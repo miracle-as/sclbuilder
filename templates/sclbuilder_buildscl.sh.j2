@@ -164,10 +164,10 @@ build_scl ()
     if [[ $PACKAGE == "jaraco.text==3.2.0" ]]
     then
       	logme "Hack. add files"
-  		echo 'mkdir -p "/root/rpmbuild/BUILDROOT/miracle-awx-jaraco.text-3.2.0-1.x86_64/usr/lib/python3.6/site-packages/jaraco/text" ' >  $PRESCLFILE.add
-   		echo 'touch "/root/rpmbuild/BUILDROOT/miracle-awx-jaraco.text-3.2.0-1.x86_64/usr/lib/python3.6/site-packages/jaraco/text/Lorem ipsum.txt" ' >>  $PRESCLFILE.add
+  		echo 'mkdir -p "/root/rpmbuild/BUILDROOT/miracle-awx-jaraco.text-3.2.0-1.x86_64/usr/lib/python3.8/site-packages/jaraco/text" ' >  $PRESCLFILE.add
+   		echo 'touch "/root/rpmbuild/BUILDROOT/miracle-awx-jaraco.text-3.2.0-1.x86_64/usr/lib/python3.8/site-packages/jaraco/text/Lorem ipsum.txt" ' >>  $PRESCLFILE.add
    		/usr/local/bin/mergefiles.sh ${PRESCLFILE}  ${PRESCLFILE}.add "%clean" before   >/dev/null 2>&1
-       	echo '"/opt/miracle/miracle-awx/root/usr/lib/python3.6/site-packages/jaraco/text/Lorem ipsum.txt"' >> $PRESCLFILE
+       	echo '"/opt/miracle/miracle-awx/root/usr/lib/python3.8site-packages/jaraco/text/Lorem ipsum.txt"' >> $PRESCLFILE
     fi
 
 	logme "rpmbuild -ba -D 'debug_package %{nil}' --clean $PRESCLFILE --define \"scl {{ organisation }}-{{ project }}\" "
