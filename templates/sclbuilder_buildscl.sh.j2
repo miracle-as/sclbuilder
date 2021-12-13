@@ -123,7 +123,7 @@ build_scl ()
     then
 	  	sed -i 's#"/usr/bin/uwsgi"##' $PRESCLFILE
 	  	echo "/opt/miracle/{{ organisation }}-{{ project }}/root/usr/bin/uwsgi" >> $PRESCLFILE
-    	echo "/usr/lib/debug/opt/miracle/miracle-awx/root/usr/bin/uwsgi-2.0.18-1.x86_64.debug" >> $PRESCLFILE
+    	echo "/usr/lib/debug/opt/{{ organisation }}/{{ organisation }}-{{ project }}/root/usr/bin/uwsgi-2.0.18-1.x86_64.debug" >> $PRESCLFILE
     fi
 
     ##################################
