@@ -145,6 +145,7 @@ build_scl ()
 		echo 'touch /root/rpmbuild/BUILDROOT/miracle-awx-ruamel.yaml.clib-0.2.0-1.x86_64/opt/miracle/miracle-awx/root/usr/bin/uwsgi' >> $PRESCLFILE.ruamel.yaml.clib-0.2.0.add
 		echo 'mkdir -p /root/rpmbuild/BUILDROOT/miracle-awx-ruamel.yaml.clib-0.2.0-1.x86_64/usr/lib/debug/opt/miracle/miracle-awx/root/usr/bin' >>$PRESCLFILE.ruamel.yaml.clib-0.2.0.add
 		echo 'touch /root/rpmbuild/BUILDROOT/miracle-awx-ruamel.yaml.clib-0.2.0-1.x86_64/usr/lib/debug/opt/miracle/miracle-awx/root/usr/bin/uwsgi-2.0.18-1.x86_64.debug' >>$PRESCLFILE.ruamel.yaml.clib-0.2.0.add
+	   	echo /usr/local/bin/mergefiles.sh ${PRESCLFILE}  ${PRESCLFILE}.ruamel.yaml.clib-0.2.0.add "%clean" before  
 	   	/usr/local/bin/mergefiles.sh ${PRESCLFILE}  ${PRESCLFILE}.ruamel.yaml.clib-0.2.0.add "%clean" before   >/dev/null 2>&1
 	fi
 
