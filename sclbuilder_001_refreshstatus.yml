@@ -30,7 +30,7 @@
       login_password: "django2know"
       query: >- 
         update projects_package 
-        set packagestatus = 'Compledted' 
+        set packagestatus = 'Completed' 
         where (
         packagesourcefilestatus = 'Completed' AND 
         packageorgspecfilestatus = 'Completed' AND  
