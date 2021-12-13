@@ -165,8 +165,7 @@ build_scl ()
     then
       	logme "Hack. add files"
        	echo '"/opt/{{ organisation }}/{{ organisation }}-{{ project  }}/root/usr/lib/python3.8/site-packages/jaraco/text/Lorem ipsum.txt"' >> $PRESCLFILE
-	    cat $PRESCLFILE
-		exit
+#		sed -i "#
     fi
 
 	logme "rpmbuild -ba -D 'debug_package %{nil}' --clean $PRESCLFILE --define \"scl {{ organisation }}-{{ project }}\" "
