@@ -7,6 +7,12 @@
     - organisation: "miracle"
     - project: "awxrpm"
   tasks:
+  - name: Add the user 'sclbuilder'
+    ansible.builtin.user:
+      name: sclbuilder
+      comment: service account for scl create
+    become: True
+
   - name: Install rhel
     ansible.builtin.package:
       name: 
@@ -44,7 +50,6 @@
         - spec2scl
         - setuptools_rust
         - wheel
-
 
   - name: Simple select query to acme db
     postgresql_query:

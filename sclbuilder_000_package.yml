@@ -207,9 +207,17 @@
       login_host: sclbuilder
       login_user: "sclbuilder"
       login_password: "django2know"
-      query: "update projects_package set packagestatus = 'Compledted' where (packagesourcefilestatus = 'Completed' AND packageorgspecfilestatus = 'Completed' AND  packagespecfilestatus = 'Completed' AND  packagerpmfilestatus = 'Completed' AND packagesclfilestatus packagesclrpmfilestatus jho@benny ~ []$ 
-; " 
-    register: result
+      query: >- 
+        update projects_package 
+        set packagestatus = 'Compledted' 
+        where (
+        packagesourcefilestatus = 'Completed' AND 
+        packageorgspecfilestatus = 'Completed' AND  
+        packagespecfilestatus = 'Completed' AND  
+        packagerpmfilestatus = 'Completed' AND 
+        packagesclfilestatus = 'Completed' AND
+        packagesclrpmfilestatus = 'Completed' )
+    register: statusresult
     become: yes
     become_user: sclbuilder
     with_items:
