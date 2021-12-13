@@ -1,0 +1,43 @@
+---
+
+- name: Initial database seed
+  hosts: prod_sclbuilder_worker
+  gather_facts: False
+  tasks:
+
+  - name: set package status based on substati
+    postgresql_query:
+      db: sclbuilder
+      login_host: sclbuilder
+      login_user: "sclbuilder"
+      login_password: "django2know"
+      query: >- 
+        select         packagesourcefilestatus, packageorgspecfilestatus , packageorgspecfilestatus, packagerpmfilestatus , packagesclrpmfilestatus from projects_package;
+    register: statusresult
+    become: yes
+    become_user: sclbuilder
+
+
+  - debug: 
+      var: statusresult.query_all_results.0
+
+   
+  - name: set package status based on substati
+    postgresql_query:
+      db: sclbuilder
+      login_host: sclbuilder
+      login_user: "sclbuilder"
+      login_password: "django2know"
+      query: >- 
+        update projects_package 
+        set packagesclrpmfilestatus = 'Building' 
+        where (
+        packagesourcefilestatus = 'Completed' AND 
+        packageorgspecfilestatus = 'Completed' AND  
+        packagerpmfilestatus = 'Completed' AND
+        packagesclrpmfilestatus = 'Completed' )
+    register: statusresult
+    become: yes
+    become_user: sclbuilder
+    
+   
