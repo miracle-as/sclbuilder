@@ -85,15 +85,6 @@
   
   - name: Copy the downloader env script
     ansible.builtin.template:
-      src:  .sh.j2
-      dest: /usr/local/bin/setbuildenv.sh
-      owner: root
-      group: root 
-      mode: '0755'
-    become: yes
-
-  - name: Copy the downloader env script
-    ansible.builtin.template:
       src:  setbuildenv.sh.j2
       dest: /usr/local/bin/setbuildenv.sh
       owner: root
