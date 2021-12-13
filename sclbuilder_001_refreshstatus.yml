@@ -12,7 +12,7 @@
       login_user: "sclbuilder"
       login_password: "django2know"
       query: >- 
-        select         packagesourcefilestatus, packageorgspecfilestatus , packagespecfilestatus, packagerpmfilestatus , packagesclrpmfilestatus from projects_package;
+        select         packagesourcefilestatus, packageorgspecfilestatus , packageorgspecfilestatus, packagerpmfilestatus , packagesclrpmfilestatus from projects_package;
     register: statusresult
     become: yes
     become_user: sclbuilder
@@ -34,7 +34,6 @@
         where (
         packagesourcefilestatus = 'Completed' AND 
         packageorgspecfilestatus = 'Completed' AND  
-        packagespecfilestatus = 'Completed' AND  
         packagerpmfilestatus = 'Completed' AND 
         packagesclrpmfilestatus = 'Completed' )
     register: statusresult
