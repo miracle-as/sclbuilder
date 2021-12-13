@@ -126,29 +126,6 @@ build_scl ()
     	echo "/usr/lib/debug/opt/{{ organisation }}/{{ organisation }}-{{ project }}/root/usr/bin/uwsgi-2.0.18-1.x86_64.debug" >> $PRESCLFILE
     fi
 
-    ##################################
-    #
-    ####################################
-    if [[ $PACKAGE == "ruamel.yaml.clib==0.2.0" ]];
-	then	
-		echo "/opt/miracle/miracle-awxrpm/root/usr/lib64/python3.8/site-packages/_ruamel_yaml.cpython-38-x86_64-linux-gnu.so"  >> $PRESCLFILE
-        echo "/opt/miracle/miracle-awxrpm/root/usr/lib64/python3.8/site-packages/ruamel.yaml.clib-0.2.0-py3.8.egg-info/PKG-INFO" >> $PRESCLFILE
-        echo "/opt/miracle/miracle-awxrpm/root/usr/lib64/python3.8/site-packages/ruamel.yaml.clib-0.2.0-py3.8.egg-info/SOURCES.txt" >> $PRESCLFILE
-        echo "/opt/miracle/miracle-awxrpm/root/usr/lib64/python3.8/site-packages/ruamel.yaml.clib-0.2.0-py3.8.egg-info/dependency_links.txt" >> $PRESCLFILE
-        echo "/opt/miracle/miracle-awxrpm/root/usr/lib64/python3.8/site-packages/ruamel.yaml.clib-0.2.0-py3.8.egg-info/namespace_packages.txt" >> $PRESCLFILE
-        echo "/opt/miracle/miracle-awxrpm/root/usr/lib64/python3.8/site-packages/ruamel.yaml.clib-0.2.0-py3.8.egg-info/top_level.txt" >> $PRESCLFILE
-
-	fi
-
-
-
-    #################################
-    #
-    ####################################
-	if [[ $PACKAGE == "ruamel.yaml==0.16.10" ]];
-	then
-		echo "/usr/lib/python3.8/site-packages/ruamel/yaml/LICENSE"  >> $PRESCLFILE
-	fi
 
     ##################################
     #
