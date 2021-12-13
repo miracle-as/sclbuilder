@@ -20,6 +20,7 @@
         - python38-psycopg2
         - python38-pip
         - python38-devel
+        - python3-devel
         - python3-requests
         - python38-requests
         - wget
