@@ -110,7 +110,7 @@ build_scl ()
    	then
 		logme "DJango hack"
 		sed -i 's#^"#"/opt/{{ organisation }}/{{ organisation }}-{{ project }}/root#'  $PRESCLFILE
-		sed -i 's#/root/rpmbuild/BUILDROOT/miracle-awxrpm-Django-2.2.16-1.x86_64/opt/miracle/miracle-awxrpm/root/usr/share/man/man1/django-admin.1.gz##"  $PRESCLFILE
+		sed -i 's#/root/rpmbuild/BUILDROOT/miracle-awxrpm-Django-2.2.16-1.x86_64/opt/miracle/miracle-awxrpm/root/usr/share/man/man1/django-admin.1.gz##'  $PRESCLFILE
 
     fi
 
