@@ -164,7 +164,7 @@ build_scl ()
     if [[ $PACKAGE == "jaraco.text==3.2.0" ]]
     then
       	logme "Hack. add files"
-       	echo '"/opt/{{ organisation }}/{{ organisation }}-{{ project  }}/root/usr/lib/python3.8site-packages/jaraco/text/Lorem ipsum.txt"' >> $PRESCLFILE
+       	echo '"/opt/{{ organisation }}/{{ organisation }}-{{ project  }}/root/usr/lib/python3.8/site-packages/jaraco/text/Lorem ipsum.txt"' >> $PRESCLFILE
 	    cat $PRESCLFILE
 		exit
     fi
