@@ -18,6 +18,12 @@
       mode: 755
       force: yes
     become: True
+  
+  - name: Creates directory
+    file:
+      path: /root/rpmbuild/SOURCES
+      state: directory
+    become: True
 
   - name:  create_specfiles | create a tailored metaspecfile
     ansible.builtin.template:
