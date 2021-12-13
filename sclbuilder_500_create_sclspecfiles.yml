@@ -1,7 +1,7 @@
 ---
 
 - name: Initial database seed
-  hosts: prod_sclbuilder_sclbuilder
+  hosts: prod_sclbuilder_worker
   vars:
     - version:  "1.0.0"
     - organisation: "miracle"
