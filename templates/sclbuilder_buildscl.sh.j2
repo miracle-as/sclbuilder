@@ -135,6 +135,14 @@ build_scl ()
 		mv $PRESCLFILE.new $PRESCLFILE
 		head -n-1 $PRESCLFILE > $PRESCLFILE.new
 		mv $PRESCLFILE.new $PRESCLFILE
+
+		echo "/opt/miracle/miracle-awxrpm/root/usr/lib64/python3.8/site-packages/_ruamel_yaml.cpython-38-x86_64-linux-gnu.so"  >> $PRESCLFILE
+        echo "/opt/miracle/miracle-awxrpm/root/usr/lib64/python3.8/site-packages/ruamel.yaml.clib-0.2.0-py3.8.egg-info/PKG-INFO" >> $PRESCLFILE
+        echo "/opt/miracle/miracle-awxrpm/root/usr/lib64/python3.8/site-packages/ruamel.yaml.clib-0.2.0-py3.8.egg-info/SOURCES.txt" >> $PRESCLFILE
+        echo "/opt/miracle/miracle-awxrpm/root/usr/lib64/python3.8/site-packages/ruamel.yaml.clib-0.2.0-py3.8.egg-info/dependency_links.txt" >> $PRESCLFILE
+        echo "/opt/miracle/miracle-awxrpm/root/usr/lib64/python3.8/site-packages/ruamel.yaml.clib-0.2.0-py3.8.egg-info/namespace_packages.txt" >> $PRESCLFILE
+        echo "/opt/miracle/miracle-awxrpm/root/usr/lib64/python3.8/site-packages/ruamel.yaml.clib-0.2.0-py3.8.egg-info/top_level.txt" >> $PRESCLFILE
+
 	fi
 
 
