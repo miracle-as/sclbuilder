@@ -215,7 +215,6 @@
         packageorgspecfilestatus = 'Completed' AND  
         packagespecfilestatus = 'Completed' AND  
         packagerpmfilestatus = 'Completed' AND 
-        packagesclfilestatus = 'Completed' AND
         packagesclrpmfilestatus = 'Completed' )
     register: statusresult
     become: yes
