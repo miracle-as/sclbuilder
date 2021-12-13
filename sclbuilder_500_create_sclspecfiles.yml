@@ -125,7 +125,7 @@
       query: >-
         select packagename, packageversion, packagespecfileurl 
         from  projects_package 
-        where packagespecfilestatus = 'Building'
+        where Packagesclfilestatus = 'Building'
         limit 1;
     register: buildingresult
     become: yes
