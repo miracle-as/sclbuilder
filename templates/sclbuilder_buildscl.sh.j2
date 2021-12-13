@@ -108,6 +108,9 @@ build_scl ()
    	if [[ $PACKAGE == "Django==2.2.16" ]];
    	then
 		logme "DJango hack"
+		echo ' find ${RPM_BUILD_ROOT}/opt/miracle/miracle-awxrpm/root/ -type f >> INSTALLED_FILES'  >  /tmp/miracle-awxrpm-Django-2.2.16.add
+		/usr/local/bin/mergefiles.sh $PRESCLFILE  /tmp/miracle-awxrpm-Django-2.2.16.add "%clean" before
+
     fi
 
 ##################################
