@@ -125,7 +125,8 @@
       query: >-
         select packagename, packageversion, packagespecfileurl 
         from  projects_package 
-        where packagespecfilestatus = 'Building';
+        where packagespecfilestatus = 'Building'
+        limit 1;
     register: buildingresult
     become: yes
     become_user: sclbuilder
