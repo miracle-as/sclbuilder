@@ -109,6 +109,7 @@ build_scl ()
    	if [[ $PACKAGE == "Django==2.2.16" ]];
    	then
 		logme "DJango hack"
+		sed -i 's#^"#"/opt/{{ organisation }}/{{ organisation }}-{{ project }}/root#'  $PRESCLFILE
     fi
 
 ##################################
