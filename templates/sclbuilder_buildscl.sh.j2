@@ -130,22 +130,10 @@ build_scl ()
     #
     ####################################
     if [[ $PACKAGE == "ruamel.yaml.clib==0.2.0" ]];
-    then
-  		sed -i 's#"/usr/bin/uwsgi"##' $PRESCLFILE
-	  	echo "/opt/{{ organisation }}/{{ organisation }}-{{ project }}/root/usr/bin/uwsgi" >> $PRESCLFILE
-      	echo "/usr/lib/debug/opt/{{ organisation }}/{{ organisation }}-{{ project }}/root/usr/bin/uwsgi-2.0.18-1.x86_64.debug" >> $PRESCLFILE
-    fi
-
-    ##################################
-    #
-    ####################################
-    if [[ $PACKAGE == "ruamel.yaml.clib==0.2.0" ]];
 	then	
 		head -n-2 $PRESCLFILE > $PRESCLFILE.new
 		mv $PRESCLFILE.new $PRESCLFILE
-		echo 'mkdir -p ./root/usr/bin' >$PRESCLFILE.ruamel.yaml.clib-0.2.0.add
-		echo 'touch ./root/usr/bin/uwsgi' >> $PRESCLFILE.ruamel.yaml.clib-0.2.0.add
-		echo 'touch ./root/bin/uwsgi-2.0.18-1.x86_64.debug' >>$PRESCLFILE.ruamel.yaml.clib-0.2.0.add
+	   	echo "####" >  ${PRESCLFILE}.ruamel.yaml.clib-0.2.0.add >/dev/null 2>&1
 	   	/usr/local/bin/mergefiles.sh ${PRESCLFILE}  ${PRESCLFILE}.ruamel.yaml.clib-0.2.0.add "%clean" before   >/dev/null 2>&1
 	fi
 
