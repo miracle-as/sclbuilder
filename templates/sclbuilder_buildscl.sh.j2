@@ -108,12 +108,6 @@ build_scl ()
    	if [[ $PACKAGE == "Django==2.2.16" ]];
    	then
 		logme "DJango hack"
- 	      # Sort the filelist so that directories appear before files. This avoids
- 	      # Make sure we match foo.pyo and foo.pyc along with foo.py (but only once each)
-    	grep -P "Sort the filelist so that directories appear before files. This avoids" $PRESCLFILE -B100000 |grep -v "Sort the filelist so that directories appear before files. This avoids" > PART1
-	    echo 'sed -i "s(//(/(" INSTALLED_FILES' >> PART1
-	    grep -P "^EOF$" $PRESCLFILE -A100000 |grep -v "^EOF$" > PART2
-	    cat PART1 PART2 |grep -v " DIRS FILES" |grep -v /usr/share/man/man1/django-admin.1.gz  |grep  -v '%doc' > $PRESCLFILE
     fi
 
 ##################################
