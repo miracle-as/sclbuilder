@@ -68,6 +68,7 @@ build_scl ()
 		grep "python3 setup.py install" -A1000000 $PRESCLFILE | grep -v "python3 setup.py install" >/tmp/footer
 	fi
        	sed -i 's#root=$RPM_BUILD_ROOT#root=$RPM_BUILD_ROOT/opt/{{ organisation }}/{{ organisation }}-{{ project }}/root#'  $PRESCLFILE
+       	sed -i 's#root=$RPM_BUILD_ROOT#root=${RPM_BUILD_ROOT}/opt/{{ organisation }}/{{ organisation }}-{{ project }}/root#'  $PRESCLFILE
        	sed -i "s#%setup.*#%setup -n ${NAMEINTAR}#" $PRESCLFILE
 	logme "mandatory_after_setup.sh $PRESCLFILE"
 
