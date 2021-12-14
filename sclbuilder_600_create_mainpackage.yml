@@ -76,6 +76,7 @@
       repo: '{{ repo }} '
       dest: "/root/checkout/"
       version: "{{ version}}"
+      clone: yes
    
 
 
