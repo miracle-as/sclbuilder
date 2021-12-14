@@ -1,6 +1,6 @@
 ---
 - name: Initial database seed
-  hosts: prod_awx"
+  hosts: prod_awx
   vars:
     - organisation: "miracle"
     - repo: "https://github.com/ansible/awx.git"
