@@ -3,7 +3,7 @@
   hosts: prod_awx
   vars:
     - organisation: "miracle"
-    - repo: "https://github.com/ansible/awx.git"
+    - myrepo: "https://github.com/ansible/awx.git"
     - project: "awxrpm"
     - version: "19.4.0"
   tasks:
@@ -73,9 +73,8 @@
 
   - name: Git checkout
     ansible.builtin.git:
-      repo: '{{ repo }} '
-      dest: "/root/checkout/"
-      version: "{{ version}}"
+      repo: "{{  myrepo  }}"
+      dest: /root/checkout/
       clone: yes
    
 
