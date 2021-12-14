@@ -5,6 +5,7 @@
     - organisation: "miracle"
     - repo: "https://github.com/ansible/awx.git"
     - project: "awxrpm"
+    - version: "19.4.0"
   tasks:
 
   - name: Install rhel
@@ -68,7 +69,7 @@
   - name: Creates directory
     file:
       path: /root/checkout
-      state: directory
+      state: absent
 
   - name: Git checkout
     ansible.builtin.git:
