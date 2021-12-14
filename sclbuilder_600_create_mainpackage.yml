@@ -74,8 +74,8 @@
   - name: Git checkout
     ansible.builtin.git:
       repo: '{{ repo }} '
-      dest: "/root/checkout"
-      version: "master"
+      dest: "/root/checkout/{{ project }}/{{ project }}-{{ version }}"
+      version: "{{ version}}"
    
 
 
