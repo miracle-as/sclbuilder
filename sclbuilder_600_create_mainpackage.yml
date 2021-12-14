@@ -70,6 +70,6 @@
     ansible.builtin.git:
       repo: '{{ repo }} '
       dest: "/root/checkout"
-      version: "{{ version }}"
-      
+   
+
 
