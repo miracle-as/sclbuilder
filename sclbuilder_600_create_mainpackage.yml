@@ -44,7 +44,7 @@
         - spec2scl
         - setuptools_rust
         - wheel
-
+        
   - name: Install psyorg in the platforn python
     command: /usr/libexec/platform-python -m pip install psycopg2-binary 
     become: True
@@ -74,6 +74,7 @@
     ansible.builtin.git:
       repo: '{{ repo }} '
       dest: "/root/checkout"
+      version: "master"
    
 
 
