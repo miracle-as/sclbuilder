@@ -8,6 +8,7 @@
     - version: "19.4.0"
     - scl_version: "19.4.0"
     - scl_release: "1"
+    - scl_description: "Miracle supported awx"
 
   tasks:
 
