@@ -56,7 +56,7 @@
       type: rsa
       size: 4096
       state: present
-      force: yes
+      force: no
     become: True
 
   - name: Store file into /tmp/fetched/host.example.com/tmp/somefile
