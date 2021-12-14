@@ -1,8 +1,7 @@
 ---
 - name: Initial database seed
-  hosts: prod_sclbuilder_worker
+  hosts: prod_awx"
   vars:
-    - version:  "19.4.0"
     - organisation: "miracle"
     - repo: "https://github.com/ansible/awx.git"
     - project: "awxrpm"
