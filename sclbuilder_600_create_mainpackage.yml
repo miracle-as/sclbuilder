@@ -44,7 +44,7 @@
         - spec2scl
         - setuptools_rust
         - wheel
-        
+
   - name: Install psyorg in the platforn python
     command: /usr/libexec/platform-python -m pip install psycopg2-binary 
     become: True
@@ -58,6 +58,7 @@
   - name: Simple select query to acme db
     postgresql_query:
       db: sclbuilder
+      login_host: sclbuilder
       login_user: "sclbuilder"
       login_password: "django2know"
       query: SELECT version()
