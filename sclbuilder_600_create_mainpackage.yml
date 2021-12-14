@@ -6,6 +6,8 @@
     - myrepo: "https://github.com/ansible/awx.git"
     - project: "awxrpm"
     - version: "19.4.0"
+    - scl_version: "19.4.0"
+
   tasks:
 
   - name: Install rhel
@@ -65,7 +67,7 @@
       query: SELECT version()
     become: yes
     become_user: sclbuilder
-    
+
   - name:  create_specfiles | create a tailored script
     ansible.builtin.template:
       src: create.sclspec.sh.j2
