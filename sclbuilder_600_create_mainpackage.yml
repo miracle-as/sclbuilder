@@ -65,10 +65,10 @@
     file:
       path: /root/checkout
       state: directory
-      
+
   - name: Git checkout
     ansible.builtin.git:
-      repo: '{{} repo }} '
-      dest: /root/checkout
+      repo: '{{ repo }} '
+      dest: "/root/checkout"
       version: {{ version }}
 
