@@ -134,6 +134,7 @@
       repo: "{{  myrepo  }}"
       dest: /root/checkout/
       clone: yes
+      version: 19.4.0
     become: True
    
 
