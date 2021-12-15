@@ -39,6 +39,7 @@
         - xmlsec1-openssl-devel
         - libpq-devel
         - platform-python-devel
+        - git
       state: present
 
   - name: Install bottle python package
