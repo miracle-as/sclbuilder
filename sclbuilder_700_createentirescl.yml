@@ -10,7 +10,7 @@
     - scl_release: "1"
     - scl_description: "Miracle supported awx"
     - projectdir: "/root/{{ organisation }}/{{ project }}/{{ version }}"
-    - requirementfile: "{{ organisation }}-{{ project }}.{{ version }}.requirements.txt }}"
+    - requirementfile: "{{ organisation }}-{{ project }}-{{ version }}.requirements.txt }}"
 
   tasks:
 
@@ -141,7 +141,7 @@
       path: "/root/{{ organisation }}/{{ project }}/{{ version }}"
       state: directory
 
-  - name: Download foo.conf
+  - name: Download requirementfile
     get_url:
       url: "http://repos.pip2scl.dk/REQUIREMENTS/{{ requirementfile }}"
       dest: "{{ projectdir }}/{{ requirementfile }}"
