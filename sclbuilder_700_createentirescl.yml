@@ -10,7 +10,7 @@
     - scl_release: "1"
     - scl_description: "Miracle supported awx"
     - projectdir: "/root/{{ organisation }}/{{ project }}/{{ version }}"
-    - requirementfile: "{{ organisation }}-{{ project }}-{{ version }}.requirements.txt }}"
+    - requirementfile: "{{ organisation }}-{{ project }}-{{ version }}.requirements.txt"
 
   tasks:
 
