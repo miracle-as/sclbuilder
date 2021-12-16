@@ -139,7 +139,7 @@
   - name: Creates directory
     file:
       path: "/root/{{ organisation }}/{{ project }}/{{ version }}"
-      state: present
+      state: directory
 
   - name: Download foo.conf
     get_url:
