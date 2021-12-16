@@ -10,10 +10,11 @@
     - scl_release: "1"
     - scl_description: "Miracle supported awx"
     - projectdir: "/root/{{ organisation }}/{{ project }}/{{ version }}"
+    - specdir: "/root/rpmbuild/SPECS"
     - requirementfile: "{{ organisation }}-{{ project }}-{{ version }}.requirements.txt"
+    - metaspecfile: "{{ organisation }}.{{ project }}.meta.scl.spec"
 
   tasks:
-
   - name: Install rhel
     ansible.builtin.package:
       name: 
@@ -104,39 +105,18 @@
       force: yes
     become: True
   
-  - name: Creates directory
+  - name: Creates directory rpmbuild
     file:
-      path: /root/rpmbuild/SOURCES
+      path: "/root/rpmbuild/{{ item }}"
       state: directory
     become: True
+    loop: 
+      - SOURCES 
+      - SPECS 
+      - RPMS 
+      - SRPMS 
 
-
-
-  - name:  create_specfiles | create a tailored metaspecfile
-    ansible.builtin.template:
-      src: metascl.spec.j2
-      dest: /root/{{ organisation }}.{{ project }}.meta.scl.spec
-      mode: 644
-      force: yes
-    become: True
-
-  - name:  create_specfiles | create a tailored metaspecfile for {{ project }}
-    ansible.builtin.template:
-      src: project.specfile.spec.j2
-      dest: /root/{{ organisation }}.{{ project }}.project.spec
-      mode: 644
-      force: yes
-    become: True
-
-  - name: create_specfiles | Touch /root/rpmbuild/SOURCES/LICENSE
-    shell: touch /root/rpmbuild/SOURCES/LICENSE
-    become: True
-
-  - name: create_specfiles | run the builder script
-    shell: /usr/local/bin/create.sclspec.sh
-    become: True
-  
-  - name: Creates directory
+  - name: Creates directory for project
     file:
       path: "/root/{{ organisation }}/{{ project }}/{{ version }}"
       state: directory
@@ -148,5 +128,10 @@
       mode: '0440'
     become: True
    
-
-
+  - name: Download 
+    get_url:
+      url: "http://repos.pip2scl.dk/SPECS/{{ metaspecfile }}"
+      dest: "{{ specdir }}/{{ requirementfile }}"
+      mode: '0440'
+    become: True
+   
