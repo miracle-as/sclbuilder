@@ -44,7 +44,7 @@
         - platform-python-devel
         - git
       state: present
-      
+
   - name: Correct python3
     community.general.alternatives:
       name: python3
@@ -137,7 +137,7 @@
   - name: Download 
     get_url:
       url: "http://repos.pip2scl.dk/SPECS/{{ metaspecfile }}"
-      dest: "{{ specdir }}/{{ requirementfile }}"
+      dest: "{{ specdir }}/{{ metaspecfile }}"
       mode: '0440'
     become: True
    
