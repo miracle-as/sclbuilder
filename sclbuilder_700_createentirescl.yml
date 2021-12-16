@@ -12,7 +12,7 @@
     - projectdir: "/root/{{ organisation }}/{{ project }}/{{ version }}"
     - specdir: "/root/rpmbuild/SPECS"
     - requirementfile: "{{ organisation }}-{{ project }}-{{ version }}.requirements.txt"
-    - metaspecfile: "{{ organisation }}.{{ project }}.meta.scl.spec"
+    - metaspecfile: "{{ organisation }}-{{ project }}.meta.scl.spec"
 
   tasks:
   - name: Install rhel
