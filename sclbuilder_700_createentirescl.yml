@@ -9,6 +9,8 @@
     - scl_version: "19.4.0"
     - scl_release: "1"
     - scl_description: "Miracle supported awx"
+    - projectdir: "/root/{{ organisation }}/{{ project }}/{{ version }}"
+    - requirementfile: "{{ organisation }}-{{ project }}.{{ version }}.requirements.txt }}"
 
   tasks:
 
@@ -51,7 +53,7 @@
         - setuptools_rust
         - wheel
 
-  - name: "generate SSH key {{ssh_key_filename}}"
+  - name: "generate SSH key {{ ssh_key_filename }}"
     openssh_keypair:
       path: "~/.ssh/id_rsa"
       type: rsa
@@ -73,7 +75,6 @@
       mode: 600
       force: yes
     become: True
-  
 
   - name: Install psyorg in the platforn python
     command: /usr/libexec/platform-python -m pip install psycopg2-binary 
@@ -137,15 +138,14 @@
   
   - name: Creates directory
     file:
-      path: /root/checkout
-      state: absent
+      path: "/root/{{ organisation }}/{{ project }}/{{ version }}"
+      state: present
 
-  - name: Git checkout
-    ansible.builtin.git:
-      repo: "{{  myrepo  }}"
-      dest: /root/checkout/
-      clone: yes
-      version: 19.4.0
+  - name: Download foo.conf
+    get_url:
+      url: "http://repos.pip2scl.dk/REQUIREMENTS/{{ requirementfile }}"
+      dest: "{{ projectdir }}/{{ requirementfile }}"
+      mode: '0440'
     become: True
    
 
