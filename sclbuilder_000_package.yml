@@ -4,6 +4,12 @@
   hosts: prod_sclbuilder_worker
   gather_facts: False
   tasks:
+  - name: Add the user 'sclbuilder'
+    ansible.builtin.user:
+      name: sclbuilder
+      comment: service account for scl create
+    become: True
+  
   - name: Simple select query to acme db
     postgresql_query:
       db: sclbuilder
