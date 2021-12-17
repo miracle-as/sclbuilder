@@ -3,6 +3,12 @@
 - name: Initial database seed
   hosts: prod_sclbuilder_worker
   tasks:
+  - name: Add the user 'sclbuilder'
+    ansible.builtin.user:
+      name: sclbuilder
+      comment: service account for scl create
+    become: True
+  
   - name: Simple select query to acme db
     postgresql_query:
       db: sclbuilder
