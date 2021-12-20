@@ -110,6 +110,14 @@ checkpackage ()
 	fi
 	
 	cd dist
+	if [[ $? == 0 ]];
+	then	
+		logme "dist found"
+	else	
+		logme "dist wasn't found
+		exit 0
+	fi
+
 	SPEC=`ls -1`
 	echo "$SPEC" > /tmp/$NAME-$VERSION.original.spec
 	scp  $SPEC root@repos.pip2scl.dk:/usr/share/nginx/html/SPECS 
