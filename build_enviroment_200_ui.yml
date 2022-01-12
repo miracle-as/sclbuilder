@@ -17,7 +17,12 @@
     - name: Git checkout
       ansible.builtin.git:
         repo: "https://github.com/miracle-as/{{ repository }}.git"
-        dest: /opt/{{ repository }}
+        dest: "/opt/{{ repository }}"
+
+    - pip: install requirements
+      requirements: "/opt/{{ repositoty }}/requirements.txt"
+      virtualenv: "/opt/{{ repository }}/venv"
+      virtualenv_command: /usr/bin/python3.6 -m venv
 
   handlers:
     - name: restart uwsgi
