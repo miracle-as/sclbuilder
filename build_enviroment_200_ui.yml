@@ -11,15 +11,15 @@
       with_items:
         - git
         - nginx
-        
+        - uwsgi
 
   tasks:
     - name: Git checkout
       ansible.builtin.git:
-        repo: https://github.com/miracle-as/sclbuilder-ui.git
-        dest: /opt/sclbuilder-ui
+        repo: "https://github.com/miracle-as/{{ repository }}.git"
+        dest: /opt/{{ repository }}
 
   handlers:
-    - name: restart postgres
-      service: name=postgresql state=restarted
+    - name: restart uwsgi
+      service: name=uwsgi state=restarted
 
