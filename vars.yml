@@ -2,3 +2,5 @@
 db_user: sclbuilder
 db_password: django2know
 db_name: sclbuilder
+repository: sclbuilder-ui
+project: sclbuilder
