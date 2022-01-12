@@ -1,0 +1,11 @@
+# mysite_uwsgi.ini file
+[uwsgi]
+chdir           = /opt/{{ repository }}/{{ project }}
+module          = {{ django_app }}.wsgi
+home            = /opt/{{ repository }}/venv
+master          = true
+processes       = 10
+socket          = /opt/socket/{{ project }}.sock
+chmod-socket    = 666
+vacuum          = true
+
