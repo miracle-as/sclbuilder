@@ -14,13 +14,12 @@
         
 
   tasks:
-    - name: "clone sclbuilder-ui"
-      - name: Git checkout
-        ansible.builtin.git:
-          repo: '
-          dest: /opt/sclbuilder-ui
-          version: release-0.22
+    - name: Git checkout
+      ansible.builtin.git:
+        repo: 
+         dest: /opt/sclbuilder-ui
 
   handlers:
     - name: restart postgres
       service: name=postgresql state=restarted
+
