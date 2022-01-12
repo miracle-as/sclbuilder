@@ -16,8 +16,8 @@
   tasks:
     - name: Git checkout
       ansible.builtin.git:
-        repo: 
-         dest: /opt/sclbuilder-ui
+        repo: https://github.com/miracle-as/sclbuilder-ui.git
+        dest: /opt/sclbuilder-ui
 
   handlers:
     - name: restart postgres
