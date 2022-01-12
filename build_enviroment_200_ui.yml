@@ -18,12 +18,12 @@
       ansible.builtin.git:
         repo: "https://github.com/miracle-as/{{ repository }}.git"
         dest: "/opt/{{ repository }}"
-        
+
     - name: Install pip requirements
       pip:
-      requirements: "/opt/{{ repositoty }}/requirements.txt"
-      virtualenv: "/opt/{{ repository }}/venv"
-      virtualenv_command: /usr/bin/python3.6 -m venv
+        requirements: "/opt/{{ repositoty }}/requirements.txt"
+        virtualenv: "/opt/{{ repository }}/venv"
+        virtualenv_command: /usr/bin/python3.6 -m venv
 
   handlers:
     - name: restart uwsgi
