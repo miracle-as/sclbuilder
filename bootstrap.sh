@@ -1,3 +1,7 @@
+sudo dnf -y install yum-utils
+sudo yum-config-manager --add-repo https://rpm.releases.hashicorp.com/RHEL/hashicorp.repo
+sudo dnf -y install rsync gcc zlib-devel libvirt-devel cmake ruby ruby-devel vagrant podman podman-docker
+
 #vl down
 #vl up
 #vl ansible_inventory > inventory 
