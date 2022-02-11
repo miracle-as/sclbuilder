@@ -1,8 +1,8 @@
-vl down
-vl up
-vl ansible_inventory > inventory 
-vl ssh_config  > ~/.ssh/config
-vl ssh_config  > /tmp/pip2scl.ssh.config
+#vl down
+#vl up
+#vl ansible_inventory > inventory 
+#vl ssh_config  > ~/.ssh/config
+#vl ssh_config  > /tmp/pip2scl.ssh.config
 rm -r  ~/.ansible
 ansible-galaxy install -f -r roles/requirements.yml
 ansible-playbook -i inventory buildawx.playbook.yml 

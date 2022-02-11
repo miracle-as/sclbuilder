@@ -2,30 +2,72 @@
 # vi: set ft=ruby :
 
 Vagrant.configure("2") do |config|
-  config.vm.box = "generic/rhel8"
   config.vm.define "prod_sclbuilder_worker"
-  config.vm.provider "virtualbox" do |v|
-    v.memory = 8192
-    v.cpus = 8
-  end
-
-  if Vagrant.has_plugin?('vagrant-registration')
-    config.registration.org = '14498519'
-    config.registration.activationkey = 'virt-lightening'
+  config.vm.provider "docker" do |d| 
+    d.build_dir = "."
   end
 end
 
 Vagrant.configure("2") do |config|
-  config.vm.box = "generic/rhel8"
   config.vm.define "awxserver"
-  config.vm.provider "virtualbox" do |v|
-    v.memory = 8192
-    v.cpus = 8
+  config.vm.provider "docker" do |d|    
+    d.build_dir = "."
   end
+end
 
-  if Vagrant.has_plugin?('vagrant-registration')
-    config.registration.org = '14498519'
-    config.registration.activationkey = 'virt-lightening'
+Vagrant.configure("2") do |config|
+  config.vm.define "prod_sclbuilder_web_001"
+  config.vm.provider "docker" do |d|
+    d.build_dir = "."
+  end
+end
+
+Vagrant.configure("2") do |config|
+  config.vm.define "prod_sclbuilder_web_002"
+  config.vm.provider "docker" do |d|
+    d.build_dir = "."
+  end
+end
+
+Vagrant.configure("2") do |config|
+  config.vm.define "prod_sclbuilder_web_003"
+  config.vm.provider "docker" do |d|
+    d.build_dir = "."
+  end
+end
+
+Vagrant.configure("2") do |config|
+  config.vm.define "prod_sclbuilder_monitor"
+  config.vm.provider "docker" do |d|
+    d.build_dir = "."
+  end
+end
+
+Vagrant.configure("2") do |config|
+  config.vm.define "prod_sclbuilder_db"
+  config.vm.provider "docker" do |d|
+    d.build_dir = "."
+  end
+end
+
+Vagrant.configure("2") do |config|
+  config.vm.define "prod_sclbuilder_rpmbuilder"
+  config.vm.provider "docker" do |d|
+    d.build_dir = "."
+  end
+end
+
+Vagrant.configure("2") do |config|
+  config.vm.define "prod_sclbuilder_sclbuilder"
+  config.vm.provider "docker" do |d|
+    d.build_dir = "."
+  end
+end
+
+Vagrant.configure("2") do |config|
+  config.vm.define "prod_awx"
+  config.vm.provider "docker" do |d|
+    d.build_dir = "."
   end
 end
 

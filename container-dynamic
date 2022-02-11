@@ -1,0 +1,42 @@
+#!/bin/bash
+
+for i in `docker ps -a | awk '{ print $10}'`; do
+
+	host=`echo $i | cut -f2- -d_ | rev | cut -f2- -d_ |rev`
+
+	if [[ "$host" != "" ]];then
+		hosts="$hosts\"$host\","
+		alias="$alias\"$host\":{\"ansible_host\":\"$i\"},"
+	fi
+	
+	
+
+
+done
+
+hosts=${hosts::-1}
+alias=${alias::-1}
+
+if [ "$1" == "--list" ]; then
+cat<<EOF
+{
+  "bash_hosts": {
+    "hosts": [
+      $hosts
+    ],
+    "vars": {
+      "ansible_connection": "docker"
+    }
+  },
+  "_meta": {
+    "hostvars": {
+	$alias
+    }
+  }
+}
+EOF
+elif [ "$1" == "--host" ]; then
+  echo '{"_meta": {hostvars": {}}}'
+else
+  echo "{ }"
+fi
