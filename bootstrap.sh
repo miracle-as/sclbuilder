@@ -9,7 +9,7 @@ sudo dnf -y install rsync gcc zlib-devel libvirt-devel cmake ruby ruby-devel vag
 #vl ssh_config  > /tmp/pip2scl.ssh.config
 rm -r  ~/.ansible
 ansible-galaxy install -f -r roles/requirements.yml
-ansible-playbook -i inventory buildawx.playbook.yml 
+ansible-playbook -i container-dynamic buildawx.playbook.yml 
 ssh prod_sclbuilder_worker sudo mkdir /home/vagrant
 scp /home/jho/.ssh/scldistro root@prod_sclbuilder_worker:/home/vagrant/
 ansible-galaxy install -f -r roles/requirements.yml

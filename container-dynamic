@@ -1,6 +1,6 @@
 #!/bin/bash
 
-for i in `docker ps -a | awk '{ print $10}'`; do
+for i in `podman ps -a --format "{{.Names}}"`; do
 
 	host=`echo $i | cut -f2- -d_ | rev | cut -f2- -d_ |rev`
 
@@ -8,10 +8,6 @@ for i in `docker ps -a | awk '{ print $10}'`; do
 		hosts="$hosts\"$host\","
 		alias="$alias\"$host\":{\"ansible_host\":\"$i\"},"
 	fi
-	
-	
-
-
 done
 
 hosts=${hosts::-1}

@@ -1,38 +1,38 @@
 ---
 roles:
-  - src: git@github.com:JakobHolstDK/miracle-ansible-role-awxrpm-venv-installer.git
+  - src: git@github.com:miracle-as/miracle-ansible-role-awxrpm-venv-installer.git
     scm: git
     version: "master"
 
-  - src: git@github.com:JakobHolstDK/miracle-ansible-role-pipfreeze2scl-awx.git
+  - src: git@github.com:miracle-as/miracle-ansible-role-pipfreeze2scl-awx.git
     scm: git
     version: "master"
 
-  - src: git@github.com:JakobHolstDK/miracle-ansible-role-pipfreeze2scl.git
+  - src: git@github.com:miracle-as/miracle-ansible-role-pipfreeze2scl.git
     scm: git
     version: "master"
 
-  - src: git@github.com:JakobHolstDK/miracle-ansible-role-build-scl-rpms.git
+  - src: git@github.com:miracle-as/miracle-ansible-role-build-scl-rpms.git
     scm: git
     version: "master"
   
-  - src: git@github.com:JakobHolstDK/miracle-ansible-role-reposerver.git
+  - src: git@github.com:miracle-as/miracle-ansible-role-reposerver.git
     scm: git
     version: "master"
   
-  - src: git@github.com:JakobHolstDK/miracle-ansible-role-awxprebuild
+  - src: git@github.com:miracle-as/miracle-ansible-role-awxprebuild
     scm: git
     version: "master"
 
-  - src: git@github.com:JakobHolstDK/ansible_role_init_pip.git
+  - src: git@github.com:miracle-as/ansible_role_init_pip.git
     scm: git
     version: "master"
 
-  - src: git@github.com:JakobHolstDK/ansible_role_init_rpmbuild_environment.git
+  - src: git@github.com:miracle-as/ansible_role_init_rpmbuild_environment.git
     scm: git
     version: "master"
 
-  - src: git@github.com:JakobHolstDK/vault-by-a-miracle.git
+  - src: git@github.com:miracle-as/vault-by-a-miracle.git
     scm: git
     version: "master"
 

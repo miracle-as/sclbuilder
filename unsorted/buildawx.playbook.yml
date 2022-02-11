@@ -1,14 +1,14 @@
 ---
 - name: Setup python
-  hosts: prod_prod_sclbuilder_worker_worker
+  hosts: prod_sclbuilder_worker
   roles:
   - role: ansible_role_init_pip
   - role: ansible_role_init_rpmbuild_environment
     rpmbuild_build_dir: "/root/rpmbuild"
-  become: true
+#  become: true
 
-- name: Build openstack components
-  hosts: prod_prod_sclbuilder_worker_worker
+- name: Add AWX Repo
+  hosts: prod_sclbuilder_worker
   tasks:
     - name: add repo
       yum_repository:
@@ -17,10 +17,10 @@
         baseurl: http://repos.pip2scl.dk/RPMS
         gpgcheck: no
         enabled: yes
-      become: true
+#      become: true
 
 - name: Build openstack components
-  hosts: prod_prod_sclbuilder_worker_worker
+  hosts: prod_sclbuilder_worker
   tasks:
     - name: Build the scl
       vars:
@@ -37,5 +37,5 @@
          - branch: "19.4.0"
       include_role:
          name:  miracle-ansible-role-pipfreeze2scl 
-  become: True
+#  become: True
 

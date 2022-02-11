@@ -1,7 +1,7 @@
 ---
 
 - name: Setup a project in prod_sclbuilder_worker
-  hosts: sclbuilder
+  hosts: prod_sclbuilder_sclbuilder
   vars:
     organisation: "miracle"
     project: "awxrpm"

@@ -1,23 +1,21 @@
 ---
 - name: Setup python
-  hosts: prod_prod_sclbuilder_worker_worker
+  hosts: prod_sclbuilder_worker
   roles:
   - role: ansible_role_init_pip
   - role: ansible_role_init_rpmbuild_environment
     rpmbuild_build_dir: "/root/rpmbuild"
-  become: true
 
 - name: Build openstack components
-  hosts: prod_prod_sclbuilder_worker_worker
+  hosts: prod_sclbuilder_worker
   tasks:
     - name: add repo
       yum_repository:
         name: awx
         description: "awx-rpm "
-        baseurl: http://repos.pip2scl.dk/RPMS
+        baseurl: https://rpm.miracle.dk/AWX-RPM/EL8/RPMS/
         gpgcheck: no
         enabled: yes
-      become: true
 
 
 - name: Simple select query to acme db
@@ -27,7 +25,6 @@
       postgresql_query:
         db: prod_sclbuilder_worker
         query: SELECT version()
-      become: True
 
 
 

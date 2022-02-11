@@ -1,7 +1,7 @@
 ---
 
-- name: Setup a project in prod_sclbuilder_worker
-  hosts: sclbuilder
+- name: Setup a project in prod_prod_sclbuilder_sclbuilder_worker
+  hosts: prod_sclbuilder_sclbuilder
   vars:
     organisation: "miracle"
     project: "awxrpm"
@@ -16,8 +16,6 @@
       login_password: "django2know"
       query: select * from  projects_project where projectname = '{{ project }}';
     register: myproject 
-    become: yes
-    become_user: sclbuilder
   
   - name: insert when missing
     postgresql_query:
@@ -40,5 +38,3 @@
         '{{ ansible_date_time.date }} '
         );
     register: insertproject
-    become: yes
-    become_user: sclbuilder
