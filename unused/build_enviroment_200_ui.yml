@@ -1,6 +1,5 @@
 ---
-- hosts: prod_sclbuilder_db
-
+- hosts: prod_sclbuilder_database_ui
   vars_files:
     - vars.yml
 

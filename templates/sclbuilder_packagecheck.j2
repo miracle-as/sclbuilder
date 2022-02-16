@@ -112,8 +112,8 @@ zip2tgz ()
         scp ${OURSOURCE} root@repos.pip2scl.dk:/usr/share/nginx/html/SOURCES/${OURNAME}  >/dev/null 2>&1
         logme "clean /tmp/repack"
         OURURL="http://repos.pip2scl.dk/SOURCES/${OURNAME}"
-        redis-cli set $MYURL "$OURURL"  >/dev/null 2>&1
-        redis-cli set $MYEXT "tar.gz"  >/dev/null 2>&1
+        redis-cli -h {{ redishost }} set $MYURL "$OURURL"  >/dev/null 2>&1
+        redis-cli -h {{ redishost }} set $MYEXT "tar.gz"  >/dev/null 2>&1
         logme "$PACKAGE Package converted to tgz"
         /usr/bin/rm -r /tmp/repack >/dev/null 2>&1
 }
@@ -155,7 +155,7 @@ download_source ()
 	if [[ $? == 0 ]];
 	then
 		logme "File has an URL  $FILEPATH"
-		redis-cli set $MYSRCURL $FILEPATH >/dev/null 2>&1
+		redis-cli -h {{ redishost }} set $MYSRCURL $FILEPATH >/dev/null 2>&1
 		if [[ $? == 0 ]];
 		then
 			logme "Filepath saved in redis"
@@ -185,7 +185,7 @@ download_source ()
 		fi
 	fi
 	FILENAME="${NAME}-${LAST}"
-	redis-cli set $MYSRCNAME $FILENAME >/dev/null 2>&1
+	redis-cli -h {{ redishost }} set $MYSRCNAME $FILENAME >/dev/null 2>&1
 	logme "Filename $FILENAME stored in redis"
 	EXTENTION=`echo $FILENAME | rev |awk -F'.' '{ print $1}'|rev `
 	logme "File extention is $EXTENTION"
@@ -202,7 +202,7 @@ download_source ()
 		if [[ $? == 0 ]];
 		then
 		logme "SUM: $SUM"
-			redis-cli set $MYSUM $SUM >/dev/null 2>&1
+			redis-cli -h {{ redishost }} set $MYSUM $SUM >/dev/null 2>&1
 		else
 			logme "noSUM: Unexpected error "
 			exit
@@ -238,15 +238,15 @@ download_source ()
 	then
 		KNOWNEXT="yes"
                        OURURL="http://repos.pip2scl.dk/SOURCES/${OURNAME}"
-                       redis-cli set $MYURL "$OURURL"  >/dev/null 2>&1
-                       redis-cli set $MYEXT "$EXTENTION"  >/dev/null 2>&1
-                       URL=`redis-cli get $MYURL`
+                       redis-cli -h {{ redishost }} set $MYURL "$OURURL"  >/dev/null 2>&1
+                       redis-cli -h {{ redishost }} set $MYEXT "$EXTENTION"  >/dev/null 2>&1
+                       URL=`redis-cli -h {{ redishost }} get $MYURL`
 		bz2tgz
 	fi
 	EXTENTION="tar.gz"
 
 	SRCURL=`echo $DOWNLOAD | awk -F"URL:" '{ print $2 }'`
-	redis-cli set $MYSRCURL "$SRCURL"  >/dev/null 2>&1
+	redis-cli -h {{ redishost }} set $MYSRCURL "$SRCURL"  >/dev/null 2>&1
 	touchthem $BUILDDIR/SOURCES/${NAME}-${VERSION}.tar.gz 
 	scp $BUILDDIR/SOURCES/${NAME}-${VERSION}.tar.gz root@repos.pip2scl.dk:/usr/share/nginx/html/SOURCES/${NAME}-${VERSION}.tar.gz >/dev/null 2>&1
 	if [[ $? == 0 ]];

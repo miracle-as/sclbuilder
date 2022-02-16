@@ -66,4 +66,4 @@ export MYSRCNAME="sourcefilename:${PACKAGE}"
 export MYERR="error:{$PACKAGE}"
 export MYNIT="NIT:${PACKAGE}"
 
-export OURORGSOURCE=`redis-cli get $MYSRCNAME`
+export OURORGSOURCE=`redis-cli -h {{ redishost }} get $MYSRCNAME`

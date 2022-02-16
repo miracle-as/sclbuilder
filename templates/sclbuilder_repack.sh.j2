@@ -55,7 +55,7 @@ repackpackage ()
 		then
 			logme "Source extrated"
 			NIT=`ls -1`
-			redis-cli set $MYNIT $NIT >/dev/null 2>&1
+			redis-cli -h {{ redishost }} set $MYNIT $NIT >/dev/null 2>&1
 		else
 			logme "Extration failed"
 			exit 22
@@ -65,7 +65,7 @@ repackpackage ()
 	logme "name in tar $NIT"
 	logme "Check $NIT"
 	MYDIRKEY="pkgdir:${PACKAGE}"
-	redis-cli set $MYDIRKEY "${NIT}" >/dev/null 2>&1
+	redis-cli -h {{ redishost }} set $MYDIRKEY "${NIT}" >/dev/null 2>&1
  	cd $NIT
 	if [[ $? == 0 ]];
 	then
@@ -124,7 +124,7 @@ repackpackage ()
 	if [[ $? == 0 ]];
 	then
 			echo "$FILENAME"
-        	redis-cli set  $MYORGSPECKEY  $SPEC >/dev/null 2>&1
+        	redis-cli -h {{ redishost }} set  $MYORGSPECKEY  $SPEC >/dev/null 2>&1
 	else
 		logme "copy failed"
 		exit

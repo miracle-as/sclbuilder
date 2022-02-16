@@ -75,5 +75,3 @@ ENTRYPOINT ["container-entrypoint"]
 CMD ["run-postgresql"]
 
 
-ENV POSTGRESQL_ADMIN_PASSWORD=sclbuilder
-

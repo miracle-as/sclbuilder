@@ -90,7 +90,7 @@ zip2tgz ()
 {
 	logme "Zip to tgz"
         OURNAME="${NAME}-${VERSION}.tar.gz"
-	SRCFILE=`redis-cli get $MYSRCNAME`
+	SRCFILE=`redis-cli -h {{ redishost }} get $MYSRCNAME`
         logme "Repacking $SRCFILE"
         logme "clean /tmp/repack"
         /usr/bin/rm -r /tmp/repack >/dev/null 2>&1
@@ -126,8 +126,8 @@ zip2tgz ()
         scp ${BUILDDIR}/SOURCES/${NAME}-${VERSION}.tar.gz   root@repos.pip2scl.dk:/usr/share/nginx/html/SOURCES/${OURNAME}  >/dev/null 2>&1
         logme "clean /tmp/repack"
         OURURL="http://repos.pip2scl.dk/SOURCES/${OURNAME}"
-        redis-cli set $MYURL "$OURURL"  >/dev/null 2>&1
-        redis-cli set $MYEXT "tar.gz"  >/dev/null 2>&1
+        redis-cli -h {{ redishost }} set $MYURL "$OURURL"  >/dev/null 2>&1
+        redis-cli -h {{ redishost }} set $MYEXT "tar.gz"  >/dev/null 2>&1
         logme "$PACKAGE Package converted to tgz"
         /usr/bin/rm -r /tmp/repack >/dev/null 2>&1
 
@@ -140,7 +140,7 @@ bz2tgz ()
 	MYURL="url:${PACKAGE}"
         EXTENTION="tar.gz"
         OURNAME="${NAME}-${VERSION}.${EXTENTION}"
-        URL=`redis-cli get $MYURL`
+        URL=`redis-cli -h {{ redishost }} get $MYURL`
         wget $URL -O /tmp/bzfile.bz2 >/dev/null 2>&1
 	/usr/bin/rm /tmp/bzfile >/dev/null 2>&1
         logme "save my current work dir "
@@ -157,8 +157,8 @@ bz2tgz ()
         scp ${BUILDDIR}/SOURCES/${NAME}-${VERSION}.${EXTENTION}   root@repos.pip2scl.dk:/usr/share/nginx/html/SOURCES/${OURNAME} >/dev/null 2>&1
         logme "clean /tmp/repack"
         OURURL="http://repos.pip2scl.dk/SOURCES/${OURNAME}"
-        redis-cli set $MYURL "$OURURL"  >/dev/null 2>&1
-        redis-cli set $MYEXT "$EXTENTION"  >/dev/null 2>&1
+        redis-cli -h {{ redishost }} set $MYURL "$OURURL"  >/dev/null 2>&1
+        redis-cli -h {{ redishost }} set $MYEXT "$EXTENTION"  >/dev/null 2>&1
         logme "$PACKAGE Package converted to tgz"
         /usr/bin/rm -r /tmp/repack >/dev/null 2>&1
 
@@ -238,12 +238,12 @@ download_source ()
 	VERSION=`echo $PACKAGE | awk -F'==' '{ print $2 }'`
 	MYKEY="filename:${PACKAGE}"
 	MYCRC="crc:$PACKAGE"
-	DOWNFILE=`redis-cli get $MYKEY 2>&1`
+	DOWNFILE=`redis-cli -h {{ redishost }} get $MYKEY 2>&1`
 	MYURL="url:${PACKAGE}"
 	MYEXT="ext:${PACKAGE}"
 	MYSRCURL="srcurl:${PACKAGE}"
 	
-	URL=`redis-cli get $MYURL`
+	URL=`redis-cli -h {{ redishost }} get $MYURL`
 	logme "Our url is $URL"
 	if [[ $URL == ""  ]];
 	then
@@ -255,7 +255,7 @@ download_source ()
 		if [[ $? == 0 ]];
 		then
 			logme "File has an URL  $FILEPATH"
-			redis-cli set $MYSRCURL $FILEPATH >/dev/null 2>&1
+			redis-cli -h {{ redishost }} set $MYSRCURL $FILEPATH >/dev/null 2>&1
 			if [[ $? == 0 ]];
 			then
 				logme "Filepath saved in redis"
@@ -285,7 +285,7 @@ download_source ()
 			fi
 		fi
 		FILENAME="${NAME}-${LAST}"
-		redis-cli set $MYSRCNAME $FILENAME >/dev/null 2>&1
+		redis-cli -h {{ redishost }} set $MYSRCNAME $FILENAME >/dev/null 2>&1
 
 		logme "Filename $FILENAME stored in redis"
 
@@ -304,7 +304,7 @@ download_source ()
 			if [[ $? == 0 ]];
 			then
 				logme "SUM: $SUM"
-				redis-cli set $MYSUM $SUM >/dev/null 2>&1
+				redis-cli -h {{ redishost }} set $MYSUM $SUM >/dev/null 2>&1
 			else
 				logme "noSUM: Unexpected error "
 				exit
@@ -340,15 +340,15 @@ download_source ()
 		then
 			KNOWNEXT="yes"
                         OURURL="http://repos.pip2scl.dk/SOURCES/${OURNAME}"
-                        redis-cli set $MYURL "$OURURL"  >/dev/null 2>&1
-                        redis-cli set $MYEXT "$EXTENTION"  >/dev/null 2>&1
-                        URL=`redis-cli get $MYURL`
+                        redis-cli -h {{ redishost }} set $MYURL "$OURURL"  >/dev/null 2>&1
+                        redis-cli -h {{ redishost }} set $MYEXT "$EXTENTION"  >/dev/null 2>&1
+                        URL=`redis-cli -h {{ redishost }} get $MYURL`
 			bz2tgz
 		fi
 		EXTENTION="tar.gz"
 
 		SRCURL=`echo $DOWNLOAD | awk -F"URL:" '{ print $2 }'`
-		redis-cli set $MYSRCURL "$SRCURL"  >/dev/null 2>&1
+		redis-cli -h {{ redishost }} set $MYSRCURL "$SRCURL"  >/dev/null 2>&1
 		touchthem $BUILDDIR/SOURCES/${NAME}-${VERSION}.tar.gz 
 		scp $BUILDDIR/SOURCES/${NAME}-${VERSION}.tar.gz root@repos.pip2scl.dk:/usr/share/nginx/html/SOURCES/${NAME}-${VERSION}.tar.gz >/dev/null 2>&1
 		if [[ $? == 0 ]];
@@ -362,7 +362,7 @@ download_source ()
 		logme "$PACKAGE Already Downloaded"
 	fi
 
-	EXTENTION=`redis-cli get $MYEXT 2>&1`
+	EXTENTION=`redis-cli -h {{ redishost }} get $MYEXT 2>&1`
 
 	logme "tar file refreshed"
 		
@@ -390,7 +390,7 @@ checkpackage ()
 	then
 		logme "$TARFILE is here"
 	else
-		redis-cli get $MYURL
+		redis-cli -h {{ redishost }} get $MYURL
 	fi
 
 
@@ -406,7 +406,7 @@ checkpackage ()
 		then
 			logme "Source extrated"
 			NIT=`ls -1`
-			redis-cli set $MYNIT $NIT >/dev/null 2>&1
+			redis-cli -h {{ redishost }} set $MYNIT $NIT >/dev/null 2>&1
 		else
 			logme "Extration failed"
 			exit 22
@@ -416,7 +416,7 @@ checkpackage ()
 	logme "name in tar $NIT"
 	logme "Check $NIT"
 	MYDIRKEY="pkgdir:${PACKAGE}"
-	redis-cli set $MYDIRKEY "${NIT}" >/dev/null 2>&1
+	redis-cli -h {{ redishost }} set $MYDIRKEY "${NIT}" >/dev/null 2>&1
  	cd $NIT
 	if [[ $? == 0 ]];
 	then
@@ -523,7 +523,7 @@ checkpackage ()
 	cp $SPEC $SPECDST
 	if [[ $? == 0 ]];
 	then
-        	redis-cli set  $MYSPEC  $SPECDST >/dev/null 2>&1
+        	redis-cli -h {{ redishost }} set  $MYSPEC  $SPECDST >/dev/null 2>&1
 	else
 		logme "copy failed"
 		exit
@@ -541,7 +541,7 @@ build_rpm ()
         MYCRC="crc:$PACKAGE"
         MYDIRKEY="pkgdir:${PACKAGE}"
 	MYSPEC="specfile:${PACKAGE}"
-	SPEC=`redis-cli get $MYSPEC`
+	SPEC=`redis-cli -h {{ redishost }} get $MYSPEC`
 	logme "My spec file is : $SPEC"
 	if [[ -f $SPEC ]];
 	then
@@ -554,7 +554,7 @@ build_rpm ()
 	NAMEINSPEC=`grep "define name" $SPEC |awk '{ print $3 }'`
 	EXTENTION="tar.gz"
 	TARFILE="${BUILDDIR}/SOURCES/${NAME}-${VERSION}.${EXTENTION}"
-	URL=`redis-cli get  $MYURL`
+	URL=`redis-cli -h {{ redishost }} get  $MYURL`
 	logme "We want to build $BUILDDIR/VERSPEC/${NAME}-${VERSION}.verified.spec"
 	logme "We are ready to pretty spec"
 	sed -i "s/define version 0.0.0/define version ${VERSION}/" $SPEC
@@ -645,15 +645,15 @@ build_rpm ()
 	if [[ $? == 0 ]];
 	then
 		logme "RPMs build"
-		redis-cli set $MYRPMSPEC "$SPEC"  >/dev/null 2>&1
+		redis-cli -h {{ redishost }} set $MYRPMSPEC "$SPEC"  >/dev/null 2>&1
 		for RPM in `cat $BUILDOUT/${NAME}-${VERSION}.rpmbuild.log |grep "^Wrote:" | awk -F"Wrote: "  '{ print $2 }' `
 		do	
 			MYRPM="rpm:${PACKAGE}"
 			MYSRPM="rpms:${PACKAGE}"
 			SRPM=`echo $RPM |grep "/SRPMS/"`
 			RPM=`echo $RPM |grep "/RPMS/"`
-			redis-cli set $MYRPM "$RPM"  >/dev/null 2>&1
-			redis-cli set $MYSRPM "$SRPM"    >/dev/null 2>&1
+			redis-cli -h {{ redishost }} set $MYRPM "$RPM"  >/dev/null 2>&1
+			redis-cli -h {{ redishost }} set $MYSRPM "$SRPM"    >/dev/null 2>&1
 			BUILD="ok"
 		done
 	else
@@ -670,15 +670,15 @@ build_rpm ()
 			if [[ $? == 0 ]];
 			then
 				logme "RPMs build with python 3.8"
-                		redis-cli set $MYRPMSPEC "$SPEC"  >/dev/null 2>&1
+                		redis-cli -h {{ redishost }} set $MYRPMSPEC "$SPEC"  >/dev/null 2>&1
                 		for RPM in `cat $BUILDOUT/${NAME}-${VERSION}.rpmbuild.log |grep "^Wrote:" | awk -F"Wrote: "  '{ print $2 }' `
                 		do
                         		MYRPM="rpm:${PACKAGE}"
                         		MYSRPM="rpms:${PACKAGE}"
                         		SRPM=`echo $RPM |grep "/SRPMS/"`
                         		RPM=`echo $RPM |grep "/RPMS/"`
-                        		redis-cli set $MYRPM "$RPM"  >/dev/null 2>&1
-                        		redis-cli set $MYSRPM "$SRPM"    >/dev/null 2>&1
+                        		redis-cli -h {{ redishost }} set $MYRPM "$RPM"  >/dev/null 2>&1
+                        		redis-cli -h {{ redishost }} set $MYSRPM "$SRPM"    >/dev/null 2>&1
 					BUILD="ok"
 				done
 			fi
@@ -701,15 +701,15 @@ build_rpm ()
         		then
                			logme "RPMs build and some files added"
 				BUILD="ok"
-                		redis-cli set $MYRPMSPEC "$SPEC"  >/dev/null 2>&1
+                		redis-cli -h {{ redishost }} set $MYRPMSPEC "$SPEC"  >/dev/null 2>&1
                 		for RPM in `cat $BUILDOUT/${NAME}-${VERSION}.rpmbuild.log |grep "^Wrote:" | awk -F"Wrote: "  '{ print $2 }' `
                 		do
                         		MYRPM="rpm:${PACKAGE}"
                         		MYSRPM="rpms:${PACKAGE}"
                         		SRPM=`echo $RPM |grep "/SRPMS/"`
                         		RPM=`echo $RPM |grep "/RPMS/"`
-                        		redis-cli set $MYRPM "$RPM"  >/dev/null 2>&1
-                        		redis-cli set $MYSRPM "$SRPM"    >/dev/null 2>&1
+                        		redis-cli -h {{ redishost }} set $MYRPM "$RPM"  >/dev/null 2>&1
+                        		redis-cli -h {{ redishost }} set $MYSRPM "$SRPM"    >/dev/null 2>&1
 					BUILD="ok"
                 		done
 			fi
@@ -732,15 +732,15 @@ build_rpm ()
                         then
                                 logme "RPMs build and some files added"
                                 BUILD="ok"
-                                redis-cli set $MYRPMSPEC "$SPEC"  >/dev/null 2>&1
+                                redis-cli -h {{ redishost }} set $MYRPMSPEC "$SPEC"  >/dev/null 2>&1
                                 for RPM in `cat $BUILDOUT/${NAME}-${VERSION}.rpmbuild.log |grep "^Wrote:" | awk -F"Wrote: "  '{ print $2 }' `
                                 do
                                         MYRPM="rpm:${PACKAGE}"
                                         MYSRPM="rpms:${PACKAGE}"
                                         SRPM=`echo $RPM |grep "/SRPMS/"`
                                         RPM=`echo $RPM |grep "/RPMS/"`
-                                        redis-cli set $MYRPM "$RPM"  >/dev/null 2>&1
-                                        redis-cli set $MYSRPM "$SRPM"    >/dev/null 2>&1
+                                        redis-cli -h {{ redishost }} set $MYRPM "$RPM"  >/dev/null 2>&1
+                                        redis-cli -h {{ redishost }} set $MYSRPM "$SRPM"    >/dev/null 2>&1
                                         BUILD="ok"
                                 done
                         fi
@@ -769,15 +769,15 @@ build_rpm ()
                         			then
                                 			logme "RPMs build and some files added"
                                 			BUILD="ok"
-                                			redis-cli set $MYRPMSPEC "$SPEC"  >/dev/null 2>&1
+                                			redis-cli -h {{ redishost }} set $MYRPMSPEC "$SPEC"  >/dev/null 2>&1
                                 			for RPM in `cat $BUILDOUT/${NAME}-${VERSION}.rpmbuild.log |grep "^Wrote:" | awk -F"Wrote: "  '{ print $2 }' `
                                 			do
                                         			MYRPM="rpm:${PACKAGE}"
                                         			MYSRPM="rpms:${PACKAGE}"
                                        		 		SRPM=`echo $RPM |grep "/SRPMS/"`
                                         			RPM=`echo $RPM |grep "/RPMS/"`
-                                        			redis-cli set $MYRPM "$RPM"  >/dev/null 2>&1
-                                        			redis-cli set $MYSRPM "$SRPM"    >/dev/null 2>&1
+                                        			redis-cli -h {{ redishost }} set $MYRPM "$RPM"  >/dev/null 2>&1
+                                        			redis-cli -h {{ redishost }} set $MYSRPM "$SRPM"    >/dev/null 2>&1
                                         			BUILD="ok"
                                 			done
                         			fi
@@ -802,15 +802,15 @@ build_rpm ()
                         then
                         	logme "RPMs build and some files added"
                                 BUILD="ok"
-                                redis-cli set $MYRPMSPEC "$SPEC"  >/dev/null 2>&1
+                                redis-cli -h {{ redishost }} set $MYRPMSPEC "$SPEC"  >/dev/null 2>&1
                                 for RPM in `cat $BUILDOUT/${NAME}-${VERSION}.rpmbuild.log |grep "^Wrote:" | awk -F"Wrote: "  '{ print $2 }' `
                                 do
                                         MYRPM="rpm:${PACKAGE}"
                                         MYSRPM="rpms:${PACKAGE}"
                                         SRPM=`echo $RPM |grep "/SRPMS/"`
                                         RPM=`echo $RPM |grep "/RPMS/"`
-                                        redis-cli set $MYRPM "$RPM"  >/dev/null 2>&1
-                                        redis-cli set $MYSRPM "$SRPM"    >/dev/null 2>&1
+                                        redis-cli -h {{ redishost }} set $MYRPM "$RPM"  >/dev/null 2>&1
+                                        redis-cli -h {{ redishost }} set $MYSRPM "$SRPM"    >/dev/null 2>&1
                                         BUILD="ok"
                                 done
                          fi
@@ -834,15 +834,15 @@ build_rpm ()
                                 then
                                      logme "RPMs build and some files added"
                                      BUILD="ok"
-                                     redis-cli set $MYRPMSPEC "$SPEC"  >/dev/null 2>&1
+                                     redis-cli -h {{ redishost }} set $MYRPMSPEC "$SPEC"  >/dev/null 2>&1
                                      for RPM in `cat $BUILDOUT/${NAME}-${VERSION}.rpmbuild.log |grep "^Wrote:" | awk -F"Wrote: "  '{ print $2 }' `
                                      do
                                           MYRPM="rpm:${PACKAGE}"
                                           MYSRPM="rpms:${PACKAGE}"
                                           SRPM=`echo $RPM |grep "/SRPMS/"`
                                           RPM=`echo $RPM |grep "/RPMS/"`
-                                          redis-cli set $MYRPM "$RPM"  >/dev/null 2>&1
-                                          redis-cli set $MYSRPM "$SRPM"    >/dev/null 2>&1
+                                          redis-cli -h {{ redishost }} set $MYRPM "$RPM"  >/dev/null 2>&1
+                                          redis-cli -h {{ redishost }} set $MYSRPM "$SRPM"    >/dev/null 2>&1
                                           BUILD="ok"
                                      done
                                 fi
@@ -868,15 +868,15 @@ build_rpm ()
                                 then
                                      logme "RPMs build and some files added"
                                      BUILD="ok"
-                                     redis-cli set $MYRPMSPEC "$SPEC"  >/dev/null 2>&1
+                                     redis-cli -h {{ redishost }} set $MYRPMSPEC "$SPEC"  >/dev/null 2>&1
                                      for RPM in `cat $BUILDOUT/${NAME}-${VERSION}.rpmbuild.log |grep "^Wrote:" | awk -F"Wrote: "  '{ print $2 }' `
                                      do
                                           MYRPM="rpm:${PACKAGE}"
                                           MYSRPM="rpms:${PACKAGE}"
                                           SRPM=`echo $RPM |grep "/SRPMS/"`
                                           RPM=`echo $RPM |grep "/RPMS/"`
-                                          redis-cli set $MYRPM "$RPM"  >/dev/null 2>&1
-                                          redis-cli set $MYSRPM "$SRPM"    >/dev/null 2>&1
+                                          redis-cli -h {{ redishost }} set $MYRPM "$RPM"  >/dev/null 2>&1
+                                          redis-cli -h {{ redishost }} set $MYSRPM "$SRPM"    >/dev/null 2>&1
                                           BUILD="ok"
                                      done
                                 fi
@@ -909,7 +909,7 @@ build_rpm ()
 		scp $SPEC root@repos.pip2scl.dk:/usr/share/nginx/html/SPECS/${NAME}-${VERSION}.verified.spec
 	else
 		logme "RPMS build failed	"
-		redis-cli set $MYERR "$BUILDOUT/${NAME}-${VERSION}.rpmbuild.log" >/dev/null 2>&1  
+		redis-cli -h {{ redishost }} set $MYERR "$BUILDOUT/${NAME}-${VERSION}.rpmbuild.log" >/dev/null 2>&1  
 	fi
 }	
 	
@@ -920,11 +920,11 @@ build_scl ()
 	MYSPEC="specfile:${PACKAGE}"
 	MYSCLSRPM="sclsrpm:${PACKAGE}"
 	MYSCLRPM="sclrpm:${PACKAGE}"
-	VERSPECURL=`redis-cli get $MYVERSPEC`
+	VERSPECURL=`redis-cli -h {{ redishost }} get $MYVERSPEC`
 	mkdir $BUILDDIR/VERSPEC >/dev/null 2>&1
 	mkdir $BUILDDIR/PRESPEC >/dev/null 2>&1
 	mkdir $BUILDDIR/SCLSPEC >/dev/null 2>&1
-	URL=`redis-cli get $MYURL `
+	URL=`redis-cli -h {{ redishost }} get $MYURL `
 	
 	NAMEINTAR=`tar tvf $BUILDDIR/SOURCES/${NAME}-${VERSION}.tar.gz |head -1 |awk '{ print $6 }' |sed 's(/(('`
 	wget -O $BUILDDIR/VERSPEC/${NAME}-${VERSION}.verified.spec   $VERSPECURL >/dev/null 2>&1
@@ -1122,7 +1122,7 @@ while [[ $LOOP != 0 ]];
 do
 	MYRPM="rpm:${PACKAGE}"
 	MYSRPM="rpms:${PACKAGE}"
-	SPEC=`redis-cli get $MYSPEC 2>&1`
+	SPEC=`redis-cli -h {{ redishost }} get $MYSPEC 2>&1`
 	SPECNAME=`echo $SPEC| rev |awk -F'/' '{ print $1 }' |rev| sed 's/\\.spec/\\.verified\\.spec/'`
         CURL=`curl "http://repos.pip2scl.dk/SPECS/${NAME}-${VERSION}.hardcoded.scl.spec"  2>/dev/null |grep "The page you are looking for is not found" `
         if [[ $? != 0 ]];
@@ -1131,9 +1131,9 @@ do
 		LOOP=0
 	else
                 logme "scl Spec file is needs to be build"
-		VERSPEC=`redis-cli get $MYVERSPEC 2>&1`
-		SRPM=`redis-cli get $MYSRPM 2>&1`
-		RPM=`redis-cli get $MYRPM 2>&1`
+		VERSPEC=`redis-cli -h {{ redishost }} get $MYVERSPEC 2>&1`
+		SRPM=`redis-cli -h {{ redishost }} get $MYSRPM 2>&1`
+		RPM=`redis-cli -h {{ redishost }} get $MYRPM 2>&1`
 		if [[ $RPM == "" ]];
 		then
 			logme "Download source "
@@ -1147,7 +1147,7 @@ do
 			logme "Package already build"
                		scp $SPEC root@repos.pip2scl.dk:/usr/share/nginx/html/SPECS/${NAME}-${VERSION}.verified.spec >/dev/null 2>&1
 			VERSPECURL="http://repos.pip2scl.dk/SPECS/${SPECNAME}"
-			redis-cli set $MYVERSPEC $VERSPECURL >/dev/null 2>&1 
+			redis-cli -h {{ redishost }} set $MYVERSPEC $VERSPECURL >/dev/null 2>&1 
 			logme "My verified specfile is $SPECNAME and located  $VERSPECURL"
 			LOOP=0
 		fi

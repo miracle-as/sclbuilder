@@ -57,8 +57,8 @@ touchthem ()
 		fi	
 		touch ${MYDIR}/README.md
         	touch ${MYDIR}/CHANGELOG.rst
-		tar czf $FILE  $MYDIR >/dev/null 2>&1
-		scp $FILE root@repos.pip2scl.dk:/usr/share/nginx/html/SOURCES/ >/dev/null 2>&1
+		mkdir -p /repo/AWX-RPM/SOURCES/
+		tar czf /repo/AWX-RPM/SOURCES/$FILE $MYDIR >/dev/null 2>&1
 		logme "Source file copied to remote site"
 	else
 		logme "Something weird happened"
@@ -107,11 +107,11 @@ zip2tgz ()
 		exit
 	fi
         logme "Uploading repacked tar"
-        scp ${OURSOURCE} root@repos.pip2scl.dk:/usr/share/nginx/html/SOURCES/${OURNAME}  >/dev/null 2>&1
+        cp ${OURSOURCE} /repo/AWX-RPM/SOURCES/  >/dev/null 2>&1
         logme "clean /tmp/repack"
-        OURURL="http://repos.pip2scl.dk/SOURCES/${OURNAME}"
-        redis-cli set $MYURL "$OURURL"  >/dev/null 2>&1
-        redis-cli set $MYEXT "tar.gz"  >/dev/null 2>&1
+        OURURL="{{ repourl }}{{ repopath }}/SOURCES/${OURNAME}"
+        redis-cli -h {{ redishost }} set $MYURL "$OURURL"  >/dev/null 2>&1
+        redis-cli -h {{ redishost }} set $MYEXT "tar.gz"  >/dev/null 2>&1
         logme "$PACKAGE Package converted to tgz"
         /usr/bin/rm -r /tmp/repack >/dev/null 2>&1
 }
@@ -131,7 +131,7 @@ bz2tgz ()
     bunzip2  /tmp/bzfile.bz2  >/dev/null 2>&1
 	gzip -f /tmp/bzfile >/dev/null 2>&1
 	cp /tmp/bzfile.gz $OURSOURCE
-    scp ${OURSOURCE} root@repos.pip2scl.dk:/usr/share/nginx/html/SOURCES/${OURNAME} >/dev/null 2>&1
+    cp ${OURSOURCE} /repo/AWX-RPM/SOURCES/${OURNAME} >/dev/null 2>&1
     logme "clean /tmp/repack"
     logme "$PACKAGE Package converted to tgz"
     /usr/bin/rm -r /tmp/repack >/dev/null 2>&1
@@ -184,7 +184,7 @@ download_source ()
 		fi
 	fi
 	FILENAME="${NAME}-${LAST}"
-	redis-cli set $MYSRCNAME $FILENAME >/dev/null 2>&1
+	redis-cli -h {{ redishost }} set $MYSRCNAME $FILENAME >/dev/null 2>&1
 	logme "Filename $FILENAME stored in redis"
 	EXTENTION=`echo $FILENAME | rev |awk -F'.' '{ print $1}'|rev `
 	logme "File extention is $EXTENTION"
@@ -201,7 +201,7 @@ download_source ()
 		if [[ $? == 0 ]];
 		then
 		logme "SUM: $SUM"
-			redis-cli set $MYSUM $SUM >/dev/null 2>&1
+			redis-cli -h {{ redishost }} set $MYSUM $SUM >/dev/null 2>&1
 		else
 			logme "noSUM: Unexpected error "
 			exit
@@ -233,18 +233,18 @@ download_source ()
 	if [[ $EXTENTION == "bz2" ]];
 	then
 		KNOWNEXT="yes"
-                       OURURL="http://repos.pip2scl.dk/SOURCES/${OURNAME}"
-                       redis-cli set $MYURL "$OURURL"  >/dev/null 2>&1
-                       redis-cli set $MYEXT "$EXTENTION"  >/dev/null 2>&1
-                       URL=`redis-cli get $MYURL`
+                       OURURL="{{ repourl }}{{ repopath }}/SOURCES/${OURNAME}"
+                       redis-cli -h {{ redishost }} set $MYURL "$OURURL"  >/dev/null 2>&1
+                       redis-cli -h {{ redishost }} set $MYEXT "$EXTENTION"  >/dev/null 2>&1
+                       URL=`redis-cli -h {{ redishost }} get $MYURL`
 		bz2tgz
 	fi
 	EXTENTION="tar.gz"
 
 	SRCURL=`echo $DOWNLOAD | awk -F"URL:" '{ print $2 }'`
-	redis-cli set $MYSRCURL "$SRCURL"  >/dev/null 2>&1
+	redis-cli -h {{ redishost }} set $MYSRCURL "$SRCURL"  >/dev/null 2>&1
 	touchthem $OURSOURCE
-	scp $OURSOURCE root@repos.pip2scl.dk:/usr/share/nginx/html/SOURCES/${NAME}-${VERSION}.tar.gz >/dev/null 2>&1
+	cp $OURSOURCE /repo/AWX-RPM/SOURCES/${NAME}-${VERSION}.tar.gz >/dev/null 2>&1
 	if [[ $? == 0 ]];
 	then
 		logme "Package downloaded"

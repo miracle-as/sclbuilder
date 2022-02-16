@@ -1,22 +1,22 @@
- name: Initial database seed
+- name: Initial database seed
   hosts: prod_sclbuilder_database
   gather_facts: False
   tasks:
-  - name: install pip
-    dnf:
-      name: [ "python3-pip" , "libpq-devel" , "gcc", "python3-devel" ]
-      state: latest
+#  - name: install pip
+#    dnf:
+#      name: [ "python3-pip" , "libpq-devel" , "gcc", "python3-devel" ]
+#      state: latest
   
-  - name: Install psyorg in the platforn python
-    command: /usr/libexec/platform-python -m pip install psycopg2-binary 
+#  - name: Install psyorg in the platforn python
+#    command: /usr/libexec/platform-python -m pip install psycopg2-binary 
 
-  - name: Install setuptools_rust in the platforn python
-    command: /usr/libexec/platform-python -m pip install setuptools_rust
+#  - name: Install setuptools_rust in the platforn python
+#    command: /usr/libexec/platform-python -m pip install setuptools_rust
 
   - name: Simple select query to acme db
     postgresql_query:
       db: sclbuilder
-      login_host: sclbuilder
+      login_host: localhost
       login_user: "sclbuilder"
       login_password: "django2know"
       query: SELECT version()
@@ -24,7 +24,7 @@
   - name: Insert package
     postgresql_query:
       db: sclbuilder
-      login_host: sclbuilder
+      login_host: localhost
       login_user: "sclbuilder"
       login_password: "django2know"
       query: select * from  projects_package where packagestatus IS NULL;
@@ -33,7 +33,7 @@
   - name: loop packages
     postgresql_query:
       db: sclbuilder
-      login_host: sclbuilder
+      login_host: locahost
       login_user: "sclbuilder"
       login_password: "django2know"
       query: "update projects_package set packagestatus = 'Initial' where id = {{ item.id }} ; " 
@@ -44,7 +44,7 @@
   - name: get all packages
     postgresql_query:
       db: sclbuilder
-      login_host: sclbuilder
+      login_host: localhost
       login_user: "sclbuilder"
       login_password: "django2know"
       query: select * from  projects_package;
@@ -53,7 +53,7 @@
   - name: set expected urls
     postgresql_query:
       db: sclbuilder
-      login_host: sclbuilder
+      login_host: localhost
       login_user: "sclbuilder"
       login_password: "django2know"
       query: >-
@@ -76,7 +76,7 @@
     postgresql_query:
       db: sclbuilder
       login_user: "sclbuilder"
-      login_host: sclbuilder
+      login_host: localhost
       login_password: "django2know"
       query: select id, packagestatus,  packagesclrpmfilestatus from  projects_package where packagesclfilestatus IS NULL ;
     register: sclpackages
@@ -84,7 +84,7 @@
   - name: set expected urls
     postgresql_query:
       db: sclbuilder
-      login_host: sclbuilder
+      login_host: localhost
       login_user: "sclbuilder"
       login_password: "django2know"
       query: >-
@@ -99,7 +99,7 @@
   - name: get all packages  where packagerpmfilestatus is null
     postgresql_query:
       db: sclbuilder
-      login_host: sclbuilder
+      login_host: localhost
       login_user: "sclbuilder"
       login_password: "django2know"
       query: select id, packagestatus, packagesclrpmfilestatus from  projects_package where packagesclrpmfilestatus IS NULL ;
@@ -108,7 +108,7 @@
   - name: set expected sclrpmpackages
     postgresql_query:
       db: sclbuilder
-      login_host: sclbuilder
+      login_host: localhost
       login_user: "sclbuilder"
       login_password: "django2know"
       query: >-
@@ -123,7 +123,7 @@
   - name: get all packages  where packagerpmfilestatus is null
     postgresql_query:
       db: sclbuilder
-      login_host: sclbuilder
+      login_host: localhost
       login_user: "sclbuilder"
       login_password: "django2know"
       query: select id, packagestatus, packagerpmfilestatus from  projects_package where packagerpmfilestatus IS NULL ;
@@ -133,7 +133,7 @@
     postgresql_query:
       db: sclbuilder
       login_user: "sclbuilder"
-      login_host: sclbuilder
+      login_host: localhost
       login_password: "django2know"
       query: >-
         update projects_package set 
@@ -147,7 +147,7 @@
   - name: Insert package
     postgresql_query:
       db: sclbuilder
-      login_host: sclbuilder
+      login_host: localhost
       login_user: "sclbuilder"
       login_password: "django2know"
       query: select * from  projects_package where packagestatus = 'Completed';
@@ -156,10 +156,10 @@
   - name: loop packages
     postgresql_query:
       db: sclbuilder
-      login_host: sclbuilder
+      login_host: localhost
       login_user: "sclbuilder"
       login_password: "django2know"
-      query: "update projects_package set packagestatusurl = 'http://repos.pip2scl.dk/logos/greenball.png' where id = {{ item.id }} ; " 
+      query: "update projects_package set packagestatusurl = 'http://rpm.miracle.dk/logos/greenball.png' where id = {{ item.id }} ; " 
     register: result
     with_items:
     - "{{ completed.query_all_results.0 }}"
@@ -167,7 +167,7 @@
   - name: Insert package
     postgresql_query:
       db: sclbuilder
-      login_host: sclbuilder
+      login_host: localhost
       login_user: "sclbuilder"
       login_password: "django2know"
       query: select * from  projects_package where packagestatus = 'Building';
@@ -176,12 +176,12 @@
   - name: set package status based on substati
     postgresql_query:
       db: sclbuilder
-      login_host: sclbuilder
+      login_host: lolcahost
       login_user: "sclbuilder"
       login_password: "django2know"
       query: >- 
         update projects_package 
-        set packagestatus = 'Compledted' 
+        set packagestatus = 'Completed' 
         where (
         packagesourcefilestatus = 'Completed' AND 
         packageorgspecfilestatus = 'Completed' AND  
