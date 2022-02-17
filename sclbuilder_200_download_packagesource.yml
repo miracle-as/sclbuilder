@@ -1,64 +1,9 @@
 ---
-- name: Initial database seed
+- name: Download pypi packages
   hosts: prod_sclbuilder_worker
   vars_files:
-    - vars.yml 
+    - vars.yml
   tasks:
-  - name: Install rhel
-    ansible.builtin.package:
-      name: 
-        - glusterfs-fuse
-        - redis
-        - python38-psycopg2
-        - python38-pip
-        - python38-devel
-        - python3-devel
-        - python3-requests
-        - python38-requests
-        - wget
-        - rpm-build
-        - scl-utils-build
-        - scl-utils
-        - help2man
-        - unzip
-        - openssl-devel
-        - libtool-ltdl-devel
-        - sphinx
-        #- python3-sphinx
-        - make
-        - gcc
-        - libffi-devel
-        - openldap-devel
-        - libxml2-devel
-        - xmlsec1
-        - xmlsec1-openssl
-        #- xmlsec1-devel 
-        #- xmlsec1-openssl-devel
-        - libpq-devel
-        - platform-python-devel
-      state: present
-
-  - name: Install bottle python package
-    pip:
-      name: 
-        - requests
-        - requirements-parser
-        - spec2scl
-        - setuptools_rust
-        - wheel
-
-
-  - name: Update pip
-    pip:
-      name: pip
-
-  - name: Install psyorg in the platforn python
-    command: /usr/libexec/platform-python -m pip install psycopg2-binary 
-
-  - name: Install setuptools_rust in the platforn python
-    command: /usr/libexec/platform-python -m pip install setuptools_rust
-
-  
   - name: Simple select query to acme db
     community.postgresql.postgresql_query:
       db: sclbuilder
@@ -78,6 +23,8 @@
       as_single_query: yes 
     register: sourceurlmissingpackages
     delegate_to: localhost
+    tags:
+      - checkstatus
 
   - name: Set them to building
     community.postgresql.postgresql_query:
@@ -88,13 +35,15 @@
       query: >-
         update projects_package set packagestatus = 'Building', 
         packagesourcefilestatus = 'Building' , 
-        packagesourcefileurl = '{{ repourl }}{{ repopath }}{{ item.packagename }}-{{ item.packageversion}}.tar.gz'  
+        packagesourcefileurl = '{{ repourl }}{{ repopath }}/SOURCES/{{ item.packagename }}-{{ item.packageversion}}.tar.gz'  
         where id = {{ item.id }} ; 
       as_single_query: yes
     register: adoptedpackages
     with_items:
     - "{{ sourceurlmissingpackages.query_all_results.0 }}"
     delegate_to: localhost
+    tags:
+      - checkstatus
 
 
   - name: Select the new ones 
@@ -106,7 +55,9 @@
       query: select * from  projects_package where packagesourcefilestatus 	IS NULL;;
       as_single_query: yes
     register: newpackages
-    delegate_to: localhost 
+    delegate_to: localhost
+    tags:
+      - checkstatus 
   
   - name: Set them to building
     community.postgresql.postgresql_query:
@@ -121,6 +72,8 @@
     with_items:
     - "{{ newpackages.query_all_results.0 }}"
     delegate_to: localhost
+    tags:
+      - checkstatus
 
   - name: Select the building candidates
     community.postgresql.postgresql_query:
@@ -132,69 +85,54 @@
       as_single_query: yes
     register: buildingsource
     delegate_to: localhost
-  
-  - name: Copy the downloader script
-    ansible.builtin.template:
-      src: sclbuilder_download.sh.j2
-      dest: /usr/local/bin/sclbuilder_download.sh
-      owner: root
-      group: root 
-      mode: '0755'
-
-  - name: Copy the downloader python script
-    ansible.builtin.template:
-      src: pip-downloader.py.j2
-      dest: /usr/local/bin/pip-downloader.py
-      owner: root
-      group: root 
-      mode: '0755'
-
-  - name: Copy the downloar create original spec name
-    ansible.builtin.template:
-      src:  sclbuilder_create_original_specfile.sh.j2
-      dest: /usr/local/bin/sclbuilder_create_original_specfile.sh
-      owner: root
-      group: root 
-      mode: '0755'
-
-  - name: Copy the downloader env script
-    ansible.builtin.template:
-      src:  setbuildenv.sh.j2
-      dest: /usr/local/bin/setbuildenv.sh
-      owner: root
-      group: root 
-      mode: '0755'
-
+    tags:
+      - checkstatus
+ 
   - name: Run download on our targets
     command: "/usr/local/bin/sclbuilder_download.sh {{ item.packagename }}=={{ item.packageversion }}"
     register: download
-    with_items:
-    - "{{ buildingsource.query_all_results.0 }}"
+    with_items: "{{ buildingsource.query_all_results.0 }}"
+    ignore_errors: yes
+    async: 10
+    poll: 0
 
+  - name: Check sync status
+    async_status:
+      jid: "{{ async_result_item.ansible_job_id }}"
+    loop: "{{ download.results }}"
+    loop_control:
+      loop_var: "async_result_item"
+    register: async_poll_results
+    until: async_poll_results.finished
+    ignore_errors: yes
+    retries: 30
+    
   - name: Check that downloads are available at {{ repourl }}
     uri:
       url: "{{ repourl }}{{ repopath }}/SOURCES/{{ item.packagename }}-{{ item.packageversion }}.tar.gz"
     register: urlcheck
+    ignore_errors: yes
     with_items:
     - "{{ buildingsource.query_all_results.0 }}"
+    tags:
+      - checkstatus
+    async: 10
+    poll: 0
+    delegate_to: localhost
 
-
-  - name: Create Spec files
-    command: "/usr/local/bin/sclbuilder_create_original_specfile.sh  {{ item.packagename }}=={{ item.packageversion }}"
-    register: orgspecfile
-    with_items:
-    - "{{ buildingsource.query_all_results.0 }}"
-
-#  - name: Run download on our targets
-#    uri:
-#      url: "{{ repourl }}{{ repopath }}{{ item.packagename }}-{{ item.packageversion }}.tar.gz"
-#    register: urlcheck
-#    with_items:
-#    - "{{ buildingsource.query_all_results.0 }}"
-
-#  - debug: 
-#      var: urlcheck
-
+  - name: Check sync status
+    async_status:
+      jid: "{{ async_result_item.ansible_job_id }}"
+    loop: "{{ urlcheck.results }}"
+    loop_control:
+      loop_var: "async_result_item"
+    register: async_poll_results
+    until: async_poll_results.finished
+    retries: 30
+    delegate_to: localhost
+    ignore_errors: yes
+    tags:
+      - checkstatus
 
   - name: update database if based on curl
     community.postgresql.postgresql_query:
@@ -207,9 +145,11 @@
     become: yes
     become_user: sclbuilder
     with_items:
-      - "{{ urlcheck.results }}"
+      - "{{ async_poll_results.results }}"
     when:  item.status == 200
     delegate_to: localhost
+    tags:
+      - checkstatus
 
   - debug: 
       var: completed

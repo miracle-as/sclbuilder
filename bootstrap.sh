@@ -13,7 +13,7 @@ vagrant up --provider=docker
 rm -r  ~/.ansible
 ansible-galaxy install -f -r roles/requirements.yml
 ansible-galaxy collection install community.postgresql
+ansible-galaxy install containers.podman # Internal podman connection plugin is broken
 ansible-playbook -i container-dynamic build_enviroment_100_db.yml
-
 
  

@@ -1,0 +1,91 @@
+- name: Download pypi packages
+  hosts: prod_sclbuilder_worker
+  vars_files:
+    - vars.yml
+  tasks:
+  - name: Install rhel
+    ansible.builtin.package:
+      name:
+        - glusterfs-fuse
+        - redis
+        - python38-psycopg2
+        - python38-pip
+        - python38-devel
+        - python3-devel
+        - python3-requests
+        - python38-requests
+        - wget
+        - rpm-build
+        - scl-utils-build
+        - scl-utils
+        - help2man
+        - unzip
+        - openssl-devel
+        - libtool-ltdl-devel
+        - sphinx
+        #- python3-sphinx
+        - make
+        - gcc
+        - libffi-devel
+        - openldap-devel
+        - libxml2-devel
+        - xmlsec1
+        - xmlsec1-openssl
+        #- xmlsec1-devel
+        #- xmlsec1-openssl-devel
+        - libpq-devel
+        - platform-python-devel
+      state: present
+
+  - name: Install bottle python package
+    pip:
+      name:
+        - requests
+        - requirements-parser
+        - spec2scl
+        - setuptools_rust
+        - wheel
+
+
+  - name: Update pip
+    pip:
+      name: pip
+
+  - name: Install psyorg in the platforn python
+    command: /usr/libexec/platform-python -m pip install psycopg2-binary
+
+  - name: Install setuptools_rust in the platforn python
+    command: /usr/libexec/platform-python -m pip install setuptools_rust
+
+  - name: Copy the downloader script
+    ansible.builtin.template:
+      src: sclbuilder_download.sh.j2
+      dest: /usr/local/bin/sclbuilder_download.sh
+      owner: root
+      group: root
+      mode: '0755'
+
+  - name: Copy the downloader python script
+    ansible.builtin.template:
+      src: pip-downloader.py.j2
+      dest: /usr/local/bin/pip-downloader.py
+      owner: root
+      group: root
+      mode: '0755'
+
+  - name: Copy the downloar create original spec name
+    ansible.builtin.template:
+      src:  sclbuilder_create_original_specfile.sh.j2
+      dest: /usr/local/bin/sclbuilder_create_original_specfile.sh
+      owner: root
+      group: root
+      mode: '0755'
+
+  - name: Copy the downloader env script
+    ansible.builtin.template:
+      src:  setbuildenv.sh.j2
+      dest: /usr/local/bin/setbuildenv.sh
+      owner: root
+      group: root
+      mode: '0755'
+  

@@ -12,7 +12,8 @@ export PRESCLDIR="${BUILDDIR}/PRESCLS"
 export VERSCLDIR="${BUILDDIR}/VERSCLS"
 export OUTPUTDIR="${BUILDDIR}/OUTPUT"
 export DOWNLOADDIR="${BUILDDIR}/DOWNLOADS"
-export REPO="http://repos.pip2scl.dk"
+export REPO="{{ repourl }}"
+export REPOPATH="{{ repopath }}"
 
 export QUIET="no"
 
@@ -43,7 +44,7 @@ export OURTARSOURCE="${BUILDDIR}/DOWNLOADS/${OURTARNAME}"
 export OURZIPSOURCE="${BUILDDIR}/DOWNLOADS/${OURZIPNAME}"
 export OURBZSOURCE="${BUILDDIR}/DOWNLOADS/${OURBZNAME}"
 
-export OURURL="${REPO}/SOURCES/${OURNAME}"
+export OURURL="${REPO}${REPOPATH}/SOURCES/${OURNAME}"
 
 export FAILEDRPMS="${OUTPUTDIR}/failed.txt"
 export LOGFILE="${OUTPUTDIR}/${NAME}-${VERSION}.package.log"

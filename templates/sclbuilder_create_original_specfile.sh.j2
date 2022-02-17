@@ -71,7 +71,7 @@ checkpackage ()
 	if [[ $EXTENTION == "tar.gz" ]];
 	then
 		logme "Extract the source from $FILE"
-		tar xf $TARFILE
+		tar xf $TARFILE --no-same-owner
 		if [[ $? == 0 ]];
 		then
 			logme "Source extrated"
@@ -120,8 +120,9 @@ checkpackage ()
 
 	SPEC=`ls -1`
 	echo "$SPEC" > /tmp/$NAME-$VERSION.original.spec
-	scp  $SPEC root@repos.pip2scl.dk:/usr/share/nginx/html/SPECS 
-	scp  /tmp/$NAME-$VERSION.original.spec root@repos.pip2scl.dk:/usr/share/nginx/html/SPECS 
+	mkdir -p /repo/{{ repopath }}/SPECS
+        cp $SPEC /repo/{{ repopath }}/SPECS/
+	cp /tmp/$NAME-$VERSION.original.spec /repo/{{ repopath }}/SPECS/ 
 }
 
 check_args

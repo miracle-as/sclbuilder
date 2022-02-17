@@ -142,9 +142,10 @@ bz2tgz ()
 download_source ()
 {
 	logme "This is a new file - Download" 
-   	echo $PACKAGE > /tmp/requirements.txt
-    cd /tmp && DOWNLOAD=`python3 /usr/local/bin/pip-downloader.py `
-    FILEPATH=`echo $DOWNLOAD | awk -F"Downloading:" '{ print $2 }' |awk '{ print $1 }' `
+   	echo $PACKAGE > /tmp/requirements-$1.txt
+        cd /tmp && DOWNLOAD=`python3 /usr/local/bin/pip-downloader.py /tmp/requirements-$1.txt`
+        FILEPATH=`echo $DOWNLOAD | awk -F"Downloading:" '{ print $2 }' |awk '{ print $1 }' `
+	rm -f /tmp/requirements-$1.txt
 	logme "The file is downloaded to $FILEPATH"
 	echo $FILEPATH |grep -i "gz$" >/dev/null 2>&1
 	if [[ $? == 0 ]];

@@ -94,7 +94,7 @@ def download_best_package(package_name, specifier='', path=PACKAGES_DIR):
 
 
 if __name__ == '__main__':
-    f = open("./requirements.txt", "rt")
+    f = open(sys.argv[1], "rt")
     lines = f.readlines()
     for line in lines:
         myname=line.split("==")[0].lower()

@@ -21,7 +21,7 @@ cat<<EOF
       $hosts
     ],
     "vars": {
-      "ansible_connection": "containers.podman.podman"
+      "ansible_connection": "docker"
     }
   },
   "_meta": {

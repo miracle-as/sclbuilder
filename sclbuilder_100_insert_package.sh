@@ -5,7 +5,7 @@ SCRIPT=/tmp/packagers.sh
 echo > $SCRIPT
 for REQ in `curl $URL | grep -v '#'|tr -d ' '|tr -d '\r'`
 do
-    NAME=`echo $REQ | awk -F'==' '{ print $1 }'`
+    NAME=`echo $REQ | awk -F'==' '{ print $1 }' | cut -f1 -d[`
     VERS=`echo $REQ | awk -F'==' '{ print $2 }'`
     SLUG=`echo ${NAME}___${VERS} | tr '.' '_'`
     EXTRAVAR="'{ \"slug\": \"$SLUG\", \"name\": \"$NAME\", \"version\": \"$VERS\" }'"
