@@ -13,7 +13,7 @@ Vagrant.configure("2") do |config|
   config.vm.define "prod_sclbuilder_worker" do | worker |
     worker.vm.synced_folder "/opt/awxrpm/data/repo", "/repo", docker_consistency: "delegated" 
     worker.vm.provider "docker" do |d|
-      d.build_dir = "docker/rhel/."
+      d.build_dir = "docker/worker/."
 #      d.create_args = ["--user=1000","--userns=keep-id"]
     end
   end

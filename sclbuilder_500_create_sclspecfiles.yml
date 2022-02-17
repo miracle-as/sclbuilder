@@ -1,5 +1,4 @@
 ---
-
 - name: Initial database seed
   hosts: prod_sclbuilder_worker
   vars:
@@ -7,118 +6,68 @@
     - organisation: "miracle"
     - project: "awxrpm"
   tasks:
-  - name: Add the user 'sclbuilder'
-    ansible.builtin.user:
-      name: sclbuilder
-      comment: service account for scl create
-    become: True
-
-  - name: Install rhel
-    ansible.builtin.package:
-      name: 
-        - redis
-        - python38-psycopg2
-        - python38-pip
-        - python38-devel
-        - python3-devel
-        - python3-requests
-        - python38-requests
-        - wget
-        - rpm-build
-        - scl-utils-build
-        - scl-utils
-        - help2man
-        - unzip
-        - openssl-devel
-        - libtool-ltdl-devel
-        - python3-sphinx
-        - make
-        - gcc
-        - libffi-devel
-        - openldap-devel
-        - libxml2-devel
-        - xmlsec1-devel 
-        - xmlsec1-openssl-devel
-        - libpq-devel
-        - platform-python-devel
-      state: present
-
-  - name: Install bottle python package
-    pip:
-      name: 
-        - requests
-        - requirements-parser
-        - spec2scl
-        - setuptools_rust
-        - wheel
-
-  - name: Install psyorg in the platforn python
-    command: /usr/libexec/platform-python -m pip install psycopg2-binary 
-    become: True
 
   - name: Simple select query to acme db
-    postgresql_query:
+    community.postgresql.postgresql_query:
       login_host: sclbuilder
       db: sclbuilder
       login_user: "sclbuilder"
       login_password: "django2know"
       query: SELECT version()
-    become: yes
-    become_user: sclbuilder
+      as_single_query: yes
+    delegate_to: localhost
 
-  - name: Select the all packages where packagesclfilestatus is NULL
-    postgresql_query:
-      db: sclbuilder
-      login_host: sclbuilder
-      login_user: "sclbuilder"
-      login_password: "django2know"
-      query: select id, packagesclfilestatus  from  projects_package where packagesclfilestatus IS NULL;
-    register: sclfilesstatusnull
-    become: yes
-    become_user: sclbuilder
+#  - name: Select the all packages where packagesclfilestatus is NULL
+#    community.postgresql.postgresql_query:
+#      db: sclbuilder
+#      login_host: sclbuilder
+#      login_user: "sclbuilder"
+#      login_password: "django2know"
+#      query: select id, packagesclfilestatus  from  projects_package where packagesclfilestatus IS NULL;
+#      as_single_query: yes
+#    register: sclfilesstatusnull
+#    delegate_to: localhost
 
-  - name: Set them to building
-    postgresql_query:
-      db: sclbuilder
-      login_host: sclbuilder
-      login_user: "sclbuilder"
-      login_password: "django2know"
-      query: >-
-        update projects_package set packagesclfilestatus = 'Building'
-        where id = {{ item.id }}; 
-    become: yes
-    become_user: sclbuilder
-    with_items:
-    - "{{ sclfilesstatusnull.query_all_results.0 }}"
-
+#  - name: Set them to building
+#    community.postgresql.postgresql_query:
+#      db: sclbuilder
+#      login_host: sclbuilder
+#      login_user: "sclbuilder"
+#      login_password: "django2know"
+#      query: >-
+#        update projects_package set packagesclfilestatus = 'Building'
+#        where id = {{ item.id }}; 
+#      as_single_query: yes
+#    with_items:
+#    - "{{ sclfilesstatusnull.query_all_results.0 }}"
+#    delegate_to: localhost
 
   - name: Select the new ones 
-    postgresql_query:
+    community.postgresql.postgresql_query:
       db: sclbuilder
       login_host: sclbuilder
       login_user: "sclbuilder"
       login_password: "django2know"
-      query: select * from  projects_package where packagespecfilestatus 	IS NULL;;
+      query: select id from  projects_package where packagespecfilestatus 	IS NULL;;
+      as_single_query: yes
     register: newpackages
-    become: yes
-    become_user: sclbuilder
-  
+    delegate_to: localhost 
+ 
   - name: Set them to building
-    postgresql_query:
+    community.postgresql.postgresql_query:
       login_host: sclbuilder
       db: sclbuilder
       login_user: "sclbuilder"
       login_password: "django2know"
       query: "update projects_package set packagespecfilestatus = 'Building'  where id = {{ item.id }} ; " 
+      as_single_query: yes
     register: adoptedpackages
-    become: yes
-    become_user: sclbuilder
     with_items:
     - "{{ newpackages.query_all_results.0 }}"
-
+    delegate_to: localhost 
 
   - name: Select the building candidates
-    postgresql_query:
+    community.postgresql.postgresql_query:
       db: sclbuilder
       login_host: sclbuilder
       login_user: "sclbuilder"
@@ -126,68 +75,21 @@
       query: >-
         select packagename, packageversion, packagespecfileurl 
         from  projects_package 
-        where Packagesclrpmfilestatus = 'Building'
+        where packagesclrpmfilestatus = 'Building'
         limit 1;
+      as_single_query: yes 
     register: buildingresult
-    become: yes
-    become_user: sclbuilder
-
-
-  - name: Copy the rpmbuilder script
-    ansible.builtin.template:
-      src: mergefiles.sh.j2
-      dest: /usr/local/bin/mergefiles.sh
-      owner: root
-      group: root 
-      mode: '0755'
-    become: yes
-
-  - name: Copy the rpmbuilder script
-    ansible.builtin.template:
-      src: sclbuilder_buildscl.sh.j2
-      dest: /usr/local/bin/sclbuilder_buildscl.sh
-      owner: root
-      group: root 
-      mode: '0755'
-    become: yes
-
-  - name: Copy the mandatory after setup addon
-    ansible.builtin.template:
-      src:   mandatory_after_setup.add.j2
-      dest: /usr/local/bin/mandatory_after_setup.add
-      owner: root
-      group: root 
-      mode: '0755'
-    become: yes
-
-  - name: Copy the mandatory after setup script
-    ansible.builtin.template:
-      src:   mandatory_after_setup.sh.j2
-      dest: /usr/local/bin/mandatory_after_setup.sh
-      owner: root
-      group: root 
-      mode: '0755'
-    become: yes
-
-  - name: Copy the downloader env script
-    ansible.builtin.template:
-      src:  setbuildenv.sh.j2
-      dest: /usr/local/bin/setbuildenv.sh
-      owner: root
-      group: root 
-      mode: '0755'
-    become: yes
+    delegate_to: localhost
 
   - name: Run sclbuilder_buildscl.sh  on our targets
     command: "/usr/local/bin/sclbuilder_buildscl.sh {{ item.packagename }}=={{ item.packageversion }}"
-    become: yes
     register: specfiles
     with_items:
     - "{{ buildingresult.query_all_results.0 }}"
 
   - name: Run download on our targets
     uri:
-      url: "http://repos.pip2scl.dk/META/{{ item.packagename }}-{{ item.packageversion }}.sclfiles"
+      url: "{{ repourl }}{{ repopath }}/META/{{ item.packagename }}-{{ item.packageversion }}.sclfiles"
     register: urlcheck
     with_items:
     - "{{ buildingresult.query_all_results.0 }}"
@@ -197,7 +99,7 @@
 
 
   - name: update database if based on curl
-    postgresql_query:
+    community.postgresql.postgresql_query:
       db: sclbuilder
       login_host: sclbuilder
       login_user: "sclbuilder"
@@ -208,9 +110,9 @@
         packagesclfilestatus = 'Completed', 
         packagesclrpmfilestatus = 'Completed' 
         where  packagesclrpmfilesurl = '{{ item.url }}' ; 
+      as_single_query: yes 
     register: result
-    become: yes
-    become_user: sclbuilder
     with_items:
       - "{{ urlcheck.results }}"
     when:  item.status == 200
+    delegate_to: localhost

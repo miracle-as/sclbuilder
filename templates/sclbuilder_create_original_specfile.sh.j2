@@ -60,7 +60,9 @@ checkpackage ()
 	then
 		logme "$TARFILE is here"
 	else
-		redis-cli -h {{ redishost }} get $MYURL
+		logme "Copying source file"
+                cp $REPOFOLDER$REPOSUBFOLDER/SOURCES/$NAME-$VERSION.tar.gz $SRCDIR/
+		#redis-cli -h {{ redishost }} get $MYURL
 	fi
 
 

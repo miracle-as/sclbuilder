@@ -6,14 +6,9 @@
   - name: Install rhel
     ansible.builtin.package:
       name:
-        - glusterfs-fuse
         - redis
-        - python38-psycopg2
         - python38-pip
         - python38-devel
-        - python3-devel
-        - python3-requests
-        - python38-requests
         - wget
         - rpm-build
         - scl-utils-build
@@ -23,7 +18,7 @@
         - openssl-devel
         - libtool-ltdl-devel
         - sphinx
-        #- python3-sphinx
+        - python38-wheel
         - make
         - gcc
         - libffi-devel
@@ -40,22 +35,10 @@
   - name: Install bottle python package
     pip:
       name:
-        - requests
         - requirements-parser
         - spec2scl
         - setuptools_rust
-        - wheel
-
-
-  - name: Update pip
-    pip:
-      name: pip
-
-  - name: Install psyorg in the platforn python
-    command: /usr/libexec/platform-python -m pip install psycopg2-binary
-
-  - name: Install setuptools_rust in the platforn python
-    command: /usr/libexec/platform-python -m pip install setuptools_rust
+      executable: pip-3.8
 
   - name: Copy the downloader script
     ansible.builtin.template:
@@ -89,3 +72,35 @@
       group: root
       mode: '0755'
   
+
+  - name: Copy the rpmbuilder script
+    ansible.builtin.template:
+      src: mergefiles.sh.j2
+      dest: /usr/local/bin/mergefiles.sh
+      owner: root
+      group: root
+      mode: '0755'
+
+  - name: Copy the rpmbuilder script
+    ansible.builtin.template:
+      src: sclbuilder_buildscl.sh.j2
+      dest: /usr/local/bin/sclbuilder_buildscl.sh
+      owner: root
+      group: root
+      mode: '0755'
+
+  - name: Copy the mandatory after setup addon
+    ansible.builtin.template:
+      src:   mandatory_after_setup.add.j2
+      dest: /usr/local/bin/mandatory_after_setup.add
+      owner: root
+      group: root
+      mode: '0755'
+
+  - name: Copy the mandatory after setup script
+    ansible.builtin.template:
+      src:   mandatory_after_setup.sh.j2
+      dest: /usr/local/bin/mandatory_after_setup.sh
+      owner: root
+      group: root
+      mode: '0755'

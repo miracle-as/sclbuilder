@@ -79,7 +79,7 @@
     tags:
       - checkstatus
   
-  - name: Run sclbuilder_buildrpm.sh  on our targets
+  - name: Run sclbuilder_create_original_specfile.sh on our targets
     command: "/usr/local/bin/sclbuilder_create_original_specfile.sh {{ item.packagename }}=={{ item.packageversion }}"
     register: specfiles
     with_items:
