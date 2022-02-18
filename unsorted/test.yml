@@ -1,5 +1,5 @@
 ---
-- hosts: localhost
+- hosts: prod_sclbuilder_worker
   vars:
     durations:
       - 1

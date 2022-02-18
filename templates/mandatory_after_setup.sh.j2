@@ -7,7 +7,7 @@ then
         exit 1
 fi
  
-sed -i "/python3.8/python3/" $SCLSPECFILE
+sed -i "s/python3.8/python3/g" $SCLSPECFILE
 
 # if it isnt a spec file
 grep '%{?scl:%scl_package %{name}}' $SCLSPECFILE >/dev/null 2>&1

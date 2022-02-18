@@ -34,54 +34,59 @@ fi
 
 lastbuild ()
 {
-	curl http://repos.pip2scl.dk/header.html >  $INDEX
+        INDEX=$REPOFOLDER/$REPOSUBFOLDER/index.html
+
+	curl {{ repourl }}{{ repopath }}/header.html >  $INDEX
 	echo "<pre>" >> $INDEX
 	cat $LASTBUILD >> $INDEX
 	echo "</pre>" >> $INDEX
-	curl http://repos.pip2scl.dk/footer.html >> $INDEX
-	scp $INDEX root@repos.pip2scl.dk:/usr/share/nginx/html/index.html 
+	curl {{ repourl }}{{ repopath }}/footer.html >> $INDEX
 }
 
 build_scl ()
 {
 	logme "adding $PACKAGE to software collection $SCL"
-	wget  $OURURL -O $OURSOURCE  >/dev/null 2>&1
-	if [[ $? == 0 ]];
-	then	
-		logme "Download complete"
-	else	
-		logme "Download Fauild"
-		exit	
-	fi
-	NAMEINTAR=`tar tvf $OURSOURCE |head -1 |awk '{ print $6 }' |sed 's(/(('`
-	wget -O $VERSPECFILE.new   $VERSPECFILEURL >/dev/null 2>&1
-	grep  -v '"/.*__pycache__.*/'  $VERSPECFILE.new > $VERSPECFILE
-	logme "Create spec file"
-	spec2scl  $VERSPECFILE > $PRESCLFILE  2>/dev/null
-	logme "Our SCL specfile before mod is $PRESCLFILE"
-	AFTERLINE=`cat $PRESCLFILE | grep "python3 setup.py install" -A1 | tail -1`
-	echo "$AFTERLINE"  |grep '%{?scl:EOF}' >/dev/null 2>&1
-	if [[ $? == 0 ]];
-	then
-		logme "We need to append this line in the the scl spec file after python setup and before scl"
-		grep "python3 setup.py install" -B1000000 $PRESCLFILE >/tmp/header
-		grep "python3 setup.py install" -A1000000 $PRESCLFILE | grep -v "python3 setup.py install" >/tmp/footer
-	fi
-       	sed -i 's#root=$RPM_BUILD_ROOT#root=$RPM_BUILD_ROOT/opt/{{ organisation }}/{{ organisation }}-{{ project }}/root#'  $PRESCLFILE
-       	sed -i 's#root=${RPM_BUILD_ROOT}#root=${RPM_BUILD_ROOT}/opt/{{ organisation }}/{{ organisation }}-{{ project }}/root#'  $PRESCLFILE
-       	sed -i "s#%setup.*#%setup -n ${NAMEINTAR}#" $PRESCLFILE
-	logme "mandatory_after_setup.sh $PRESCLFILE"
+        wget  $OURURL -O $OURSOURCE  >/dev/null 2>&1
+        cp $OURSOURCE $OURSCLSOURCE
 
-	mandatory_after_setup.sh $PRESCLFILE > $PRESCLFILE.added
-	if [[ $? == 0 ]];
-	then
-		logme "We have added the mandatory part"
-		cp $PRESCLFILE.added $PRESCLFILE
-	else
-		logme "Add failed"
-		exit 0
+        if [[ $? == 0 ]];
+        then
+                logme "Download complete"
+        else
+                logme "Download Failed"
+                exit
+        fi
+        NAMEINTAR=`tar tvf $OURSOURCE |head -1 |awk '{ print $6 }' |sed 's(/(('`
+        wget -O $ORGSPECFILE.new $ORGSPECFILEURL >/dev/null 2>&1
+        grep  -v '"/.*__pycache__.*/'  $ORGSPECFILE.new > $ORGSPECFILE
+        logme "Create spec file"
+        spec2scl  $ORGSPECFILE > $PRESCLFILE  2>/dev/null
+        logme "Our SCL specfile before mod is $PRESCLFILE"
+        AFTERLINE=`cat $PRESCLFILE | grep "python3 setup.py install" -A1 | tail -1`
+        echo "$AFTERLINE"  |grep '%{?scl:EOF}' >/dev/null 2>&1
+        if [[ $? == 0 ]];
+        then
+                logme "We need to append this line in the the scl spec file after python setup and before scl"
+                grep "python3 setup.py install" -B1000000 $PRESCLFILE >/tmp/header
+                grep "python3 setup.py install" -A1000000 $PRESCLFILE | grep -v "python3 setup.py install" >/tmp/footer
+        fi
+        sed -i 's#root=$RPM_BUILD_ROOT#root=$RPM_BUILD_ROOT/opt/miracle/miracle-awxrpm/root#'  $PRESCLFILE
+        sed -i 's#root=${RPM_BUILD_ROOT}#root=${RPM_BUILD_ROOT}/opt/miracle/miracle-awxrpm/root#'  $PRESCLFILE
+        sed -i "s#%setup.*#%setup -n ${NAMEINTAR}#" $PRESCLFILE
+        logme "mandatory_after_setup.sh $PRESCLFILE"
 
-	fi
+        echo $PRESCLFILE
+
+        mandatory_after_setup.sh $PRESCLFILE > $PRESCLFILE.added
+        if [[ $? == 0 ]];
+        then
+                logme "We have added the mandatory part"
+                cp $PRESCLFILE.added $PRESCLFILE
+        else
+                logme "Add failed"
+                exit 0
+
+        fi
 
 ##################################
 #
@@ -143,7 +148,8 @@ build_scl ()
 	if [[ $? == 0 ]];
 	then
 		logme "scl build succeeded"
-		scp  /tmp/${NAME}-${VERSION}.sclfiles root@repos.pip2scl.dk:/usr/share/nginx/html/META/${NAME}-${VERSION}.sclfiles
+		mkdir -p $REPOFOLDER$REPOPATH/META $REPOFOLDER$REPOPATH/RPMS $REPOFOLDER$REPOPATH/SRPMS
+		cp  /tmp/${NAME}-${VERSION}.sclfiles $REPOFOLDER$REPOPATH/META/${NAME}-${VERSION}.sclfiles
 		cp $PRESCLFILE $SCLFILE
 		for FILE in  `cat  /tmp/prebuild.log |grep "^Wrote:"   |awk '{ print $2 }'`
 		do
@@ -152,7 +158,7 @@ build_scl ()
 		if [[ $PERSIST == '-persist=yes' ]];
 		then
 
-              		scp $SCLFILE root@repos.pip2scl.dk:/usr/share/nginx/html/SPECS/${NAME}-${VERSION}.hardcoded.scl.spec  >/dev/null 2>&1
+              		cp $SCLFILE $REPOFOLDER$REPOPATH/SPECS/${NAME}-${VERSION}.hardcoded.scl.spec  >/dev/null 2>&1
                 	if [[ $? == 0 ]];
                 	then
                         	logme "scl specfile copied"
@@ -162,7 +168,7 @@ build_scl ()
                 	fi
 		fi
 
-		scp $SCLFILE root@repos.pip2scl.dk:/usr/share/nginx/html/SPECS/	 >/dev/null 2>&1
+		cp $SCLFILE $REPOFOLDER$REPOPATH/SPECS/	 >/dev/null 2>&1
 		if [[ $? == 0 ]];
 		then
 			logme "scl specfile copied"
@@ -171,7 +177,7 @@ build_scl ()
 			exit
 		fi
 
-		rsync -avzc $BUILDDIR/RPMS/* root@repos.pip2scl.dk:/usr/share/nginx/html/RPMS/ >/dev/null 2>&1
+		rsync -avzc $BUILDDIR/RPMS/* $REPOFOLDER$REPOPATH/RPMS/ >/dev/null 2>&1
 		if [[ $? == 0 ]];
 		then
 			logme "scl rpm synced"
@@ -180,7 +186,7 @@ build_scl ()
 			exit
 		fi
 
-		rsync -avzc $BUILDDIR/SRPMS/* root@repos.pip2scl.dk:/usr/share/nginx/html/SRPMS/ >/dev/null 2>&1
+		rsync -avzc $BUILDDIR/SRPMS/* $REPOFOLDER$REPOPATH/SRPMS/ >/dev/null 2>&1
 		if [[ $? == 0 ]];
 		then
 			logme "scl srpm synced"

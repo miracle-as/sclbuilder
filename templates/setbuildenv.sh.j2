@@ -1,6 +1,8 @@
 export BUILDDIR="/root/rpmbuild"
 export PRETTYSPEC="/usr/local/bin/prettyspec.sh"
 
+export PACKAGEPREFIX="{{ organisation }}-{{ project }}-"
+
 export NAME=`echo $PACKAGE | awk -F'==' '{ print $1 }'`
 export VERSION=`echo $PACKAGE | awk -F'==' '{ print $2 }'`
 
@@ -15,10 +17,11 @@ export DOWNLOADDIR="${BUILDDIR}/DOWNLOADS"
 export REPO="{{ repourl }}"
 export REPOPATH="{{ repopath }}"
 export REPOFOLDER="{{ repofolder }}"
-export REPOSUBFOLDER"{{ reposubfolder }}"
+export REPOSUBFOLDER"={{ reposubfolder }}"
 
 export QUIET="no"
 
+mkdir -p  ${ORGSPECDIR} >/dev/null 2>&1
 mkdir -p  ${SRCDIR} >/dev/null 2>&1
 mkdir -p  ${VERSPECDIR} >/dev/null 2>&1
 mkdir -p  ${PRESPECDIR} >/dev/null 2>&1
@@ -27,10 +30,10 @@ mkdir -p  ${VERSCLDIR} >/dev/null 2>&1
 mkdir -p  ${OUTPUTDIR} >/dev/null 2>&1
 mkdir -p  ${DOWNLOADDIR} >/dev/null 2>&1
 
-export ORGSPECFILEURL="${REPO}/SPECS/${NAME}-${VERSION}.original.spec"
-export ORGSPECFILE="${ORGSPECDIR}/${NAME}-${VERSION}.original.spec"
+export ORGSPECFILEURL="${REPO}${REPOPATH}/SPECS/${NAME}.spec"
+export ORGSPECFILE="${ORGSPECDIR}/${NAME}.spec"
 export VERSPECFILE="${VERSPECDIR}/${NAME}-${VERSION}.verified.spec"
-export VERSPECFILEURL="${REPO}/SPECS/${NAME}-${VERSION}.verified.spec"
+export VERSPECFILEURL="${REPO}${REPOPATH}/SPECS/${NAME}-${VERSION}.verified.spec"
 export PRESPECFILE="${PRESPECDIR}/${NAME}-${VERSION}.pre.spec"
 export SCLFILE="${VERSCLDIR}/${NAME}-${VERSION}.scl.spec"
 export VERSCLFILE="${VERSCLDIR}/${NAME}-${VERSION}.verified.scl.spec"
@@ -42,6 +45,7 @@ export OURZIPNAME="${NAME}-${VERSION}.zip"
 export OURBZNAME="${NAME}-${VERSION}.bz2"
 
 export OURSOURCE="${BUILDDIR}/SOURCES/${OURNAME}"
+export OURSCLSOURCE="${BUILDDIR}/SOURCES/${PACKAGEPREFIX}${OURNAME}"
 export OURTARSOURCE="${BUILDDIR}/DOWNLOADS/${OURTARNAME}"
 export OURZIPSOURCE="${BUILDDIR}/DOWNLOADS/${OURZIPNAME}"
 export OURBZSOURCE="${BUILDDIR}/DOWNLOADS/${OURBZNAME}"

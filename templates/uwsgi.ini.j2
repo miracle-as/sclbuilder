@@ -1,8 +1,8 @@
 # mysite_uwsgi.ini file
 [uwsgi]
-chdir           = /opt/{{ repository }}/{{ project }}
+chdir           = /opt/{{ scluirepository }}/{{ project }}
 module          = {{ django_app }}.wsgi
-home            = /opt/{{ repository }}/venv
+home            = /opt/{{ scluirepository }}/venv
 master          = true
 processes       = 10
 socket          = /opt/socket/{{ project }}.sock

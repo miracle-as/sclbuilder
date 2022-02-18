@@ -10,23 +10,35 @@ for i in `podman ps -a --format "{{.Names}}"`; do
 	fi
 done
 
+while read -r variable;do
+
+	if [[ "$variable" != "---" ]];then
+		key=`echo $variable | cut -f1 -d: | sed 's/\"//g'`
+		value=`echo $variable | cut -f2- -d: | sed 's/\"//g' | sed 's/^ *//g'`
+		variables="$variables\"$key\":\"$value\","
+
+	fi
+
+done < vars.yml
+
 hosts=${hosts::-1}
 alias=${alias::-1}
+variables=${variables::-1}
 
 if [ "$1" == "--list" ]; then
 cat<<EOF
 {
   "bash_hosts": {
     "hosts": [
-      $hosts
+      "localhost",$hosts
     ],
     "vars": {
-      "ansible_connection": "containers.podman.podman"
+      "ansible_connection": "containers.podman.podman",$variables
     }
   },
   "_meta": {
     "hostvars": {
-	$alias
+	"localhost":{"ansible_connection":"local"},$alias
     }
   }
 }
