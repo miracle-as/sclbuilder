@@ -26,8 +26,6 @@
         - libxml2-devel
         - xmlsec1
         - xmlsec1-openssl
-        #- xmlsec1-devel
-        #- xmlsec1-openssl-devel
         - libpq-devel
         - platform-python-devel
       state: present

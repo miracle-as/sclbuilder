@@ -1,61 +1,9 @@
 ---
 - name: Initial database seed
   hosts: prod_awx
-  vars:
-    - organisation: "miracle"
-    - myrepo: "https://github.com/ansible/awx.git"
-    - project: "awxrpm"
-    - version: "19.4.0"
-    - scl_version: "19.4.0"
-    - scl_release: "1"
-    - scl_description: "Miracle supported awx"
-
+  vars_files:
+    - vars.yml
   tasks:
-
-  - name: "generate SSH key {{ssh_key_filename}}"
-    openssh_keypair:
-      path: "~/.ssh/id_rsa"
-      type: rsa
-      size: 4096
-      state: present
-      force: no
-    become: True
-
-  - name: Store file into /tmp/fetched/host.example.com/tmp/somefile
-    ansible.builtin.fetch:
-      src: ~/.ssh/id_rsa.pub
-      dest: /var/lib/fetched
-    become: True
-  
-  - name:  create ssh config
-    ansible.builtin.template:
-      src: sshconfig.j2
-      dest: /root/.ssh/config
-      mode: 600
-      force: yes
-    become: True
-  
-
-  - name: Install psyorg in the platforn python
-    command: /usr/libexec/platform-python -m pip install psycopg2-binary 
-    become: True
-
-  - name: Add the user 'sclbuilder'
-    ansible.builtin.user:
-      name: sclbuilder
-      comment: service account for scl create
-    become: True
-
-  - name: Simple select query to acme db
-    postgresql_query:
-      db: sclbuilder
-      login_host: sclbuilder
-      login_user: "sclbuilder"
-      login_password: "django2know"
-      query: SELECT version()
-    become: yes
-    become_user: sclbuilder
-
   - name:  create_specfiles | create a tailored script
     ansible.builtin.template:
       src: create.sclspec.sh.j2
@@ -69,8 +17,6 @@
       path: /root/rpmbuild/SOURCES
       state: directory
     become: True
-
-
 
   - name:  create_specfiles | create a tailored metaspecfile
     ansible.builtin.template:

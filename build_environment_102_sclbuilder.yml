@@ -1,0 +1,65 @@
+- name: Download pypi packages
+  hosts: prod_sclbuilder_sclbuilder
+  vars_files:
+    - vars.yml
+  tasks:
+  - name: Install rhel
+    ansible.builtin.package:
+      name:
+        - redis
+        - python38-pip
+        - python38-devel
+        - wget
+        - rpm-build
+        - scl-utils-build
+        - scl-utils
+        - help2man
+        - unzip
+        - openssl-devel
+        - libtool-ltdl-devel
+        - sphinx
+        - python38-wheel
+        - make
+        - gcc
+        - libffi-devel
+        - openldap-devel
+        - libxml2-devel
+        - xmlsec1
+        - xmlsec1-openssl
+        - libpq-devel
+        - platform-python-devel
+      state: present
+
+  - name: Install bottle python package
+    pip:
+      name:
+        - requirements-parser
+        - spec2scl
+        - setuptools_rust
+      executable: pip-3.8
+
+  - name:  create_specfiles | create a tailored script
+    ansible.builtin.template:
+      src: create.sclspec.sh.j2
+      dest: /usr/local/bin/create.sclspec.sh
+      mode: 755
+      force: yes
+
+  - name: Creates directory
+    file:
+      path: /root/rpmbuild/SOURCES
+      recurse: true
+
+  - name:  create_specfiles | create a tailored metaspecfile
+    ansible.builtin.template:
+      src: metascl.spec.j2
+      dest: /root/{{ organisation }}.{{ project }}.meta.scl.spec
+      mode: 644
+      force: yes
+
+  - name:  create_specfiles | create a tailored metaspecfile for {{ project }}
+    ansible.builtin.template:
+      src: project.specfile.spec.j2
+      dest: /root/{{ organisation }}.{{ project }}.project.spec
+      mode: 644
+      force: yes

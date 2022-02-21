@@ -23,14 +23,6 @@
     become: yes
     become_user: sclbuilder
   
-#  - debug: 
-#      var: result.query_all_results.0
-
-#  - name: loop packages
-#    debug: msg="HERWEGO :{{ item.id }}"
-#    with_items:
-#    - "{{ result.query_all_results.0 }}"
-
   - name: Copy the rpmbuilder script
     ansible.builtin.template:
       src: sclbuilder_updaterelease.sh.j2
