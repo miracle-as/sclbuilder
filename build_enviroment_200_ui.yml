@@ -1,5 +1,5 @@
 ---
-- hosts: prod_sclbuilder_db
+- hosts: ui
   become: yes
 
   vars_files:
@@ -20,7 +20,7 @@
 
     - name: Install pip requirements
       pip:
-        requirements: "/opt/{{ repositoty }}/requirements.txt"
+        requirements: "/opt/{{ repository }}/requirements.txt"
         virtualenv: "/opt/{{ repository }}/venv"
         virtualenv_command: /usr/bin/python3.6 -m venv
 

@@ -1,5 +1,5 @@
 ---
-- hosts: prod_sclbuilder_db
+- hosts: ui
   become: yes
 
   vars_files:
